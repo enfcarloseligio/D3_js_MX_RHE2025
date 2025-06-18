@@ -1,0 +1,484 @@
+/* ===================================================
+   RECURSOS Y VARIABLES GLOBALES
+=================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
+
+/* Variables de color institucional */
+:root {
+  --color-Gris-Neutro-Urbano: #98989A;
+  --color-Negro-Profundo: #161a1d;
+  --color-Carmesí-Clásico: #9b2247;
+  --color-Guinda-Imperial: #611232;
+  --color-Verde-Pino-Oscuro: #1e5b4f;
+  --color-Verde-Abismo: #002f2a;
+  --color-Marfil-Dorado: #e6d194;
+  --color-Oro-Antiguo: #a57f2c;
+}
+
+/* ===================================================
+   ESTILOS GLOBALES
+=================================================== */
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  font-family: 'Noto Sans', sans-serif;
+  background-color: #ffffff;
+}
+
+h1 {
+  margin-bottom: 10px;
+  color: var(--color-Guinda-Imperial);
+  font-weight: bold;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 10px;
+  color: var(--color-Carmesí-Clásico);
+  font-weight: bold;
+  text-align: center;
+}
+
+#nota {
+  text-align: center;
+  margin-top: 20px;
+  font-style: italic;
+}
+
+/* ===================================================
+   HEADER INSTITUCIONAL (GOBIERNO DE MÉXICO)
+=================================================== */
+.gob-header {
+  width: 100%;
+}
+
+.gob-barra {
+  background-color: var(--color-Guinda-Imperial);
+  padding: 10px 0;
+}
+
+.gob-barra-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.gob-barra img {
+  height: 60px;
+  display: block;
+}
+
+.gob-menu {
+  background-color: var(--color-Oro-Antiguo);
+}
+
+.gob-menu-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.gob-menu ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.gob-menu ul li {
+  padding: 12px 16px;
+}
+
+.gob-menu ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+.gob-menu ul li a:hover {
+  text-decoration: underline;
+}
+
+/* ===================================================
+   MENU INSTITUCIONAL
+=================================================== */
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.menu-principal {
+  background-color: var(--color-Oro-Antiguo);
+}
+
+.menu {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  background-color: var(--color-Oro-Antiguo);
+}
+
+.menu > li {
+  position: relative;
+}
+
+.menu a {
+  display: block;
+  padding: 15px 20px;
+  color: #fff;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  background-color: var(--color-Guinda-Imperial);
+}
+
+/* Submenús */
+.submenu-lista {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--color-Carmesí-Clásico);
+  display: none;
+  list-style: none;
+  min-width: 180px;
+  z-index: 10;
+}
+
+.submenu:hover > .submenu-lista {
+  display: block;
+}
+
+.submenu-lista li {
+  position: relative;
+}
+
+.submenu-lista a {
+  padding: 10px 15px;
+}
+
+/* Segundo nivel de submenús */
+.submenu-lista .submenu .submenu-lista {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  background-color: var(--color-Carmesí-Clásico);
+  min-width: 180px;
+  z-index: 10;
+}
+
+/* Mostrar submenú del segundo nivel al hacer hover */
+.submenu-lista .submenu:hover .submenu-lista {
+  display: block;
+}
+
+/* ===================================================
+   BANNER PRINCIPAL
+=================================================== */
+.banner-principal {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  height: 100%;
+}
+
+.banner-principal img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  object-position: 0 -50px;
+  display: block;
+}
+
+/* ===================================================
+   MAPA Y TOOLTIP
+=================================================== */
+#mapa-nacional {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+#mapa-nacional svg {
+  max-width: 100%;
+  height: auto;
+  background-color: blue;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+/* Tooltip que aparece al pasar el mouse sobre los estados */
+.tooltip {
+  position: absolute;
+  background: #ffffff;
+  color: #333333;
+  border: 1px solid #cccccc;
+  padding: 6px 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  font-size: 13px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ===================================================
+   BOTONES GENERALES
+=================================================== */
+button,
+.button {
+  background-color: var(--color-Verde-Pino-Oscuro);
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Noto Sans', sans-serif;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+button:hover,
+.button:hover {
+  background-color: var(--color-Verde-Abismo);
+}
+
+/* Contenedor de botones (centrado) */
+.descarga-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.btn-acceso {
+  background-color: var(--color-Verde-Pino-Oscuro);
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Noto Sans', sans-serif;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.btn-acceso:hover {
+  background-color: var(--color-Verde-Abismo);
+}
+
+/* ===================================================
+   FOOTER INSTITUCIONAL
+=================================================== */
+.gob-footer {
+  background-color: var(--color-Guinda-Imperial);
+  color: white;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  width: 100%;
+  padding: 40px 0 0;
+  overflow: hidden;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+.footer-logo img {
+  height: 60px;
+  margin-bottom: 20px;
+}
+
+.footer-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  flex-grow: 1;
+}
+
+.footer-col {
+  min-width: 200px;
+}
+
+.footer-col h4 {
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: var(--color-texto-footer);
+}
+
+.footer-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-col ul li {
+  margin-bottom: 8px;
+}
+
+.footer-col ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+.footer-col ul li a:hover {
+  text-decoration: underline;
+}
+
+.social-icons img {
+  height: 24px;
+  margin-right: 10px;
+}
+
+/* Textura decorativa del footer */
+.footer-texture {
+  background-image: url('img/texture-r-2.svg');
+  background-repeat: repeat-x;
+  background-position: top center;
+  background-size: auto 150px;
+  height: 50px;
+  overflow: hidden;
+  margin-top: 20px;
+}
+
+/* ===================================================
+   RESPONSIVE DESIGN
+=================================================== */
+@media screen and (max-width: 768px) {
+  .footer-columns {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-col {
+    width: 100%;
+  }
+
+  .social-icons img {
+    margin-top: 10px;
+  }
+
+  .gob-menu ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .gob-menu ul li {
+    padding: 8px 0;
+  }
+}
+
+/* ===================================================
+   Index
+=================================================== */
+.contenido-principal {
+    max-width: 80%;
+    padding: 20px;
+}
+
+/*Accesos Destacados*/
+
+.accesos-destacados {
+  margin: 40px auto;
+  padding: 0 20px;
+  max-width: 1000px;
+  text-align: center;
+}
+
+.accesos-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.acceso-card {
+  background-color: var(--color-Verde-Pino-Oscuro);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 180px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: transform 0.2s ease, background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.acceso-card:hover {
+  background-color: var(--color-Verde-Abismo);
+  transform: scale(1.05);
+}
+
+/* Indicadores Clave*/
+
+.indicadores-clave {
+  margin: 40px auto;
+  padding: 0 20px;
+  max-width: 1000px;
+  text-align: center;
+}
+
+.titulo-seccion {
+  font-size: 1.5rem;
+  color: var(--color-Guinda-Imperial);
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.indicadores-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.indicador {
+  background-color: var(--color-Carmesí-Clásico);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.indicador:hover {
+  transform: scale(1.05);
+}
+
+.indicador strong {
+  font-size: 1.8rem;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.indicador p {
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.4;
+}

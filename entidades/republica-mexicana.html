@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Descripción para motores de búsqueda -->
+  <meta name="description" content="Visualización interactiva de la distribución de enfermeras por entidad federativa en México 2025.">
+  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería">
+  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025">
+  <title>Distribución Nacional de Enfermeras - Gobierno de México</title>
+  <link rel="stylesheet" href="../styles.css">
+  <!-- Librerías necesarias -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="../scripts/republica-mexicana.js" defer></script>
+  <!-- componentes -->
+  <script src="../scripts/inyectar-layout.js" defer></script>
+</head>
+
+<body>
+
+  <!-- Contenido principal -->
+  <main class="contenido-principal">
+    <h1>Mapa Nacional de Enfermería</h1>
+    <p class="bienvenida">
+      Visualice la distribución de enfermeras por cada mil habitantes en cada entidad federativa del país, con base en datos oficiales actualizados.
+    </p>
+
+    <div id="mapa-nacional"></div>
+
+    <div class="descarga-container">
+      <button id="descargar-png">Descargar PNG</button>
+    </div>
+  </main>
+ 
+</body>
+</html>
+

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Descripción para motores de búsqueda -->
+  <meta name="description" content="Visualización interactiva de la distribución de enfermeras por entidad federativa en México 2025.">
+  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud">
+  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025">
+  <title>Distribución de Enfermeras - Gobierno de México</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Librerías necesarias -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="code.js" defer></script>
+  <!-- componentes -->
+  <script src="../scripts/inyectar-layout.js" defer></script>
+
+</head>
+
+
+<body>
+
+    <!-- Contenido principal -->
+  <main class="contenido-principal">
+    <h1>Bienvenida al Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE)</h1>
+    <p class="bienvenida">
+    La Dirección de Enfermería y la Comisión Permanente de Enfermería Le damos la más cordial bienvenida a este espacio diseñado para brindar información precisa, actualizada y sistematizada sobre los recursos humanos en enfermería en México. Este sitio constituye una herramienta clave para directivos, responsables de políticas públicas, investigadores y líderes del sector salud que requieren consultar datos estratégicos sobre la fuerza laboral en enfermería, su distribución, formación y desempeño institucional.
+    <br><br>
+    A través del SIARHE, se busca fortalecer la toma de decisiones basada en evidencia, promover la planeación efectiva del recurso humano en salud y contribuir al desarrollo de políticas que respondan a las necesidades del sistema nacional de salud.
+    </p>
+    <br>
+    <h2>¿Qué es el SIARHE?</h2>
+    <p class="SIARHE">
+    El Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) es una plataforma oficial de la Secretaría de Salud que integra, organiza y actualiza de forma continua los datos nominales del personal de enfermería en México que labora en instituciones públicas del Sistema Nacional de Salud.
+    <br><br>
+    Su objetivo principal es ofrecer información confiable y desagregada sobre el perfil demográfico, académico, laboral e institucional del recurso humano en enfermería, a fin de apoyar los procesos de planeación, gestión, evaluación y formulación de políticas públicas basadas en evidencia.
+    <br><br>
+    El SIARHE permite consultar estadísticas por entidad federativa, tipo de institución, categoría profesional, nivel de atención, condiciones laborales, entre otros indicadores estratégicos que reflejan la situación actual y las tendencias del personal de enfermería en el país.    </p>
+  </main>
+  <section class="accesos-destacados">
+   <h2 class="titulo-seccion">Accesos destacados</h2>
+    <div class="accesos-grid">
+      <a class="acceso-card" href="entidades/republica-mexicana.html">
+      🗺️<br>Ver mapa nacional
+      </a>
+      <a class="acceso-card" href="#">
+      📊<br>Consultar estadísticas
+      </a>
+      <a class="acceso-card" href="#">
+      📚<br>Ver normativa
+      </a>
+      <a class="acceso-card" href="#">
+      🔐<br>Iniciar sesión
+      </a>
+    </div>
+</section>
+  
+  <!-- Indicadores Clave -->
+<section class="indicadores-clave">
+  <h2 class="titulo-seccion">Indicadores clave</h2>
+  <div class="indicadores-grid">
+    <div class="indicador">
+      <strong>135,418</strong>
+      <p>Enfermeras registradas</p>
+    </div>
+    <div class="indicador">
+      <strong>2.50</strong>
+      <p>Tasa nacional<br>por cada mil habitantes</p>
+    </div>
+    <div class="indicador">
+      <strong>39.6 años</strong>
+      <p>Promedio de edad</p>
+    </div>
+    <div class="indicador">
+      <strong>71%</strong>
+      <p>Con nivel académico</p>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
+
