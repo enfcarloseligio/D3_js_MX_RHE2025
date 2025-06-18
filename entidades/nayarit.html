@@ -22,16 +22,18 @@
 
   <!-- Contenido principal -->
   <main class="contenido-principal">
-    <h1>Mapa de Enfermeras por cada Mil Habitantes en el Estado de Nayarit</h1>
+  <section aria-labelledby="titulo-mapa">
+    <h1 id="titulo-mapa">Mapa de Enfermeras por cada Mil Habitantes en el Estado de Nayarit</h1>
     <p class="bienvenida">
-      Visualice la distribución de enfermeras por cada mil habitantes en los municipios del Estado de Nayarit, con base en datos oficiales actualizados.
+    Visualice la distribución de enfermeras por cada mil habitantes en los municipios del Estado de Nayarit, con base en datos oficiales actualizados.
     </p>
 
     <div id="mapa-nayarit"></div>
 
     <div class="descarga-container">
-      <button id="descargar-png">Descargar PNG</button>
-    </div>
+    <button id="descargar-png" aria-label="Descargar imagen del mapa en formato PNG">Descargar PNG</button>
+  </div>
+</section>
   </main>
  
 </body>
