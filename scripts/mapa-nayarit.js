@@ -11,12 +11,7 @@ const svg = d3.select("#mapa-nayarit")
   .attr("height", height)
   .style("background-color", "#e6f0f8");
 
-const projection = d3.geoMercator()
-  .scale(50)
-  .center([-104.8, 22.5])
-  .translate([width / 2, height / 2]);
-
-const path = d3.geoPath().projection(projection);
+const g = svg.append("g");
 
 const tooltip = d3.select("body").append("div")
   .attr("class", "tooltip")
@@ -33,48 +28,49 @@ const tooltip = d3.select("body").append("div")
 // CARGA DE DATOS Y RENDERIZADO
 // ==============================
 
-let colorScale;
-
 Promise.all([
   d3.json("../data/entidades/mapa-nayarit.json"),
   d3.csv("../data/tasas/tasas-enfermeras-nayarit.csv")
 ]).then(([geoData, tasas]) => {
 
+  // Diccionario con nombres normalizados
   const tasaMap = {};
   tasas.forEach(d => {
-    tasaMap[d.municipio] = {
+    const nombre = d.municipio.trim();
+    tasaMap[nombre] = {
       tasa: +d.tasa,
       poblacion: +d.población,
       enfermeras: +d.enfermeras
     };
   });
 
-  const tasasArray = tasas.map(d => +d.tasa);
-  const minTasa = d3.min(tasasArray);
-  const maxTasa = d3.max(tasasArray);
+  // Escala de color con cortes fijos
+  const colorScale = d3.scaleLinear()
+    .domain([0.76, 1.55, 2.06, 3.45, 5.32]) // Dominios definidos por rangos significativos
+    .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']); // Paleta institucional
 
-  colorScale = d3.scaleLinear()
-    .domain([0.76, 1.56, 2.06, 3.45, 5.32])
-    .range(['#e6d194', '#f7944d', '#d63c4f', '#9b2247', '#004d00']);
+  // Proyección adaptada al tamaño del SVG
+  const projection = d3.geoMercator().fitSize([width, height], geoData);
+  const path = d3.geoPath().projection(projection);
 
-  svg.selectAll("path")
+  g.selectAll("path")
     .data(geoData.features)
     .join("path")
     .attr("d", path)
     .attr("fill", d => {
-      const nombre = d.properties.NOMGEO;
+      const nombre = d.properties.NOMGEO.trim();
       const datos = tasaMap[nombre];
       return datos ? colorScale(datos.tasa) : "#ccc";
     })
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.5)
     .on("mouseover", function (event, d) {
-      const nombre = d.properties.NOMGEO;
+      const nombre = d.properties.NOMGEO.trim();
       const datos = tasaMap[nombre];
       tooltip
         .html(`
           <strong>${nombre}</strong><br>
-          Tasa: ${datos ? datos.tasa.toFixed(2) : "sin datos"}<br>
+          Tasa: ${datos ? datos.tasa.toFixed(2) : "Sin datos"}<br>
           Población: ${datos ? datos.poblacion.toLocaleString() : "—"}<br>
           Enfermeras: ${datos ? datos.enfermeras.toLocaleString() : "—"}
         `)
