@@ -1,0 +1,22 @@
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Entornos de desarrollo
+.vscode/
+.idea/
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Archivos de sistema operativo
+desktop.ini
+
+# Archivos de compilación o cache (si usaras algún bundler en el futuro)
+dist/
+build/
+
+# Otros
+node_modules/
+.env
