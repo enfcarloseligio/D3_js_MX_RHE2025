@@ -52,21 +52,27 @@ h2 {
 =================================================== */
 .gob-header {
   width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--color-Guinda-Imperial);
 }
+
 
 .gob-barra {
   background-color: var(--color-Guinda-Imperial);
-  padding: 10px 0;
+  padding: 5px 0;
 }
 
 .gob-barra-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 10px;
 }
 
 .gob-barra img {
-  height: 60px;
+  height: 50px;
+  width: 150px;
   display: block;
 }
 
@@ -77,7 +83,7 @@ h2 {
 .gob-menu-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 5px;
 }
 
 .gob-menu ul {
@@ -90,14 +96,14 @@ h2 {
 }
 
 .gob-menu ul li {
-  padding: 12px 16px;
+  padding: 5px 5px;
 }
 
 .gob-menu ul li a {
   color: white;
   text-decoration: none;
   font-weight: bold;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .gob-menu ul li a:hover {
@@ -107,6 +113,7 @@ h2 {
 /* ===================================================
    MENU INSTITUCIONAL
 =================================================== */
+
 /* Reset básico */
 * {
   margin: 0;
@@ -120,8 +127,11 @@ body {
 
 .menu-principal {
   background-color: var(--color-Oro-Antiguo);
+  display: flex;
+  justify-content: center;
 }
 
+/* Menú principal */
 .menu {
   list-style: none;
   display: flex;
@@ -136,9 +146,13 @@ body {
 
 .menu a {
   display: block;
-  padding: 15px 20px;
+  height: 40px;
+  line-height: 40px;
+  padding: 0px 15px;
   color: #fff;
   text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: bold;
 }
 
 .menu a:hover {
@@ -155,6 +169,8 @@ body {
   list-style: none;
   min-width: 180px;
   z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
 }
 
 .submenu:hover > .submenu-lista {
@@ -166,7 +182,17 @@ body {
 }
 
 .submenu-lista a {
-  padding: 10px 15px;
+  display: block;
+  min-height: 40px;
+  line-height: 40px;
+  padding: 0 15px;
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.submenu-lista a:hover {
+  background-color: var(--color-Guinda-Imperial);
 }
 
 /* Segundo nivel de submenús */
@@ -178,6 +204,8 @@ body {
   background-color: var(--color-Carmesí-Clásico);
   min-width: 180px;
   z-index: 10;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  border-radius: 2px;
 }
 
 /* Mostrar submenú del segundo nivel al hacer hover */
