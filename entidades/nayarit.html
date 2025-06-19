@@ -19,17 +19,30 @@
 </head>
 
 <body>
-
+  
   <!-- Contenido principal -->
   <main class="contenido-principal">
   <section aria-labelledby="titulo-mapa">
-    <h1 id="titulo-mapa">¿Cuántas Enfermeras Hay en el Estado de Nayarit</h1>
+  <h1>Distribución de Enfermeras por Cada Mil Habitantes en Yucatán 2025</h1>
     <p class="bienvenida">
     Visualice la distribución de enfermeras por cada mil habitantes en los municipios del Estado de Nayarit, con base en datos oficiales actualizados.
     </p>
-
-    <div id="mapa-nayarit"></div>
-
+  <div class="mapas">
+    <div id="mapa-nayarit" class="mapa-wrapper">
+    <!-- Aquí se inyecta el mapa -->
+      <div class="zoom-controles">
+        <button id="zoom-in" class="boton">+</button>
+        <button id="zoom-out" class="boton">–</button>
+        <button id="zoom-reset" class="boton">⟳</button>
+      </div>
+    </div>
+  </div>
+    <p id="nota">
+    <em>
+      Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
+      <br>Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
+    </em>
+  </p>
     <div class="descarga-container">
     <button id="descargar-png" aria-label="Descargar imagen del mapa en formato PNG">Descargar PNG</button>
   </div>

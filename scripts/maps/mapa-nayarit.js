@@ -164,3 +164,35 @@ document.getElementById("descargar-png").addEventListener("click", function () {
 
   image.src = url;
 });
+// ==============================
+// ZOOM INTERACTIVO CON BOTONES
+// ==============================
+
+const zoom = d3.zoom()
+  .scaleExtent([1, 8])
+  .on("zoom", event => {
+    g.attr("transform", event.transform);
+  });
+
+svg.call(zoom);
+
+// Controles manuales
+const zoomStep = 0.5;
+let currentTransform = d3.zoomIdentity;
+
+svg.call(zoom).on("zoom", (event) => {
+  currentTransform = event.transform;
+  g.attr("transform", currentTransform);
+});
+
+document.getElementById("zoom-in").addEventListener("click", () => {
+  svg.transition().call(zoom.scaleBy, 1 + zoomStep);
+});
+
+document.getElementById("zoom-out").addEventListener("click", () => {
+  svg.transition().call(zoom.scaleBy, 1 - zoomStep);
+});
+
+document.getElementById("zoom-reset").addEventListener("click", () => {
+  svg.transition().call(zoom.transform, d3.zoomIdentity);
+});
