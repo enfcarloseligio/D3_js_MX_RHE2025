@@ -1,3 +1,5 @@
+import { crearTooltip, mostrarTooltip, ocultarTooltip } from '../utils/tooltip.js';
+
 // ==============================
 // CONFIGURACIÓN DEL MAPA DE NAYARIT
 // ==============================
@@ -13,16 +15,7 @@ const svg = d3.select("#mapa-nayarit")
 
 const g = svg.append("g");
 
-const tooltip = d3.select("body").append("div")
-  .attr("class", "tooltip")
-  .style("position", "absolute")
-  .style("padding", "10px")
-  .style("background", "white")
-  .style("border", "1px solid #999")
-  .style("border-radius", "5px")
-  .style("pointer-events", "none")
-  .style("display", "none")
-  .style("font-family", "sans-serif");
+const tooltip = crearTooltip();
 
 // ==============================
 // CARGA DE DATOS Y RENDERIZADO
@@ -33,7 +26,6 @@ Promise.all([
   d3.csv("../data/tasas/tasas-enfermeras-nayarit.csv")
 ]).then(([geoData, tasas]) => {
 
-  // Diccionario con nombres normalizados
   const tasaMap = {};
   tasas.forEach(d => {
     const nombre = d.municipio.trim();
@@ -44,12 +36,10 @@ Promise.all([
     };
   });
 
-  // Escala de color con cortes fijos
   const colorScale = d3.scaleLinear()
-    .domain([0.76, 1.55, 2.06, 3.45, 5.32]) // Dominios definidos por rangos significativos
-    .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']); // Paleta institucional
+    .domain([0.76, 1.55, 2.06, 3.45, 5.32])
+    .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']);
 
-  // Proyección adaptada al tamaño del SVG
   const projection = d3.geoMercator().fitSize([width, height], geoData);
   const path = d3.geoPath().projection(projection);
 
@@ -67,28 +57,21 @@ Promise.all([
     .on("mouseover", function (event, d) {
       const nombre = d.properties.NOMGEO.trim();
       const datos = tasaMap[nombre];
-      tooltip
-        .html(`
-          <strong>${nombre}</strong><br>
-          Tasa: ${datos ? datos.tasa.toFixed(2) : "Sin datos"}<br>
-          Población: ${datos ? datos.poblacion.toLocaleString() : "—"}<br>
-          Enfermeras: ${datos ? datos.enfermeras.toLocaleString() : "—"}
-        `)
-        .style("display", "block");
       d3.select(this).attr("stroke-width", 1.5);
+      mostrarTooltip(tooltip, event, nombre, datos);
     })
-    .on("mousemove", event => {
+    .on("mousemove", function (event) {
       tooltip
         .style("left", (event.pageX + 10) + "px")
         .style("top", (event.pageY - 28) + "px");
     })
     .on("mouseout", function () {
-      tooltip.style("display", "none");
+      ocultarTooltip(tooltip);
       d3.select(this).attr("stroke-width", 0.5);
     });
 
   // ==============================
-  // LEYENDA FIJA POR CUARTILES
+  // LEYENDA
   // ==============================
 
   const legendWidth = 20;
@@ -102,11 +85,11 @@ Promise.all([
 
   linearGradient.selectAll("stop")
     .data([
-      { offset: "0%", color: '#e6d194' },
-      { offset: "25%", color: '#f7944d' },
-      { offset: "50%", color: '#d63c4f' },
-      { offset: "75%", color: '#9b2247' },
-      { offset: "100%", color: '#004d00' }
+      { offset: "0%", color: '#9b2247' },
+      { offset: "25%", color: 'orange' },
+      { offset: "50%", color: '#e6d194' },
+      { offset: "75%", color: 'green' },
+      { offset: "100%", color: 'darkgreen' }
     ])
     .enter().append("stop")
     .attr("offset", d => d.offset)
@@ -131,12 +114,22 @@ Promise.all([
     .attr("transform", `translate(${30 + legendWidth}, 0)`)
     .call(legendAxis);
 
+  // ==============================
+  // ZOOM INTERACTIVO
+  // ==============================
+
+  svg.call(d3.zoom()
+    .scaleExtent([1, 8])
+    .on("zoom", event => {
+      g.attr("transform", event.transform);
+    }));
+
 }).catch(error => {
   console.error("Error al cargar datos del mapa de Nayarit:", error);
 });
 
 // ==============================
-// BOTÓN PARA DESCARGAR PNG
+// DESCARGAR COMO PNG
 // ==============================
 
 document.getElementById("descargar-png").addEventListener("click", function () {
