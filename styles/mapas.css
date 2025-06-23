@@ -74,9 +74,26 @@
    TABLAS DE DATOS
 =================================================== */
 
+.tabla-scroll {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.tabla-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+.tabla-scroll::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+.tabla-scroll table {
+  min-width: 600px; /* Ajustable según el número de columnas */
+}
+
 .tabla-datos {
-  width: 90%;
-  margin: 1rem auto;
+  width: 100%;
   border-collapse: collapse;
   font-family: 'Noto Sans', sans-serif;
   table-layout: auto;
@@ -103,20 +120,6 @@
   text-align: right;
 }
 
-/* ENVOLTORIO RESPONSIVO PARA TABLAS */
-.tabla-scroll {
-  width: 100%;
-  overflow-x: auto;
-  margin-bottom: 1rem;
-}
-
-.tabla-scroll::-webkit-scrollbar {
-  height: 8px;
-}
-.tabla-scroll::-webkit-scrollbar-thumb {
-  background-color: #ccc;
-  border-radius: 4px;
-}
 
 /* ===================================================
    PREVENCIÓN DE DESBORDAMIENTO HORIZONTAL
