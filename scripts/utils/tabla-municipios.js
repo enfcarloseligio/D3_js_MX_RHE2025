@@ -11,7 +11,7 @@ export function generarTablaMunicipios(rutaCSV) {
         <th>Municipio</th>
         <th>Enfermeras</th>
         <th>Población</th>
-        <th>Tasa</th>
+        <th>Tasa por cada mil habitantes</th>
       </tr>
     `;
 
@@ -26,11 +26,11 @@ export function generarTablaMunicipios(rutaCSV) {
 
       const celdaEnfermeras = document.createElement("td");
       celdaEnfermeras.className = "numero";
-      celdaEnfermeras.textContent = d.enfermeras;
+      celdaEnfermeras.textContent = Number(d.enfermeras).toLocaleString('es-MX');
 
       const celdaPoblacion = document.createElement("td");
       celdaPoblacion.className = "numero";
-      celdaPoblacion.textContent = d.población;
+      celdaPoblacion.textContent = Number(d.población).toLocaleString('es-MX');
 
       const celdaTasa = document.createElement("td");
       celdaTasa.className = "numero";
@@ -51,3 +51,11 @@ export function generarTablaMunicipios(rutaCSV) {
     console.error("Error al cargar la tabla de municipios:", error);
   });
 }
+
+document.getElementById("descargar-excel").addEventListener("click", () => {
+  const tabla = document.querySelector("#tabla-contenido table");
+  if (!tabla) return;
+
+  const wb = XLSX.utils.table_to_book(tabla, { sheet: "Resumen Municipal" });
+  XLSX.writeFile(wb, "tasas-enfermeras-municipios.xlsx");
+});
