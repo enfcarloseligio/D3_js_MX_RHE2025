@@ -103,7 +103,14 @@
 .tabla-datos td {
   padding: 10px;
   border: 1px solid #ddd;
-  white-space: nowrap;
+}
+
+/* Encabezados en varias líneas y responsivos */
+.tabla-datos th {
+  white-space: normal;
+  word-wrap: break-word;
+  text-align: center;
+  font-size: 14px;
 }
 
 .tabla-datos thead {
@@ -120,6 +127,21 @@
   text-align: right;
 }
 
+/* ===================================================
+   OPTIMIZACIÓN PARA MÓVILES
+=================================================== */
+
+@media screen and (max-width: 480px) {
+  .tabla-datos th,
+  .tabla-datos td {
+    padding: 6px 4px;
+    font-size: 13px;
+  }
+
+  .tabla-scroll table {
+    min-width: unset; /* Permite adaptar mejor en pantallas pequeñas */
+  }
+}
 
 /* ===================================================
    PREVENCIÓN DE DESBORDAMIENTO HORIZONTAL
