@@ -19,7 +19,7 @@ import {
 // ==============================
 
 // Se inserta un SVG dentro del contenedor con id #mapa-nayarit
-const { svg, g } = crearSVGBase("#mapa-nayarit");
+const { svg, g } = crearSVGBase("#mapa-nayarit", "Mapa de distribución de enfermeras en el Estado de Nayarit");
 
 // Crea un tooltip flotante reutilizable
 const tooltip = crearTooltip();

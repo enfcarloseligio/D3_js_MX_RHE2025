@@ -11,13 +11,15 @@ export const MAP_BACKGROUND = "#e6f0f8";
  * @param {string} selector - Selector del contenedor donde se inyectará el SVG.
  * @returns {object} - Objeto con referencias a { svg, g }
  */
-export function crearSVGBase(selector) {
+export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribución por entidad federativa") {
   const svg = d3.select(selector)
     .append("svg")
     .attr("width", MAP_WIDTH)
     .attr("height", MAP_HEIGHT)
     .attr("preserveAspectRatio", "xMidYMid meet")
     .attr("viewBox", `0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`)
+    .attr("role", "img")
+    .attr("aria-label", ariaLabel)
     .style("background-color", MAP_BACKGROUND);
 
   const g = svg.append("g");
