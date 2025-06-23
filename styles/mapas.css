@@ -89,7 +89,7 @@
 }
 
 .tabla-scroll table {
-  min-width: 600px; /* Ajustable según el número de columnas */
+  min-width: 300px; /* Ajustable según el número de columnas */
 }
 
 .tabla-datos {
@@ -99,9 +99,14 @@
   table-layout: auto;
 }
 
-.tabla-datos th,
-.tabla-datos td {
+.tabla-datos th {
   padding: 10px;
+  border: 1px solid #ddd;
+  font-weight: bold;
+}
+
+.tabla-datos td {
+  padding: 5px;
   border: 1px solid #ddd;
 }
 
@@ -110,7 +115,6 @@
   white-space: normal;
   word-wrap: break-word;
   text-align: center;
-  font-size: 14px;
 }
 
 .tabla-datos thead {
