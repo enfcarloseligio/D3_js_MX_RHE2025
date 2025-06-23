@@ -8,10 +8,10 @@ export function generarTablaMunicipios(rutaCSV) {
     const thead = document.createElement("thead");
     thead.innerHTML = `
       <tr>
-        <th>Municipio</th>
-        <th>Enfermeras</th>
-        <th>Población</th>
-        <th>Tasa por cada mil habitantes</th>
+        <th><span class="flecha-orden"></span>Municipio</th>
+        <th><span class="flecha-orden"></span>Enfermeras</th>
+        <th><span class="flecha-orden"></span>Población</th>
+        <th><span class="flecha-orden"></span>Tasa por cada mil habitantes</th>
       </tr>
     `;
 
@@ -53,7 +53,6 @@ export function generarTablaMunicipios(rutaCSV) {
 
     contenedor.appendChild(envoltorio);
 
-    // Activar ordenamiento
     activarOrdenamientoTabla(tabla);
   }).catch(error => {
     console.error("Error al cargar la tabla de municipios:", error);
@@ -72,6 +71,15 @@ function activarOrdenamientoTabla(tabla) {
 
     th.addEventListener("click", () => {
       const ordenActual = th.getAttribute("data-orden");
+      const nuevoOrden = ordenActual === "asc" ? "desc" : "asc";
+
+      // Limpiar todas las flechas
+      tabla.querySelectorAll(".flecha-orden").forEach(span => span.textContent = "");
+
+      // Asignar nueva flecha a este th
+      const flecha = th.querySelector(".flecha-orden");
+      if (flecha) flecha.textContent = nuevoOrden === "asc" ? "🔼" : "🔽";
+
       const filas = Array.from(tabla.querySelectorAll("tbody tr"));
 
       filas.sort((a, b) => {
@@ -81,15 +89,15 @@ function activarOrdenamientoTabla(tabla) {
         const valorA = isNaN(celdaA) ? celdaA.toLowerCase() : parseFloat(celdaA);
         const valorB = isNaN(celdaB) ? celdaB.toLowerCase() : parseFloat(celdaB);
 
-        if (valorA < valorB) return ordenActual === "asc" ? -1 : 1;
-        if (valorA > valorB) return ordenActual === "asc" ? 1 : -1;
+        if (valorA < valorB) return nuevoOrden === "asc" ? -1 : 1;
+        if (valorA > valorB) return nuevoOrden === "asc" ? 1 : -1;
         return 0;
       });
 
       const tbody = tabla.querySelector("tbody");
       filas.forEach(fila => tbody.appendChild(fila));
 
-      th.setAttribute("data-orden", ordenActual === "asc" ? "desc" : "asc");
+      th.setAttribute("data-orden", nuevoOrden);
     });
   });
 }
