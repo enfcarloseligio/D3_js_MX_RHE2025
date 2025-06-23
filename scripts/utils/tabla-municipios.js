@@ -78,7 +78,7 @@ function activarOrdenamientoTabla(tabla) {
 
       // Asignar nueva flecha a este th
       const flecha = th.querySelector(".flecha-orden");
-      if (flecha) flecha.textContent = nuevoOrden === "asc" ? "🔼" : "🔽";
+      if (flecha) flecha.textContent = nuevoOrden === "asc" ? "▲" : "▼";
 
       const filas = Array.from(tabla.querySelectorAll("tbody tr"));
 
