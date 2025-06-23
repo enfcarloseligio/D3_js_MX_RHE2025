@@ -79,12 +79,14 @@
   margin: 1rem auto;
   border-collapse: collapse;
   font-family: 'Noto Sans', sans-serif;
+  table-layout: auto;
 }
 
 .tabla-datos th,
 .tabla-datos td {
   padding: 10px;
   border: 1px solid #ddd;
+  white-space: nowrap;
 }
 
 .tabla-datos thead {
@@ -99,4 +101,32 @@
 
 .tabla-datos td.numero {
   text-align: right;
+}
+
+/* ENVOLTORIO RESPONSIVO PARA TABLAS */
+.tabla-scroll {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.tabla-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+.tabla-scroll::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 4px;
+}
+
+/* ===================================================
+   PREVENCIÓN DE DESBORDAMIENTO HORIZONTAL
+=================================================== */
+
+body {
+  overflow-x: hidden;
+}
+
+main {
+  max-width: 100%;
+  overflow-x: hidden;
 }

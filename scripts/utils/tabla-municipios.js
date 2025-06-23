@@ -46,16 +46,14 @@ export function generarTablaMunicipios(rutaCSV) {
 
     tabla.appendChild(thead);
     tabla.appendChild(tbody);
-    contenedor.appendChild(tabla);
+
+    // ENVOLTORIO SCROLLABLE
+    const envoltorio = document.createElement("div");
+    envoltorio.className = "tabla-scroll";
+    envoltorio.appendChild(tabla);
+
+    contenedor.appendChild(envoltorio);
   }).catch(error => {
     console.error("Error al cargar la tabla de municipios:", error);
   });
 }
-
-document.getElementById("descargar-excel").addEventListener("click", () => {
-  const tabla = document.querySelector("#tabla-contenido table");
-  if (!tabla) return;
-
-  const wb = XLSX.utils.table_to_book(tabla, { sheet: "Resumen Municipal" });
-  XLSX.writeFile(wb, "tasas-enfermeras-municipios.xlsx");
-});
