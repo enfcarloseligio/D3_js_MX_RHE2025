@@ -9,12 +9,10 @@ import {
   MAP_WIDTH,
   MAP_HEIGHT,
   crearLeyenda,
-  activarZoomConBotones,
   descargarComoPNG,
   crearEtiquetaMunicipio,
-  agregarBotonCasa
+  inyectarControlesBasicos
 } from '../utils/config-mapa.js';
-
 
 // ==============================
 // CREACIÓN DEL SVG Y TOOLTIP
@@ -22,7 +20,6 @@ import {
 
 const { svg, g } = crearSVGBase("#mapa-nayarit", "Mapa de distribución de enfermeras en el Estado de Nayarit");
 const tooltip = crearTooltip();
-
 
 // ==============================
 // CARGA DE DATOS Y DIBUJO DEL MAPA
@@ -33,7 +30,6 @@ Promise.all([
   d3.csv("../data/tasas/tasas-enfermeras-nayarit.csv")
 ]).then(([geoData, tasas]) => {
 
-  // Diccionario con datos por municipio
   const tasaMap = {};
   tasas.forEach(d => {
     const nombre = d.municipio.trim();
@@ -44,7 +40,6 @@ Promise.all([
     };
   });
 
-  // Escala de colores
   const colorScale = d3.scaleLinear()
     .domain([0.76, 1.55, 2.06, 3.45, 5.32])
     .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']);
@@ -52,7 +47,6 @@ Promise.all([
   const projection = d3.geoMercator().fitSize([MAP_WIDTH, MAP_HEIGHT], geoData);
   const path = d3.geoPath().projection(projection);
 
-  // Dibuja municipios
   g.selectAll("path")
     .data(geoData.features)
     .join("path")
@@ -107,21 +101,14 @@ Promise.all([
   });
 
   // ==============================
-  // ZOOM Y BOTÓN CASA
+  // CONTROLES (Zoom + Casa)
   // ==============================
 
-  activarZoomConBotones(svg, g, {
-    selectorZoomIn: "#zoom-in",
-    selectorZoomOut: "#zoom-out",
-    selectorZoomReset: "#zoom-reset"
-  });
-
-  agregarBotonCasa(); // 🏠 Volver al mapa nacional
+  inyectarControlesBasicos(svg, g, "../entidades/republica-mexicana.html");
 
 }).catch(error => {
   console.error("Error al cargar datos del mapa de Nayarit:", error);
 });
-
 
 // ==============================
 // DESCARGA DE IMÁGENES PNG
@@ -144,4 +131,42 @@ document.getElementById("descargar-con-etiquetas").addEventListener("click", () 
     descargarComoPNG("#mapa-nayarit svg", "mapa-enfermeras-nayarit-con-nombres.png", MAP_WIDTH, MAP_HEIGHT);
     if (etiquetas) etiquetas.style.display = "none";
   }, 100);
+});
+// ==============================
+// CARGA DE TABLA DE DATOS
+// ==============================
+
+d3.csv("../data/tasas/tasas-enfermeras-nayarit.csv").then(data => {
+  const contenedor = document.getElementById("tabla-contenido");
+
+  if (!contenedor) return;
+
+  const tabla = document.createElement("table");
+  tabla.classList.add("tabla-datos");
+
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th>Municipio</th>
+      <th>Población</th>
+      <th>Enfermeras</th>
+      <th>Tasa</th>
+    </tr>
+  `;
+  tabla.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+data.forEach(d => {
+  const row = document.createElement("tr");
+  row.innerHTML = `
+    <td class="municipio">${d.municipio}</td>
+    <td class="numero">${(+d.población).toLocaleString('es-MX')}</td>
+    <td class="numero">${(+d.enfermeras).toLocaleString('es-MX')}</td>
+    <td class="numero">${parseFloat(d.tasa).toFixed(2)}</td>
+  `;
+  tabla.appendChild(row);
+});
+
+  tabla.appendChild(tbody);
+  contenedor.appendChild(tabla);
 });

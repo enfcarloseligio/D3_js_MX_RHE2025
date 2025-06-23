@@ -8,8 +8,6 @@ export const MAP_BACKGROUND = "#e6f0f8";
 
 /**
  * Crea un SVG base con un grupo <g> dentro de un contenedor.
- * @param {string} selector - Selector del contenedor donde se inyectará el SVG.
- * @returns {object} - Objeto con referencias a { svg, g }
  */
 export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribución por entidad federativa") {
   const svg = d3.select(selector)
@@ -29,8 +27,6 @@ export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribu
 
 /**
  * Crea una leyenda de colores gradiente para mapas.
- * @param {object} svg - Elemento SVG donde se añadirá la leyenda.
- * @param {object} opciones - Configuración de la leyenda.
  */
 export function crearLeyenda(svg, {
   dominio,
@@ -77,10 +73,75 @@ export function crearLeyenda(svg, {
 }
 
 /**
+ * Crea una etiqueta de texto para un municipio o entidad en el mapa.
+ */
+export function crearEtiquetaMunicipio(grupo, nombre, x, y, opciones = {}) {
+  const {
+    fontSize = "10px",
+    fill = "#000",
+    fontFamily = "'Noto Sans', sans-serif",
+    className = ""
+  } = opciones;
+
+  grupo.append("text")
+    .attr("x", x)
+    .attr("y", y)
+    .text(nombre)
+    .attr("font-size", fontSize)
+    .attr("fill", fill)
+    .attr("text-anchor", "middle")
+    .attr("pointer-events", "none")
+    .attr("class", className)
+    .style("font-family", fontFamily);
+}
+
+/**
+ * Inyecta botones de zoom y botón de casa automáticamente.
+ */
+export function inyectarControlesBasicos(svg, g, urlCasa = "../entidades/republica-mexicana.html") {
+  let contenedor = document.querySelector(".zoom-controles");
+
+  if (!contenedor) {
+    contenedor = document.createElement("div");
+    contenedor.className = "zoom-controles";
+    document.body.appendChild(contenedor);
+  }
+
+  const botones = [
+    { id: "zoom-in", label: "+", title: "Acercar" },
+    { id: "zoom-out", label: "–", title: "Alejar" },
+    { id: "zoom-reset", label: "⟳", title: "Restablecer" },
+    { id: "zoom-home", label: "🏠", title: "Volver al mapa nacional" }
+  ];
+
+  botones.forEach(({ id, label, title }) => {
+    let btn = document.getElementById(id);
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.id = id;
+      btn.innerText = label;
+      btn.className = "boton";
+      btn.title = title;
+      btn.setAttribute("aria-label", title);
+      contenedor.appendChild(btn);
+    }
+  });
+
+  // Activar funcionalidad de zoom
+  activarZoomConBotones(svg, g, {
+    selectorZoomIn: "#zoom-in",
+    selectorZoomOut: "#zoom-out",
+    selectorZoomReset: "#zoom-reset"
+  });
+
+  // Funcionalidad del botón de casa
+  document.getElementById("zoom-home").addEventListener("click", () => {
+    window.location.href = urlCasa;
+  });
+}
+
+/**
  * Habilita controles de zoom con botones personalizados.
- * @param {object} svg - Elemento SVG.
- * @param {object} g - Grupo <g> transformable.
- * @param {object} config - Selectores y opciones.
  */
 export function activarZoomConBotones(svg, g, {
   selectorZoomIn = "#zoom-in",
@@ -116,10 +177,6 @@ export function activarZoomConBotones(svg, g, {
 
 /**
  * Descarga el SVG como imagen PNG.
- * @param {string} svgSelector - Selector CSS del SVG.
- * @param {string} nombreArchivo - Nombre del archivo a descargar.
- * @param {number} width - Ancho del canvas.
- * @param {number} height - Alto del canvas.
  */
 export function descargarComoPNG(svgSelector, nombreArchivo = "mapa.png", width = MAP_WIDTH, height = MAP_HEIGHT) {
   const svgElement = document.querySelector(svgSelector);
@@ -149,54 +206,4 @@ export function descargarComoPNG(svgSelector, nombreArchivo = "mapa.png", width 
   };
 
   image.src = url;
-}
-
-/**
- * Crea una etiqueta de texto para un municipio o entidad en el mapa.
- * @param {object} grupo - Grupo SVG <g> donde se añadirá la etiqueta.
- * @param {string} nombre - Nombre del municipio o entidad.
- * @param {number} x - Coordenada X del centroide.
- * @param {number} y - Coordenada Y del centroide.
- * @param {object} opciones - Opciones opcionales (tamaño, color, clase).
- */
-export function crearEtiquetaMunicipio(grupo, nombre, x, y, opciones = {}) {
-  const {
-    fontSize = "10px",
-    fill = "#000",
-    fontFamily = "'Noto Sans', sans-serif",
-    className = ""
-  } = opciones;
-
-  grupo.append("text")
-    .attr("x", x)
-    .attr("y", y)
-    .text(nombre)
-    .attr("font-size", fontSize)
-    .attr("fill", fill)
-    .attr("text-anchor", "middle")
-    .attr("pointer-events", "none")
-    .attr("class", className)
-    .style("font-family", fontFamily);
-}
-
-/**
- * Agrega un botón de "Volver al mapa nacional" dentro del contenedor de zoom.
- * @param {string} selectorContenedor - Selector del contenedor de botones (por defecto .zoom-controles).
- * @param {string} urlDestino - Ruta al mapa nacional.
- */
-export function agregarBotonCasa(selectorContenedor = ".zoom-controles", urlDestino = "../entidades/republica-mexicana.html") {
-  const contenedor = document.querySelector(selectorContenedor);
-  if (!contenedor) return;
-
-  const botonCasa = document.createElement("button");
-  botonCasa.innerText = "🏠";
-  botonCasa.className = "boton";
-  botonCasa.title = "Volver al mapa nacional";
-  botonCasa.setAttribute("aria-label", "Volver al mapa nacional");
-
-  botonCasa.addEventListener("click", () => {
-    window.location.href = urlDestino;
-  });
-
-  contenedor.appendChild(botonCasa);
 }

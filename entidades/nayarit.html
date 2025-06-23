@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de Nayarit 2025.">
-  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería">
-  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de Nayarit 2025." />
+  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería" />
+  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025" />
   <title>Distribución de Enfermeras en el Estado de Nayarit - Gobierno de México</title>
 
-  <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="../styles/mapas.css">
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../styles/mapas.css" />
 
   <!-- Librerías necesarias -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -30,16 +30,12 @@
         Visualice la distribución de enfermeras por cada mil habitantes en los municipios del Estado de Nayarit, con base en datos oficiales actualizados.
       </p>
 
-      <!-- Contenedor del mapa -->
+      <!-- Contenedor del mapa + controles -->
       <div id="mapa-nayarit" class="mapa-wrapper">
-  <!-- Aquí se inyecta el mapa SVG dinámicamente -->
+        <!-- Aquí se inyecta el mapa SVG dinámicamente -->
 
-  <!-- Botones de zoom dentro del contenedor -->
-      <div class="zoom-controles">
-        <button id="zoom-in" class="boton" aria-label="Acercar">+</button>
-        <button id="zoom-out" class="boton" aria-label="Alejar">–</button>
-        <button id="zoom-reset" class="boton" aria-label="Reiniciar zoom">⟳</button>
-      </div>
+        <!-- Botones de zoom y botón 🏠 -->
+        <div class="zoom-controles"></div>
       </div>
 
       <!-- Nota explicativa -->
@@ -50,11 +46,18 @@
         </em>
       </p>
 
-      <!-- Botón de descarga -->
+      <!-- Botones de descarga debajo de la nota -->
       <div class="descarga-container">
-       <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
-       <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
-     </div>
+        <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
+        <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
+      </div>
+    </section>
+
+    <section class="tabla-nayarit">
+      <h2>Resumen Municipal</h2>
+      <div id="tabla-contenido">
+        <!-- Tabla cargada dinámicamente con JS -->
+      </div>
     </section>
   </main>
 </body>

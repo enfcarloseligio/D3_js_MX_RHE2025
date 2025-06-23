@@ -69,3 +69,34 @@
     border-radius: 6px;
   }
 }
+
+/* ===================================================
+   TABLAS DE DATOS
+=================================================== */
+
+.tabla-datos {
+  width: 90%;
+  margin: 1rem auto;
+  border-collapse: collapse;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.tabla-datos th,
+.tabla-datos td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}
+
+.tabla-datos thead {
+  background-color: #002f2a;
+  color: white;
+}
+
+.tabla-datos td.municipio {
+  text-align: left;
+  font-weight: 500;
+}
+
+.tabla-datos td.numero {
+  text-align: right;
+}
