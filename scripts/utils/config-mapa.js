@@ -150,3 +150,31 @@ export function descargarComoPNG(svgSelector, nombreArchivo = "mapa.png", width 
 
   image.src = url;
 }
+
+/**
+ * Crea una etiqueta de texto para un municipio o entidad en el mapa.
+ * @param {object} grupo - Grupo SVG <g> donde se añadirá la etiqueta.
+ * @param {string} nombre - Nombre del municipio o entidad.
+ * @param {number} x - Coordenada X del centroide.
+ * @param {number} y - Coordenada Y del centroide.
+ * @param {object} opciones - Opciones opcionales (tamaño, color, clase).
+ */
+export function crearEtiquetaMunicipio(grupo, nombre, x, y, opciones = {}) {
+  const {
+    fontSize = "10px",
+    fill = "#000",
+    fontFamily = "'Noto Sans', sans-serif",
+    className = ""
+  } = opciones;
+
+  grupo.append("text")
+    .attr("x", x)
+    .attr("y", y)
+    .text(nombre)
+    .attr("font-size", fontSize)
+    .attr("fill", fill)
+    .attr("text-anchor", "middle")
+    .attr("pointer-events", "none")
+    .attr("class", className)
+    .style("font-family", fontFamily);
+}

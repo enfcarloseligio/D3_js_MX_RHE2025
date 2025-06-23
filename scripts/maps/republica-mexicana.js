@@ -10,7 +10,8 @@ import {
   MAP_HEIGHT,
   crearLeyenda,
   activarZoomConBotones,
-  descargarComoPNG
+  descargarComoPNG,
+  crearEtiquetaMunicipio
 } from '../utils/config-mapa.js';
 
 
@@ -18,10 +19,7 @@ import {
 // CREACIÓN DEL SVG Y TOOLTIP
 // ==============================
 
-// Se crea el SVG con su grupo interno <g>, accesible por screen readers
 const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución nacional de enfermeras");
-
-// Se genera el tooltip flotante reutilizable
 const tooltip = crearTooltip();
 
 
@@ -30,11 +28,10 @@ const tooltip = crearTooltip();
 // ==============================
 
 Promise.all([
-  d3.json("../data/entidades-mx.json"),           // GeoJSON nacional
-  d3.csv("../data/tasas-enfermeras-mx.csv")       // CSV nacional
+  d3.json("../data/entidades-mx.json"),
+  d3.csv("../data/tasas-enfermeras-mx.csv")
 ]).then(([geoData, tasas]) => {
 
-  // Se construye un diccionario con los datos del CSV
   const tasaMap = {};
   tasas.forEach(d => {
     const estado = d.estado.trim();
@@ -45,12 +42,10 @@ Promise.all([
     };
   });
 
-  // Escala de colores para las tasas nacionales
   const colorScale = d3.scaleLinear()
     .domain([2.01, 2.39, 2.78, 3.30, 5.89])
     .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']);
 
-  // Configuración de proyección centrada en México
   const projection = d3.geoMercator()
     .scale(1500)
     .center([-102, 24])
@@ -58,7 +53,6 @@ Promise.all([
 
   const path = d3.geoPath().projection(projection);
 
-  // Dibuja las entidades federativas
   g.selectAll("path")
     .data(geoData.features)
     .join("path")
@@ -74,7 +68,7 @@ Promise.all([
       const nombre = d.properties.NOMBRE.trim();
       const datos = tasaMap[nombre];
       d3.select(this).attr("stroke-width", 1.5);
-      mostrarTooltip(tooltip, event, nombre, datos); // Muestra tooltip
+      mostrarTooltip(tooltip, event, nombre, datos);
     })
     .on("mousemove", event => {
       tooltip
@@ -82,9 +76,30 @@ Promise.all([
         .style("top", (event.pageY - 28) + "px");
     })
     .on("mouseout", function () {
-      ocultarTooltip(tooltip); // Oculta tooltip
+      ocultarTooltip(tooltip);
       d3.select(this).attr("stroke-width", 0.5);
     });
+
+// ==============================
+// ETIQUETAS DE ESTADOS (únicas)
+// ==============================
+
+const labelsGroup = g.append("g")
+  .attr("id", "etiquetas-municipios")
+  .style("display", "none");
+
+const nombresUnicos = new Set();
+
+geoData.features.forEach(d => {
+  const nombre = d.properties.NOMBRE.trim();
+  if (nombresUnicos.has(nombre)) return;
+
+  const [x, y] = path.centroid(d);
+  crearEtiquetaMunicipio(labelsGroup, nombre, x, y, {
+    fontSize: "6px" 
+  });
+  nombresUnicos.add(nombre);
+});
 
   // ==============================
   // LEYENDA GRADIENTE
@@ -112,9 +127,24 @@ Promise.all([
 
 
 // ==============================
-// DESCARGAR COMO PNG
+// DESCARGA DE IMÁGENES PNG (dos versiones)
 // ==============================
 
-document.getElementById("descargar-png").addEventListener("click", () => {
-  descargarComoPNG("#mapa-nacional svg", "mapa-enfermeras-mexico.png", MAP_WIDTH, MAP_HEIGHT);
+document.getElementById("descargar-sin-etiquetas").addEventListener("click", () => {
+  const etiquetas = document.getElementById("etiquetas-municipios");
+  if (etiquetas) etiquetas.style.display = "none";
+
+  setTimeout(() => {
+    descargarComoPNG("#mapa-nacional svg", "mapa-enfermeras-mexico-sin-nombres.png", MAP_WIDTH, MAP_HEIGHT);
+  }, 100);
+});
+
+document.getElementById("descargar-con-etiquetas").addEventListener("click", () => {
+  const etiquetas = document.getElementById("etiquetas-municipios");
+  if (etiquetas) etiquetas.style.display = "block";
+
+  setTimeout(() => {
+    descargarComoPNG("#mapa-nacional svg", "mapa-enfermeras-mexico-con-nombres.png", MAP_WIDTH, MAP_HEIGHT);
+    if (etiquetas) etiquetas.style.display = "none";
+  }, 100);
 });

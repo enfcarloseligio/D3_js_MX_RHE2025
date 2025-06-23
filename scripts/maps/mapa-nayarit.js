@@ -10,7 +10,8 @@ import {
   MAP_HEIGHT,             // Alto del SVG estándar
   crearLeyenda,           // Genera una leyenda visual
   activarZoomConBotones,  // Activa botones de zoom personalizados
-  descargarComoPNG        // Convierte el SVG en imagen PNG descargable
+  descargarComoPNG,       // Convierte el SVG en imagen PNG descargable
+  crearEtiquetaMunicipio  // Crea una etiqueta de municipio con tipografía Noto Sans
 } from '../utils/config-mapa.js';
 
 
@@ -82,6 +83,21 @@ Promise.all([
       d3.select(this).attr("stroke-width", 0.5);
     });
 
+// ==============================
+// ETIQUETAS DE MUNICIPIOS (inicialmente ocultas)
+// ==============================
+
+const labelsGroup = g.append("g")
+  .attr("id", "etiquetas-municipios")
+  .style("display", "none");
+
+geoData.features.forEach(d => {
+  const nombre = d.properties.NOMGEO.trim();
+  const [x, y] = path.centroid(d);
+  crearEtiquetaMunicipio(labelsGroup, nombre, x, y, {
+    fontSize: "11px"
+  });
+});
   // ==============================
   // LEYENDA GRADIENTE
   // ==============================
@@ -108,9 +124,24 @@ Promise.all([
 
 
 // ==============================
-// DESCARGAR COMO PNG
+// DESCARGA DE IMÁGENES PNG (dos versiones)
 // ==============================
 
-document.getElementById("descargar-png").addEventListener("click", () => {
-  descargarComoPNG("#mapa-nayarit svg", "mapa-enfermeras-nayarit.png", MAP_WIDTH, MAP_HEIGHT);
+document.getElementById("descargar-sin-etiquetas").addEventListener("click", () => {
+  const etiquetas = document.getElementById("etiquetas-municipios");
+  if (etiquetas) etiquetas.style.display = "none";
+
+  setTimeout(() => {
+    descargarComoPNG("#mapa-nayarit svg", "mapa-enfermeras-nayarit-sin-nombres.png", MAP_WIDTH, MAP_HEIGHT);
+  }, 100);
+});
+
+document.getElementById("descargar-con-etiquetas").addEventListener("click", () => {
+  const etiquetas = document.getElementById("etiquetas-municipios");
+  if (etiquetas) etiquetas.style.display = "block";
+
+  setTimeout(() => {
+    descargarComoPNG("#mapa-nayarit svg", "mapa-enfermeras-nayarit-con-nombres.png", MAP_WIDTH, MAP_HEIGHT);
+    if (etiquetas) etiquetas.style.display = "none";
+  }, 100);
 });
