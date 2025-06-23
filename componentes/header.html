@@ -1,13 +1,24 @@
-  <!-- Header institucional -->
-  <header class="gob-header">
-    <!-- Franja vino: Logo -->
-    <div class="gob-barra">
-      <div class="gob-barra-container">
-        <img src="https://framework-gb.cdn.gob.mx/landing/img/logoheader.svg" alt="Gobierno de México">
-      </div>
+<!-- Header institucional -->
+<header class="gob-header">
+  <!-- Franja vino: Logo -->
+  <div class="gob-barra">
+    <div class="gob-barra-container">
+      <img src="https://framework-gb.cdn.gob.mx/landing/img/logoheader.svg" alt="Gobierno de México">
     </div>
-    <!-- Franja dorada: Menú -->
-   <nav class="menu-principal">
+  </div>
+
+  <!-- Franja dorada: Menú -->
+  <nav class="menu-principal">
+    <input type="checkbox" id="menu-toggle" class="menu-toggle">
+    
+    <!-- Ícono hamburguesa -->
+    <label for="menu-toggle" class="menu-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </label>
+
+    <!-- Menú -->
     <ul class="menu">
       <li><a href="../index.html">Inicio</a></li>
 
@@ -21,23 +32,23 @@
 
       <li><a href="#">Normas</a></li>
 
-      <li class="submenu">
-        <a href="#">Estadísticas</a>
-        <ul class="submenu-lista">
-          <li class="submenu">
-            <a href="#">Mapa</a>
-            <ul class="submenu-lista">
-              <li><a href="../entidades/republica-mexicana.html">República</a></li>
-              <li><a href="../entidades/nayarit.html">Nayarit</a></li>
-            </ul>
-          </li>
-        </ul>
-      </li>
+    <li class="submenu">
+      <a href="#">Estadísticas</a>
+      <ul class="submenu-lista">
+        <li class="submenu">
+          <a href="#">Mapa</a>
+          <ul class="submenu-lista">
+            <li><a href="../entidades/republica-mexicana.html">República</a></li>
+            <li><a href="../entidades/nayarit.html">Nayarit</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+
 
       <li><a href="#">Acceso</a></li>
       <li><a href="#">Contáctanos</a></li>
       <li><a href="#">Ayuda</a></li>
     </ul>
   </nav>
-  
-  </header>
+</header>

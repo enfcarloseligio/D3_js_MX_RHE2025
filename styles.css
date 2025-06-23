@@ -208,10 +208,38 @@ body {
   font-family: 'Noto Sans', sans-serif;
 }
 
+/* Contenedor del menú */
 .menu-principal {
   background-color: var(--color-Oro-Antiguo);
   display: flex;
   justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+/* Ícono del menú hamburguesa (oculto en desktop) */
+.menu-toggle {
+  display: none;
+}
+
+.menu-icon {
+  display: none;
+  flex-direction: column;
+  cursor: pointer;
+  padding: 10px;
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  z-index: 200;
+}
+
+.menu-icon span {
+  height: 3px;
+  width: 25px;
+  background-color: white;
+  margin: 4px 0;
+  display: block;
+  transition: 0.3s;
 }
 
 /* Menú principal */
@@ -278,7 +306,11 @@ body {
   background-color: var(--color-Guinda-Imperial);
 }
 
-/* Segundo nivel de submenús */
+/* Segundo nivel de submenús (PC) */
+.submenu-lista .submenu {
+  position: relative;
+}
+
 .submenu-lista .submenu .submenu-lista {
   display: none;
   position: absolute;
@@ -291,9 +323,94 @@ body {
   border-radius: 2px;
 }
 
-/* Mostrar submenú del segundo nivel al hacer hover */
 .submenu-lista .submenu:hover .submenu-lista {
   display: block;
+}
+
+/* ===================================================
+   RESPONSIVE MENU (HAMBURGUESA)
+=================================================== */
+
+@media screen and (max-width: 768px) {
+  .menu-principal {
+    justify-content: flex-end;
+    flex-direction: column;
+    align-items: flex-end;
+    min-height: 45px;
+    padding: 0 10px;
+    background-color: var(--color-Oro-Antiguo);
+    position: relative;
+    z-index: 100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .menu-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    right: 10px;
+    height: 45px;
+    width: 45px;
+    padding: 0;
+    z-index: 200;
+  }
+
+  .menu {
+    display: none;
+    flex-direction: column;
+    background-color: var(--color-Oro-Antiguo);
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    padding: 0;
+    margin: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .menu-toggle:checked + .menu-icon + .menu {
+    display: flex;
+  }
+
+  .menu li {
+    text-align: center;
+    padding: 0;
+  }
+
+  .menu a,
+  .submenu-lista a {
+    height: 45px;
+    line-height: 45px;
+    font-size: 0.9rem;
+    padding: 0 15px;
+  }
+
+  .submenu-lista {
+    position: relative;
+    background-color: var(--color-Oro-Antiguo);
+    box-shadow: none;
+  }
+
+  .submenu-lista .submenu .submenu-lista {
+    position: relative;
+    top: auto;
+    left: auto;
+    background-color: var(--color-Carmesí-Clásico);
+    box-shadow: none;
+  }
+
+  .submenu-lista a {
+    background-color: var(--color-Carmesí-Clásico);
+    color: white;
+  }
+
+  .submenu-lista a:hover {
+    background-color: var(--color-Guinda-Imperial);
+  }
 }
 
 /* ===================================================
