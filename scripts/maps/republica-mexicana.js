@@ -14,14 +14,12 @@ import {
   crearEtiquetaMunicipio
 } from '../utils/config-mapa.js';
 
-
 // ==============================
 // CREACIÓN DEL SVG Y TOOLTIP
 // ==============================
 
 const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución nacional de enfermeras");
 const tooltip = crearTooltip();
-
 
 // ==============================
 // CARGA Y RENDERIZADO DE DATOS
@@ -53,7 +51,6 @@ Promise.all([
 
   const path = d3.geoPath().projection(projection);
 
-  // Diccionario de enlaces por entidad
   const enlacesEntidad = {
     "Aguascalientes": "../entidades/aguascalientes.html",
     "Baja California": "../entidades/baja-california.html",
@@ -89,7 +86,8 @@ Promise.all([
     "Zacatecas": "../entidades/zacatecas.html"
   };
 
-  // Dibuja las entidades
+  let ultimoClick = 0;
+
   g.selectAll("path")
     .data(geoData.features)
     .join("path")
@@ -108,32 +106,30 @@ Promise.all([
       mostrarTooltip(tooltip, event, nombre, datos);
     })
     .on("mousemove", event => {
-      tooltip
-        .style("left", (event.pageX + 10) + "px")
-        .style("top", (event.pageY - 28) + "px");
+      tooltip.style("left", (event.pageX + 10) + "px")
+             .style("top", (event.pageY - 28) + "px");
     })
     .on("mouseout", function () {
       ocultarTooltip(tooltip);
       d3.select(this).attr("stroke-width", 0.5);
     })
     .on("click", function (event, d) {
+      const ahora = new Date().getTime();
       const nombre = d.properties.NOMBRE.trim();
       const enlace = enlacesEntidad[nombre];
-      if (enlace) {
+
+      if (ahora - ultimoClick < 350 && enlace) {
         window.location.href = enlace;
       }
-    });
 
-  // ==============================
-  // ETIQUETAS DE ESTADOS (únicas)
-  // ==============================
+      ultimoClick = ahora;
+    });
 
   const labelsGroup = g.append("g")
     .attr("id", "etiquetas-municipios")
     .style("display", "none");
 
   const nombresUnicos = new Set();
-
   geoData.features.forEach(d => {
     const nombre = d.properties.NOMBRE.trim();
     if (nombresUnicos.has(nombre)) return;
@@ -145,19 +141,11 @@ Promise.all([
     nombresUnicos.add(nombre);
   });
 
-  // ==============================
-  // LEYENDA GRADIENTE
-  // ==============================
-
   crearLeyenda(svg, {
     dominio: [2.01, 5.89],
     pasos: [2.01, 2.39, 2.78, 3.30, 5.89],
     colores: ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']
   });
-
-  // ==============================
-  // ZOOM CON BOTONES
-  // ==============================
 
   activarZoomConBotones(svg, g, {
     selectorZoomIn: "#zoom-in",
@@ -169,9 +157,8 @@ Promise.all([
   console.error("Error al cargar los datos del mapa nacional:", error);
 });
 
-
 // ==============================
-// DESCARGA DE IMÁGENES PNG (dos versiones)
+// DESCARGA DE IMÁGENES PNG
 // ==============================
 
 document.getElementById("descargar-sin-etiquetas").addEventListener("click", () => {
