@@ -27,6 +27,17 @@ body {
   background-color: #ffffff;
 }
 
+main {
+  max-width: 1200px;
+  width: 100%;
+  padding: 10px 10px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 h1 {
   margin-bottom: 10px;
   color: var(--color-Guinda-Imperial);
@@ -423,10 +434,6 @@ button:hover,
 /* ===================================================
    Index
 =================================================== */
-.contenido-principal {
-    max-width: 80%;
-    padding: 20px;
-}
 
 /*Accesos Destacados*/
 
