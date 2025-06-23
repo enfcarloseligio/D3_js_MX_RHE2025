@@ -47,13 +47,49 @@ export function generarTablaMunicipios(rutaCSV) {
     tabla.appendChild(thead);
     tabla.appendChild(tbody);
 
-    // ENVOLTORIO SCROLLABLE
     const envoltorio = document.createElement("div");
     envoltorio.className = "tabla-scroll";
     envoltorio.appendChild(tabla);
 
     contenedor.appendChild(envoltorio);
+
+    // Activar ordenamiento
+    activarOrdenamientoTabla(tabla);
   }).catch(error => {
     console.error("Error al cargar la tabla de municipios:", error);
+  });
+}
+
+// ===============================================
+// FUNCIÓN PARA ORDENAR LAS COLUMNAS DE LA TABLA
+// ===============================================
+function activarOrdenamientoTabla(tabla) {
+  const ths = tabla.querySelectorAll("thead th");
+
+  ths.forEach((th, index) => {
+    th.style.cursor = "pointer";
+    th.setAttribute("data-orden", "asc");
+
+    th.addEventListener("click", () => {
+      const ordenActual = th.getAttribute("data-orden");
+      const filas = Array.from(tabla.querySelectorAll("tbody tr"));
+
+      filas.sort((a, b) => {
+        const celdaA = a.children[index].textContent.trim().replace(/,/g, "");
+        const celdaB = b.children[index].textContent.trim().replace(/,/g, "");
+
+        const valorA = isNaN(celdaA) ? celdaA.toLowerCase() : parseFloat(celdaA);
+        const valorB = isNaN(celdaB) ? celdaB.toLowerCase() : parseFloat(celdaB);
+
+        if (valorA < valorB) return ordenActual === "asc" ? -1 : 1;
+        if (valorA > valorB) return ordenActual === "asc" ? 1 : -1;
+        return 0;
+      });
+
+      const tbody = tabla.querySelector("tbody");
+      filas.forEach(fila => tbody.appendChild(fila));
+
+      th.setAttribute("data-orden", ordenActual === "asc" ? "desc" : "asc");
+    });
   });
 }
