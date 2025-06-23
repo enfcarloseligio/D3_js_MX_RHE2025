@@ -13,8 +13,22 @@
   --color-Verde-Abismo: #002f2a;
   --color-Marfil-Dorado: #e6d194;
   --color-Oro-Antiguo: #a57f2c;
-}
 
+  /* Variables tipográficas */
+  --font-base-pc: 16px;
+  --font-base-tablet: 15px;
+  --font-base-mobile: 14px;
+  --font-weight-normal: 400;
+  --font-weight-semi: 600;
+  --font-note-small: 12px;
+  --font-note-smaller: 11px;
+
+  --spacing-horizontal-pc: 40px;
+  --spacing-horizontal-tablet: 24px;
+  --spacing-horizontal-mobile: 16px;
+  --spacing-vertical: 20px;
+
+}
 /* ===================================================
    ESTILOS GLOBALES
 =================================================== */
@@ -23,14 +37,21 @@ body {
   flex-direction: column;
   align-items: center;
   margin: 0;
+  padding: 0;
   font-family: 'Noto Sans', sans-serif;
+  font-size: var(--font-base-pc);
+  font-weight: var(--font-weight-normal);
+  color: var(--color-Negro-Profundo);
+  line-height: 1.6;
   background-color: #ffffff;
+  box-sizing: border-box;
 }
 
-main {
+
+section, main {
   max-width: 1200px;
   width: 100%;
-  padding: 10px 10px;
+  padding: 20px 16px;
   margin: 0 auto;
   box-sizing: border-box;
   display: flex;
@@ -38,23 +59,76 @@ main {
   align-items: center;
 }
 
+/* ===================================================
+   ESTILOS TIPOGRAFÍAS
+=================================================== */
+
+/* TITULOS PARA PC */
 h1 {
-  margin-bottom: 10px;
+  font-size: 2.5rem; /* 40px en PC */
+  font-weight: var(--font-weight-semi);
   color: var(--color-Guinda-Imperial);
-  font-weight: bold;
   text-align: center;
 }
 
 h2 {
-  margin-bottom: 10px;
+  font-size: 2.125rem; /* 34px */
+  font-weight: var(--font-weight-semi);
   color: var(--color-Carmesí-Clásico);
-  font-weight: bold;
-  text-align: center;
 }
 
-#nota {
-  text-align: center;
+h3, h4, h5, h6 {
+  font-weight: var(--font-weight-semi);
+  color: var(--color-Negro-Profundo);
+}
+
+h3 { font-size: 1.5rem; }   /* 24px */
+h4 { font-size: 1.25rem; }  /* 20px */
+h5 { font-size: 1.125rem; } /* 18px */
+h6 { font-size: 1rem; }     /* 16px */
+
+/* Notas */
+#nota, .texto-nota {
+  font-size: var(--font-note-small);
+  font-weight: 300;
   font-style: italic;
+  color: var(--color-Negro-Profundo);
+}
+
+/* TABLET */
+@media (max-width: 1024px) {
+  body {
+    font-size: var(--font-base-tablet);
+  }
+
+  h1 { font-size: 2rem; }     /* 32px */
+  h2 { font-size: 1.875rem; } /* 30px */
+  h3 { font-size: 1.5rem; }
+  h4 { font-size: 1.25rem; }
+  h5 { font-size: 1.125rem; }
+  h6 { font-size: 1rem; }
+
+  .texto-nota {
+    font-size: 13px;
+  }
+}
+
+/* MÓVIL */
+@media (max-width: 768px) {
+  body {
+    font-size: var(--font-base-mobile);
+  }
+
+  h1 { font-size: 1.875rem; } /* 30px */
+  h2 { font-size: 1.625rem; } /* 26px */
+  h3 { font-size: 1.375rem; } /* 22px */
+  h4 { font-size: 1.125rem; } /* 18px */
+  h5 { font-size: 1rem; }     /* 16px */
+  h6 { font-size: 0.9375rem; }/* 15px */
+
+  .texto-nota {
+    font-size: var(--font-note-smaller);
+  }
 }
 
 /* ===================================================
@@ -407,7 +481,17 @@ button:hover,
 /* ===================================================
    RESPONSIVE DESIGN
 =================================================== */
+@media screen and (max-width: 1024px) {
+  section, main {
+    padding: var(--spacing-vertical) var(--spacing-horizontal-tablet);
+  }
+}
+
 @media screen and (max-width: 768px) {
+  section, main {
+    padding: var(--spacing-vertical) var(--spacing-horizontal-mobile);
+  }
+
   .footer-columns {
     flex-direction: column;
     align-items: flex-start;
@@ -430,7 +514,6 @@ button:hover,
     padding: 8px 0;
   }
 }
-
 /* ===================================================
    Index
 =================================================== */
@@ -438,9 +521,6 @@ button:hover,
 /*Accesos Destacados*/
 
 .accesos-destacados {
-  margin: 40px auto;
-  padding: 0 20px;
-  max-width: 1000px;
   text-align: center;
 }
 
@@ -474,9 +554,6 @@ button:hover,
 /* Indicadores Clave*/
 
 .indicadores-clave {
-  margin: 40px auto;
-  padding: 0 20px;
-  max-width: 1000px;
   text-align: center;
 }
 
