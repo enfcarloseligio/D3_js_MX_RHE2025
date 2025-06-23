@@ -2,19 +2,15 @@
 // IMPORTACIÓN DE UTILIDADES
 // ==============================
 
-import {
-  crearTooltip,
-  mostrarTooltip,
-  ocultarTooltip
-} from '../utils/tooltip.js';
+import { crearTooltip, mostrarTooltip, ocultarTooltip } from '../utils/tooltip.js';
 
 import {
   crearSVGBase,
   MAP_WIDTH,
   MAP_HEIGHT,
   crearLeyenda,
-  descargarComoPNG,
-  activarZoomConBotones
+  activarZoomConBotones,
+  descargarComoPNG
 } from '../utils/config-mapa.js';
 
 
@@ -22,8 +18,10 @@ import {
 // CREACIÓN DEL SVG Y TOOLTIP
 // ==============================
 
+// Se crea el SVG con su grupo interno <g>, accesible por screen readers
 const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución nacional de enfermeras");
 
+// Se genera el tooltip flotante reutilizable
 const tooltip = crearTooltip();
 
 
@@ -32,10 +30,11 @@ const tooltip = crearTooltip();
 // ==============================
 
 Promise.all([
-  d3.json("../data/entidades-mx.json"),
-  d3.csv("../data/tasas-enfermeras-mx.csv")
+  d3.json("../data/entidades-mx.json"),           // GeoJSON nacional
+  d3.csv("../data/tasas-enfermeras-mx.csv")       // CSV nacional
 ]).then(([geoData, tasas]) => {
 
+  // Se construye un diccionario con los datos del CSV
   const tasaMap = {};
   tasas.forEach(d => {
     const estado = d.estado.trim();
@@ -46,10 +45,12 @@ Promise.all([
     };
   });
 
+  // Escala de colores para las tasas nacionales
   const colorScale = d3.scaleLinear()
     .domain([2.01, 2.39, 2.78, 3.30, 5.89])
     .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']);
 
+  // Configuración de proyección centrada en México
   const projection = d3.geoMercator()
     .scale(1500)
     .center([-102, 24])
@@ -57,6 +58,7 @@ Promise.all([
 
   const path = d3.geoPath().projection(projection);
 
+  // Dibuja las entidades federativas
   g.selectAll("path")
     .data(geoData.features)
     .join("path")
@@ -72,7 +74,7 @@ Promise.all([
       const nombre = d.properties.NOMBRE.trim();
       const datos = tasaMap[nombre];
       d3.select(this).attr("stroke-width", 1.5);
-      mostrarTooltip(tooltip, event, nombre, datos);
+      mostrarTooltip(tooltip, event, nombre, datos); // Muestra tooltip
     })
     .on("mousemove", event => {
       tooltip
@@ -80,15 +82,28 @@ Promise.all([
         .style("top", (event.pageY - 28) + "px");
     })
     .on("mouseout", function () {
-      ocultarTooltip(tooltip);
+      ocultarTooltip(tooltip); // Oculta tooltip
       d3.select(this).attr("stroke-width", 0.5);
     });
 
-  // Leyenda
+  // ==============================
+  // LEYENDA GRADIENTE
+  // ==============================
+
   crearLeyenda(svg, {
     dominio: [2.01, 5.89],
     pasos: [2.01, 2.39, 2.78, 3.30, 5.89],
     colores: ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']
+  });
+
+  // ==============================
+  // ZOOM CON BOTONES
+  // ==============================
+
+  activarZoomConBotones(svg, g, {
+    selectorZoomIn: "#zoom-in",
+    selectorZoomOut: "#zoom-out",
+    selectorZoomReset: "#zoom-reset"
   });
 
 }).catch(error => {
