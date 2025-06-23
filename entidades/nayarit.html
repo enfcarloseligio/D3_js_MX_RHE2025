@@ -1,54 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- Descripción para motores de búsqueda -->
   <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de Nayarit 2025.">
   <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería">
   <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025">
   <title>Distribución de Enfermeras en el Estado de Nayarit - Gobierno de México</title>
+
   <link rel="stylesheet" href="../styles.css">
+
   <!-- Librerías necesarias -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <!-- Mapa de Nayarit -->
   <script type="module" src="../scripts/maps/mapa-nayarit.js"></script>
-    <!-- componentes -->
+
+  <!-- Layout general -->
   <script src="../scripts/inyectar-layout.js" defer></script>
 </head>
 
 <body>
-  
-  <!-- Contenido principal -->
   <main class="contenido-principal">
-  <section aria-labelledby="titulo-mapa">
-  <h1>Distribución de Enfermeras por Cada Mil Habitantes en Nayarit 2025</h1>
-    <p class="bienvenida">
-    Visualice la distribución de enfermeras por cada mil habitantes en los municipios del Estado de Nayarit, con base en datos oficiales actualizados.
-    </p>
-  <div class="mapas">
-    <div id="mapa-nayarit" class="mapa-wrapper">
-    <!-- Aquí se inyecta el mapa -->
-      <div class="zoom-controles">
-        <button id="zoom-in" class="boton">+</button>
-        <button id="zoom-out" class="boton">–</button>
-        <button id="zoom-reset" class="boton">⟳</button>
+    <section class="mapa-entidad">
+      <h1>Distribución de Enfermeras por Cada Mil Habitantes en Nayarit 2025</h1>
+      <p class="bienvenida">
+        Visualice la distribución de enfermeras por cada mil habitantes en los municipios del Estado de Nayarit, con base en datos oficiales actualizados.
+      </p>
+
+      <div id="mapa-nayarit" class="mapa-wrapper">
+        <!-- Aquí se inyecta el mapa -->
+        <div class="zoom-controles">
+          <button id="zoom-in" class="boton" aria-label="Acercar">+</button>
+          <button id="zoom-out" class="boton" aria-label="Alejar">–</button>
+          <button id="zoom-reset" class="boton" aria-label="Reiniciar zoom">⟳</button>
+        </div>
       </div>
-    </div>
-  </div>
-    <p id="nota">
-    <em>
-      Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
-      <br>Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
-    </em>
-  </p>
-    <div class="descarga-container">
-    <button id="descargar-png" aria-label="Descargar imagen del mapa en formato PNG">Descargar PNG</button>
-  </div>
-</section>
+
+      <p id="nota">
+        <em>
+          Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
+          <br>Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
+        </em>
+      </p>
+
+      <div class="descarga-container">
+        <button id="descargar-png" class="boton" aria-label="Descargar imagen del mapa en formato PNG">Descargar PNG</button>
+      </div>
+    </section>
   </main>
- 
 </body>
 </html>
-
