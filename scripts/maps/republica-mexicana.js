@@ -53,6 +53,43 @@ Promise.all([
 
   const path = d3.geoPath().projection(projection);
 
+  // Diccionario de enlaces por entidad
+  const enlacesEntidad = {
+    "Aguascalientes": "../entidades/aguascalientes.html",
+    "Baja California": "../entidades/baja-california.html",
+    "Baja California Sur": "../entidades/baja-california-sur.html",
+    "Campeche": "../entidades/campeche.html",
+    "Coahuila de Zaragoza": "../entidades/coahuila.html",
+    "Colima": "../entidades/colima.html",
+    "Chiapas": "../entidades/chiapas.html",
+    "Chihuahua": "../entidades/chihuahua.html",
+    "Ciudad de México": "../entidades/cdmx.html",
+    "Durango": "../entidades/durango.html",
+    "Guanajuato": "../entidades/guanajuato.html",
+    "Guerrero": "../entidades/guerrero.html",
+    "Hidalgo": "../entidades/hidalgo.html",
+    "Jalisco": "../entidades/jalisco.html",
+    "México": "../entidades/estado-de-mexico.html",
+    "Michoacán de Ocampo": "../entidades/michoacan.html",
+    "Morelos": "../entidades/morelos.html",
+    "Nayarit": "../entidades/nayarit.html",
+    "Nuevo León": "../entidades/nuevo-leon.html",
+    "Oaxaca": "../entidades/oaxaca.html",
+    "Puebla": "../entidades/puebla.html",
+    "Querétaro": "../entidades/queretaro.html",
+    "Quintana Roo": "../entidades/quintana-roo.html",
+    "San Luis Potosí": "../entidades/san-luis-potosi.html",
+    "Sinaloa": "../entidades/sinaloa.html",
+    "Sonora": "../entidades/sonora.html",
+    "Tabasco": "../entidades/tabasco.html",
+    "Tamaulipas": "../entidades/tamaulipas.html",
+    "Tlaxcala": "../entidades/tlaxcala.html",
+    "Veracruz de Ignacio de la Llave": "../entidades/veracruz.html",
+    "Yucatán": "../entidades/yucatan.html",
+    "Zacatecas": "../entidades/zacatecas.html"
+  };
+
+  // Dibuja las entidades
   g.selectAll("path")
     .data(geoData.features)
     .join("path")
@@ -78,28 +115,35 @@ Promise.all([
     .on("mouseout", function () {
       ocultarTooltip(tooltip);
       d3.select(this).attr("stroke-width", 0.5);
+    })
+    .on("click", function (event, d) {
+      const nombre = d.properties.NOMBRE.trim();
+      const enlace = enlacesEntidad[nombre];
+      if (enlace) {
+        window.location.href = enlace;
+      }
     });
 
-// ==============================
-// ETIQUETAS DE ESTADOS (únicas)
-// ==============================
+  // ==============================
+  // ETIQUETAS DE ESTADOS (únicas)
+  // ==============================
 
-const labelsGroup = g.append("g")
-  .attr("id", "etiquetas-municipios")
-  .style("display", "none");
+  const labelsGroup = g.append("g")
+    .attr("id", "etiquetas-municipios")
+    .style("display", "none");
 
-const nombresUnicos = new Set();
+  const nombresUnicos = new Set();
 
-geoData.features.forEach(d => {
-  const nombre = d.properties.NOMBRE.trim();
-  if (nombresUnicos.has(nombre)) return;
+  geoData.features.forEach(d => {
+    const nombre = d.properties.NOMBRE.trim();
+    if (nombresUnicos.has(nombre)) return;
 
-  const [x, y] = path.centroid(d);
-  crearEtiquetaMunicipio(labelsGroup, nombre, x, y, {
-    fontSize: "6px" 
+    const [x, y] = path.centroid(d);
+    crearEtiquetaMunicipio(labelsGroup, nombre, x, y, {
+      fontSize: "6px"
+    });
+    nombresUnicos.add(nombre);
   });
-  nombresUnicos.add(nombre);
-});
 
   // ==============================
   // LEYENDA GRADIENTE

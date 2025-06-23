@@ -178,3 +178,25 @@ export function crearEtiquetaMunicipio(grupo, nombre, x, y, opciones = {}) {
     .attr("class", className)
     .style("font-family", fontFamily);
 }
+
+/**
+ * Agrega un botón de "Volver al mapa nacional" dentro del contenedor de zoom.
+ * @param {string} selectorContenedor - Selector del contenedor de botones (por defecto .zoom-controles).
+ * @param {string} urlDestino - Ruta al mapa nacional.
+ */
+export function agregarBotonCasa(selectorContenedor = ".zoom-controles", urlDestino = "../entidades/republica-mexicana.html") {
+  const contenedor = document.querySelector(selectorContenedor);
+  if (!contenedor) return;
+
+  const botonCasa = document.createElement("button");
+  botonCasa.innerText = "🏠";
+  botonCasa.className = "boton";
+  botonCasa.title = "Volver al mapa nacional";
+  botonCasa.setAttribute("aria-label", "Volver al mapa nacional");
+
+  botonCasa.addEventListener("click", () => {
+    window.location.href = urlDestino;
+  });
+
+  contenedor.appendChild(botonCasa);
+}

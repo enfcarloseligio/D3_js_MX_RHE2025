@@ -5,13 +5,14 @@
 import { crearTooltip, mostrarTooltip, ocultarTooltip } from '../utils/tooltip.js';
 
 import {
-  crearSVGBase,           // Crea el contenedor SVG y grupo <g>
-  MAP_WIDTH,              // Ancho del SVG estándar
-  MAP_HEIGHT,             // Alto del SVG estándar
-  crearLeyenda,           // Genera una leyenda visual
-  activarZoomConBotones,  // Activa botones de zoom personalizados
-  descargarComoPNG,       // Convierte el SVG en imagen PNG descargable
-  crearEtiquetaMunicipio  // Crea una etiqueta de municipio con tipografía Noto Sans
+  crearSVGBase,
+  MAP_WIDTH,
+  MAP_HEIGHT,
+  crearLeyenda,
+  activarZoomConBotones,
+  descargarComoPNG,
+  crearEtiquetaMunicipio,
+  agregarBotonCasa
 } from '../utils/config-mapa.js';
 
 
@@ -19,10 +20,7 @@ import {
 // CREACIÓN DEL SVG Y TOOLTIP
 // ==============================
 
-// Se inserta un SVG dentro del contenedor con id #mapa-nayarit
 const { svg, g } = crearSVGBase("#mapa-nayarit", "Mapa de distribución de enfermeras en el Estado de Nayarit");
-
-// Crea un tooltip flotante reutilizable
 const tooltip = crearTooltip();
 
 
@@ -31,11 +29,11 @@ const tooltip = crearTooltip();
 // ==============================
 
 Promise.all([
-  d3.json("../data/entidades/mapa-nayarit.json"),                      // GeoJSON del estado
-  d3.csv("../data/tasas/tasas-enfermeras-nayarit.csv")                 // CSV con tasas por municipio
+  d3.json("../data/entidades/mapa-nayarit.json"),
+  d3.csv("../data/tasas/tasas-enfermeras-nayarit.csv")
 ]).then(([geoData, tasas]) => {
 
-  // Se construye un diccionario con los datos del CSV
+  // Diccionario con datos por municipio
   const tasaMap = {};
   tasas.forEach(d => {
     const nombre = d.municipio.trim();
@@ -46,16 +44,15 @@ Promise.all([
     };
   });
 
-  // Escala de colores para las tasas
+  // Escala de colores
   const colorScale = d3.scaleLinear()
     .domain([0.76, 1.55, 2.06, 3.45, 5.32])
     .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']);
 
-  // Configura proyección geográfica y genera path
   const projection = d3.geoMercator().fitSize([MAP_WIDTH, MAP_HEIGHT], geoData);
   const path = d3.geoPath().projection(projection);
 
-  // Dibuja los municipios del estado
+  // Dibuja municipios
   g.selectAll("path")
     .data(geoData.features)
     .join("path")
@@ -71,35 +68,36 @@ Promise.all([
       const nombre = d.properties.NOMGEO.trim();
       const datos = tasaMap[nombre];
       d3.select(this).attr("stroke-width", 1.5);
-      mostrarTooltip(tooltip, event, nombre, datos); // Muestra tooltip
+      mostrarTooltip(tooltip, event, nombre, datos);
     })
-    .on("mousemove", function (event) {
+    .on("mousemove", event => {
       tooltip
         .style("left", (event.pageX + 10) + "px")
         .style("top", (event.pageY - 28) + "px");
     })
     .on("mouseout", function () {
-      ocultarTooltip(tooltip); // Oculta tooltip
+      ocultarTooltip(tooltip);
       d3.select(this).attr("stroke-width", 0.5);
     });
 
-// ==============================
-// ETIQUETAS DE MUNICIPIOS (inicialmente ocultas)
-// ==============================
-
-const labelsGroup = g.append("g")
-  .attr("id", "etiquetas-municipios")
-  .style("display", "none");
-
-geoData.features.forEach(d => {
-  const nombre = d.properties.NOMGEO.trim();
-  const [x, y] = path.centroid(d);
-  crearEtiquetaMunicipio(labelsGroup, nombre, x, y, {
-    fontSize: "11px"
-  });
-});
   // ==============================
-  // LEYENDA GRADIENTE
+  // ETIQUETAS DE MUNICIPIOS
+  // ==============================
+
+  const labelsGroup = g.append("g")
+    .attr("id", "etiquetas-municipios")
+    .style("display", "none");
+
+  geoData.features.forEach(d => {
+    const nombre = d.properties.NOMGEO.trim();
+    const [x, y] = path.centroid(d);
+    crearEtiquetaMunicipio(labelsGroup, nombre, x, y, {
+      fontSize: "11px"
+    });
+  });
+
+  // ==============================
+  // LEYENDA
   // ==============================
 
   crearLeyenda(svg, {
@@ -109,7 +107,7 @@ geoData.features.forEach(d => {
   });
 
   // ==============================
-  // ZOOM CON BOTONES PERSONALIZADOS
+  // ZOOM Y BOTÓN CASA
   // ==============================
 
   activarZoomConBotones(svg, g, {
@@ -118,13 +116,15 @@ geoData.features.forEach(d => {
     selectorZoomReset: "#zoom-reset"
   });
 
+  agregarBotonCasa(); // 🏠 Volver al mapa nacional
+
 }).catch(error => {
   console.error("Error al cargar datos del mapa de Nayarit:", error);
 });
 
 
 // ==============================
-// DESCARGA DE IMÁGENES PNG (dos versiones)
+// DESCARGA DE IMÁGENES PNG
 // ==============================
 
 document.getElementById("descargar-sin-etiquetas").addEventListener("click", () => {
