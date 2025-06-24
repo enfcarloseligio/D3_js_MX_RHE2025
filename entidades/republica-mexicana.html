@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Visualización interactiva de la distribución de enfermeras por entidad federativa en México 2025.">
-  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería">
-  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Visualización interactiva de la distribución de enfermeras por entidad federativa en México 2025." />
+  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería" />
+  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025" />
   <title>Distribución Nacional de Enfermeras - Gobierno de México</title>
 
-  <link rel="stylesheet" href="../styles.css">
-  <link rel="stylesheet" href="../styles/mapas.css">
+  <!-- Estilos -->
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../styles/mapas.css" />
 
   <!-- Librerías necesarias -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-  <!-- Mapa Nacional -->
+  <!-- Módulo del mapa nacional -->
   <script type="module" src="../scripts/maps/republica-mexicana.js"></script>
 
-  <!-- Layout general -->
+  <!-- Inyección de encabezado y pie de página -->
   <script src="../scripts/inyectar-layout.js" defer></script>
 </head>
 
 <body>
   <main>
+    <!-- SECCIÓN PRINCIPAL DEL MAPA -->
     <section class="mapa-entidad">
       <h1>Distribución de Enfermeras por Cada Mil Habitantes en México 2025</h1>
       <p class="bienvenida">
         Visualice la distribución de enfermeras por cada mil habitantes en cada entidad federativa, con base en datos oficiales actualizados.
       </p>
 
-      <!-- Contenedor del mapa -->
+      <!-- CONTENEDOR DEL MAPA -->
       <div id="mapa-nacional" class="mapa-wrapper">
-        <!-- Aquí se inyecta el mapa SVG dinámicamente -->
-
-        <!-- Botones de zoom -->
+        <!-- SVG dinámico insertado por JS -->
         <div class="zoom-controles">
           <button id="zoom-in" class="boton" aria-label="Acercar">+</button>
           <button id="zoom-out" class="boton" aria-label="Alejar">–</button>
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <!-- Nota explicativa -->
+      <!-- NOTA EXPLICATIVA -->
       <p id="nota">
         <em>
           Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
@@ -50,12 +50,11 @@
         </em>
       </p>
 
-      <!-- Botón de descarga -->
+      <!-- BOTONES DE DESCARGA -->
       <div class="descarga-container">
-       <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
-       <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
-     </div>
-
+        <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
+        <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
+      </div>
     </section>
   </main>
 </body>
