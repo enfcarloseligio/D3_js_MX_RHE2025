@@ -17,16 +17,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  <!-- Módulo del mapa nacional -->
-  <script type="module" src="../scripts/maps/republica-mexicana.js"></script>
-
   <!-- Layout general -->
   <script src="../scripts/inyectar-layout.js" defer></script>
+
+  <!-- Mapa y tabla nacional -->
+  <script type="module" src="../scripts/maps/republica-mexicana.js"></script>
 </head>
 
 <body>
   <main>
-    <!-- SECCIÓN PRINCIPAL DEL MAPA -->
+    <!-- SECCIÓN DEL MAPA NACIONAL -->
     <section class="mapa-entidad">
       <h1>Distribución de Enfermeras por Cada Mil Habitantes en México 2025</h1>
       <p class="bienvenida">
@@ -35,7 +35,7 @@
 
       <!-- CONTENEDOR DEL MAPA -->
       <div id="mapa-nacional" class="mapa-wrapper">
-        <!-- SVG dinámico insertado por JS -->
+        <!-- SVG insertado dinámicamente -->
         <div class="zoom-controles">
           <button id="zoom-in" class="boton" aria-label="Acercar">+</button>
           <button id="zoom-out" class="boton" aria-label="Alejar">–</button>
@@ -43,7 +43,7 @@
         </div>
       </div>
 
-      <!-- NOTA EXPLICATIVA -->
+      <!-- NOTA METODOLÓGICA -->
       <p id="nota">
         <em>
           Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
@@ -51,7 +51,7 @@
         </em>
       </p>
 
-      <!-- BOTONES DE DESCARGA DEL MAPA -->
+      <!-- BOTONES DE DESCARGA DE MAPA -->
       <div class="descarga-container">
         <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
         <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
@@ -65,10 +65,8 @@
         Esta tabla presenta un resumen por entidad federativa del total de enfermeras registradas, la población estatal y la tasa de enfermeras por cada mil habitantes. Esta información permite comparar la cobertura de enfermería entre estados.
       </p>
 
-      <div class="tabla-scroll">
-        <div id="tabla-contenido">
-          <!-- Tabla cargada dinámicamente con JS -->
-        </div>
+      <div id="tabla-contenido">
+        <!-- Aquí se insertará la tabla desde JS -->
       </div>
 
       <div class="descarga-container">
@@ -76,13 +74,5 @@
       </div>
     </section>
   </main>
-
-  <!-- Carga dinámica de tabla nacional -->
-  <script type="module">
-    import { generarTablaMunicipios, habilitarDescargaExcel } from '../scripts/utils/tabla-municipios.js';
-
-    generarTablaMunicipios('../data/tasas-enfermeras-mx.csv');
-    habilitarDescargaExcel('enfermeras-nacional.xlsx');
-  </script>
 </body>
 </html>
