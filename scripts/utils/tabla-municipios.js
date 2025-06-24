@@ -101,3 +101,19 @@ function activarOrdenamientoTabla(tabla) {
     });
   });
 }
+
+// ===============================================
+// FUNCIÓN PARA DESCARGAR LA TABLA COMO EXCEL
+// ===============================================
+export function habilitarDescargaExcel(nombreArchivo = "tasas-enfermeras-municipios.xlsx") {
+  const boton = document.getElementById("descargar-excel");
+  if (!boton) return;
+
+  boton.addEventListener("click", () => {
+    const tabla = document.querySelector("#tabla-contenido table");
+    if (!tabla) return;
+
+    const wb = XLSX.utils.table_to_book(tabla, { sheet: "Resumen Municipal" });
+    XLSX.writeFile(wb, nombreArchivo);
+  });
+}

@@ -133,18 +133,3 @@ document.getElementById("descargar-con-etiquetas").addEventListener("click", () 
   }, 100);
 });
 
-// ==============================
-// DESCARGA DE EXCEL
-// ==============================
-document.addEventListener("DOMContentLoaded", () => {
-  const botonDescarga = document.getElementById("descargar-excel");
-  if (botonDescarga) {
-    botonDescarga.addEventListener("click", () => {
-      const tabla = document.querySelector("#tabla-contenido table");
-      if (!tabla) return;
-
-      const wb = XLSX.utils.table_to_book(tabla, { sheet: "Resumen Municipal" });
-      XLSX.writeFile(wb, "tasas-enfermeras-municipios.xlsx");
-    });
-  }
-});
