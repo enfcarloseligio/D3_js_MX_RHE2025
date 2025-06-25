@@ -42,9 +42,38 @@ Promise.all([
   const path = d3.geoPath().projection(projection);
 
   const enlacesEntidad = {
-    "Nayarit": "../entidades/nayarit.html",
-    "Ciudad de México": "../entidades/cdmx.html",
-    // ...continúa con los demás estados
+      "Aguascalientes": "../entidades/aguascalientes.html",
+  "Baja California": "../entidades/baja-california.html",
+  "Baja California Sur": "../entidades/baja-california-sur.html",
+  "Campeche": "../entidades/campeche.html",
+  "Chiapas": "../entidades/chiapas.html",
+  "Chihuahua": "../entidades/chihuahua.html",
+  "Ciudad de México": "../entidades/cdmx.html",
+  "Coahuila": "../entidades/coahuila.html",
+  "Colima": "../entidades/colima.html",
+  "Durango": "../entidades/durango.html",
+  "Estado de México": "../entidades/estado-de-mexico.html",
+  "Guanajuato": "../entidades/guanajuato.html",
+  "Guerrero": "../entidades/guerrero.html",
+  "Hidalgo": "../entidades/hidalgo.html",
+  "Jalisco": "../entidades/jalisco.html",
+  "Michoacán": "../entidades/michoacan.html",
+  "Morelos": "../entidades/morelos.html",
+  "Nayarit": "../entidades/nayarit.html",
+  "Nuevo León": "../entidades/nuevo-leon.html",
+  "Oaxaca": "../entidades/oaxaca.html",
+  "Puebla": "../entidades/puebla.html",
+  "Querétaro": "../entidades/queretaro.html",
+  "Quintana Roo": "../entidades/quintana-roo.html",
+  "San Luis Potosí": "../entidades/san-luis-potosi.html",
+  "Sinaloa": "../entidades/sinaloa.html",
+  "Sonora": "../entidades/sonora.html",
+  "Tabasco": "../entidades/tabasco.html",
+  "Tamaulipas": "../entidades/tamaulipas.html",
+  "Tlaxcala": "../entidades/tlaxcala.html",
+  "Veracruz": "../entidades/veracruz.html",
+  "Yucatán": "../entidades/yucatan.html",
+  "Zacatecas": "../entidades/zacatecas.html"
   };
 
   let ultimoClick = 0;
