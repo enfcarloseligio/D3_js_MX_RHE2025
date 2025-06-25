@@ -176,10 +176,34 @@ export function activarZoomConBotones(svg, g, {
 }
 
 /**
- * Descarga el SVG como imagen PNG.
+ * Descarga el SVG como imagen PNG e inserta cita de fuente con fecha.
  */
 export function descargarComoPNG(svgSelector, nombreArchivo = "mapa.png", width = MAP_WIDTH, height = MAP_HEIGHT) {
   const svgElement = document.querySelector(svgSelector);
+
+  // Insertar fondo blanco semitransparente detrás del texto
+  const fondo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  fondo.setAttribute("x", 5);
+  fondo.setAttribute("y", height - 25);
+  fondo.setAttribute("width", 950);
+  fondo.setAttribute("height", 20);
+  fondo.setAttribute("fill", "white");
+  fondo.setAttribute("fill-opacity", "0.7");
+  fondo.setAttribute("id", "fondo-cita");
+  svgElement.appendChild(fondo);
+
+  // Insertar texto temporal con la cita de fuente
+  const cita = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  cita.setAttribute("x", 10);
+  cita.setAttribute("y", height - 10);
+  cita.setAttribute("font-size", "10px");
+  cita.setAttribute("fill", "#333");
+  cita.setAttribute("font-family", "'Noto Sans', sans-serif");
+  cita.setAttribute("id", "marca-descarga");
+  const fecha = new Date().toISOString().split("T")[0];
+  cita.textContent = `Fuente: Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. Consultado el ${fecha}`;
+  svgElement.appendChild(cita);
+
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgElement);
 
@@ -206,4 +230,12 @@ export function descargarComoPNG(svgSelector, nombreArchivo = "mapa.png", width 
   };
 
   image.src = url;
+
+  // Eliminar la cita y el fondo del SVG original
+  setTimeout(() => {
+    const marca = svgElement.querySelector("#marca-descarga");
+    const fondoCita = svgElement.querySelector("#fondo-cita");
+    if (marca) svgElement.removeChild(marca);
+    if (fondoCita) svgElement.removeChild(fondoCita);
+  }, 200);
 }
