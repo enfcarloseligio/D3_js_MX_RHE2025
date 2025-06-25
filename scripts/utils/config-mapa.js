@@ -2,10 +2,13 @@
 // CONFIGURACIÓN GLOBAL PARA MAPAS DE ENTIDADES
 // ==============================
 
-export const MAP_WIDTH = 960;
-export const MAP_HEIGHT = 600;
+export const MAP_WIDTH = 1280;
+export const MAP_HEIGHT = 720;
 export const MAP_BACKGROUND = "#e6f0f8";
 
+// ==============================
+// CREACIÓN DE SVG BASE
+// ==============================
 /**
  * Crea un SVG base con un grupo <g> dentro de un contenedor.
  */
@@ -21,10 +24,12 @@ export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribu
     .style("background-color", MAP_BACKGROUND);
 
   const g = svg.append("g");
-
   return { svg, g };
 }
 
+// ==============================
+// CREACIÓN DE LEYENDA GRADIENTE
+// ==============================
 /**
  * Crea una leyenda de colores gradiente para mapas.
  */
@@ -72,6 +77,9 @@ export function crearLeyenda(svg, {
     .call(eje);
 }
 
+// ==============================
+// CREAR ETIQUETA DE MUNICIPIO
+// ==============================
 /**
  * Crea una etiqueta de texto para un municipio o entidad en el mapa.
  */
@@ -95,6 +103,9 @@ export function crearEtiquetaMunicipio(grupo, nombre, x, y, opciones = {}) {
     .style("font-family", fontFamily);
 }
 
+// ==============================
+// INYECTAR CONTROLES DE ZOOM
+// ==============================
 /**
  * Inyecta botones de zoom y botón de casa automáticamente.
  */
@@ -140,6 +151,9 @@ export function inyectarControlesBasicos(svg, g, urlCasa = "../entidades/republi
   });
 }
 
+// ==============================
+// FUNCIONALIDAD DE ZOOM CON BOTONES
+// ==============================
 /**
  * Habilita controles de zoom con botones personalizados.
  */
@@ -175,24 +189,60 @@ export function activarZoomConBotones(svg, g, {
   });
 }
 
+// ==============================
+// DESCARGAR SVG COMO PNG
+// ==============================
 /**
- * Descarga el SVG como imagen PNG e inserta cita de fuente con fecha.
+ * Descarga el SVG como imagen PNG e inserta título y cita de fuente con fecha.
  */
-export function descargarComoPNG(svgSelector, nombreArchivo = "mapa.png", width = MAP_WIDTH, height = MAP_HEIGHT) {
+export function descargarComoPNG(
+  svgSelector,
+  nombreArchivo = "mapa.png",
+  width = MAP_WIDTH,
+  height = MAP_HEIGHT,
+  nombreEntidad = ""
+) {
   const svgElement = document.querySelector(svgSelector);
 
-  // Insertar fondo blanco semitransparente detrás del texto
+// ==============================
+  // TÍTULO SUPERIOR CON FONDO
+  // ==============================
+  const fondoTitulo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  fondoTitulo.setAttribute("x", 0);
+  fondoTitulo.setAttribute("y", 0);
+  fondoTitulo.setAttribute("width", width);
+  fondoTitulo.setAttribute("height", 40);
+  fondoTitulo.setAttribute("fill", "white");
+  fondoTitulo.setAttribute("fill-opacity", "0.7");
+  fondoTitulo.setAttribute("id", "fondo-titulo");
+  svgElement.appendChild(fondoTitulo);
+
+  const titulo = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  titulo.setAttribute("x", width / 2);
+  titulo.setAttribute("y", 25);
+  titulo.setAttribute("text-anchor", "middle");
+  titulo.setAttribute("font-size", "20px");
+  titulo.setAttribute("font-family", "'Noto Sans', sans-serif");
+  titulo.setAttribute("fill", "#222");
+  titulo.setAttribute("id", "titulo-descarga");
+  titulo.textContent = nombreEntidad
+    ? `Tasa de enfermeras por cada mil habitantes en ${nombreEntidad} (2025)`
+    : `Tasa de enfermeras por cada mil habitantes (2025)`;
+  svgElement.appendChild(titulo);
+
+  // ==============================
+  // CITA INFERIOR CON FONDO
+  // ==============================
   const fondo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  fondo.setAttribute("x", 5);
-  fondo.setAttribute("y", height - 25);
-  fondo.setAttribute("width", 950);
-  fondo.setAttribute("height", 20);
+  fondo.setAttribute("x", 0);
+  fondo.setAttribute("y", height - 30);
+  fondo.setAttribute("width", width);
+  fondo.setAttribute("height", 30);
   fondo.setAttribute("fill", "white");
   fondo.setAttribute("fill-opacity", "0.7");
   fondo.setAttribute("id", "fondo-cita");
   svgElement.appendChild(fondo);
 
-  // Insertar texto temporal con la cita de fuente
   const cita = document.createElementNS("http://www.w3.org/2000/svg", "text");
   cita.setAttribute("x", 10);
   cita.setAttribute("y", height - 10);
@@ -204,6 +254,9 @@ export function descargarComoPNG(svgSelector, nombreArchivo = "mapa.png", width 
   cita.textContent = `Fuente: Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. Consultado el ${fecha}`;
   svgElement.appendChild(cita);
 
+  /// ==============================
+  // SERIALIZACIÓN Y DESCARGA
+  // ==============================
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgElement);
 
@@ -231,11 +284,13 @@ export function descargarComoPNG(svgSelector, nombreArchivo = "mapa.png", width 
 
   image.src = url;
 
-  // Eliminar la cita y el fondo del SVG original
+  // ==============================
+  // LIMPIEZA DE ELEMENTOS TEMPORALES
+  // ==============================
   setTimeout(() => {
-    const marca = svgElement.querySelector("#marca-descarga");
-    const fondoCita = svgElement.querySelector("#fondo-cita");
-    if (marca) svgElement.removeChild(marca);
-    if (fondoCita) svgElement.removeChild(fondoCita);
+    svgElement.querySelector("#titulo-descarga")?.remove();
+    svgElement.querySelector("#fondo-titulo")?.remove();
+    svgElement.querySelector("#marca-descarga")?.remove();
+    svgElement.querySelector("#fondo-cita")?.remove();
   }, 200);
 }

@@ -47,6 +47,12 @@ Promise.all([
   const projection = d3.geoMercator().fitSize([MAP_WIDTH, MAP_HEIGHT], geoData);
   const path = d3.geoPath().projection(projection);
 
+  // ==============================
+  // ESCALADO INICIAL DEL MAPA
+  // ==============================
+
+  g.attr("transform", "scale(1.1) translate(-60, -30)");
+
   g.selectAll("path")
     .data(geoData.features)
     .join("path")
@@ -114,22 +120,48 @@ Promise.all([
 // DESCARGA DE IMÁGENES PNG
 // ==============================
 
+// Obtener automáticamente el nombre de la entidad desde la URL
+const nombreEntidadArchivo = location.pathname.split("/").pop().replace(".html", "");
+const nombreEntidad = nombreEntidadArchivo
+  .split("-")
+  .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+  .join(" ");
+
+// ==============================
+// BOTÓN: Descargar SIN etiquetas de municipios
+// ==============================
+
 document.getElementById("descargar-sin-etiquetas").addEventListener("click", () => {
   const etiquetas = document.getElementById("etiquetas-municipios");
   if (etiquetas) etiquetas.style.display = "none";
 
   setTimeout(() => {
-    descargarComoPNG("#mapa-nayarit svg", "mapa-enfermeras-nayarit-sin-nombres.png", MAP_WIDTH, MAP_HEIGHT);
+    descargarComoPNG(
+      "#mapa-nayarit svg",
+      `mapa-enfermeras-${nombreEntidadArchivo}-sin-nombres.png`,
+      MAP_WIDTH,
+      MAP_HEIGHT,
+      nombreEntidad
+    );
   }, 100);
 });
+
+// ==============================
+// BOTÓN: Descargar CON etiquetas de municipios
+// ==============================
 
 document.getElementById("descargar-con-etiquetas").addEventListener("click", () => {
   const etiquetas = document.getElementById("etiquetas-municipios");
   if (etiquetas) etiquetas.style.display = "block";
 
   setTimeout(() => {
-    descargarComoPNG("#mapa-nayarit svg", "mapa-enfermeras-nayarit-con-nombres.png", MAP_WIDTH, MAP_HEIGHT);
+    descargarComoPNG(
+      "#mapa-nayarit svg",
+      `mapa-enfermeras-${nombreEntidadArchivo}-con-nombres.png`,
+      MAP_WIDTH,
+      MAP_HEIGHT,
+      nombreEntidad
+    );
     if (etiquetas) etiquetas.style.display = "none";
   }, 100);
 });
-
