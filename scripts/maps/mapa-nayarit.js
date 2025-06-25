@@ -51,7 +51,7 @@ Promise.all([
   // ESCALADO INICIAL DEL MAPA
   // ==============================
 
-  g.attr("transform", "scale(1.1) translate(-60, -30)");
+  g.attr("transform", "scale(1.0) translate(0,0)");
 
   g.selectAll("path")
     .data(geoData.features)
