@@ -192,9 +192,6 @@ export function activarZoomConBotones(svg, g, {
 // ==============================
 // DESCARGAR SVG COMO PNG
 // ==============================
-/**
- * Descarga el SVG como imagen PNG e inserta título y cita de fuente con fecha.
- */
 export function descargarComoPNG(
   svgSelector,
   nombreArchivo = "mapa.png",
@@ -204,86 +201,100 @@ export function descargarComoPNG(
 ) {
   const svgElement = document.querySelector(svgSelector);
 
-// ==============================
+  const extraTop = 50;
+  const extraBottom = 40;
+  const newHeight = height + extraTop + extraBottom;
+
+  svgElement.setAttribute("viewBox", `0 ${-extraTop} ${width} ${newHeight}`);
+
+  // ==============================
   // TÍTULO SUPERIOR CON FONDO
   // ==============================
+
   const fondoTitulo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondoTitulo.setAttribute("x", 0);
-  fondoTitulo.setAttribute("y", 0);
+  fondoTitulo.setAttribute("y", -extraTop);
   fondoTitulo.setAttribute("width", width);
-  fondoTitulo.setAttribute("height", 40);
+  fondoTitulo.setAttribute("height", extraTop);
   fondoTitulo.setAttribute("fill", "white");
   fondoTitulo.setAttribute("fill-opacity", "0.7");
   fondoTitulo.setAttribute("id", "fondo-titulo");
-  svgElement.appendChild(fondoTitulo);
+  svgElement.appendChild(fondoTitulo);  
 
   const titulo = document.createElementNS("http://www.w3.org/2000/svg", "text");
   titulo.setAttribute("x", width / 2);
-  titulo.setAttribute("y", 25);
+  titulo.setAttribute("y", -extraTop + 30);
   titulo.setAttribute("text-anchor", "middle");
   titulo.setAttribute("font-size", "20px");
   titulo.setAttribute("font-family", "'Noto Sans', sans-serif");
-  titulo.setAttribute("fill", "#222");
+  titulo.setAttribute("fill", "#111");
   titulo.setAttribute("id", "titulo-descarga");
   titulo.textContent = nombreEntidad
     ? `Tasa de enfermeras por cada mil habitantes en ${nombreEntidad} (2025)`
     : `Tasa de enfermeras por cada mil habitantes (2025)`;
-  svgElement.appendChild(titulo);
+  svgElement.appendChild(titulo); 
 
   // ==============================
-  // CITA INFERIOR CON FONDO
-  // ==============================
-  const fondo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  fondo.setAttribute("x", 0);
-  fondo.setAttribute("y", height - 30);
-  fondo.setAttribute("width", width);
-  fondo.setAttribute("height", 30);
-  fondo.setAttribute("fill", "white");
-  fondo.setAttribute("fill-opacity", "0.7");
-  fondo.setAttribute("id", "fondo-cita");
-  svgElement.appendChild(fondo);
+// CITA INFERIOR CON FONDO
+// ==============================
+const fondo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+fondo.setAttribute("x", 0);
+fondo.setAttribute("y", height);
+fondo.setAttribute("width", width);
+fondo.setAttribute("height", extraBottom);
+fondo.setAttribute("fill", "white");
+fondo.setAttribute("fill-opacity", "0.7");
+fondo.setAttribute("id", "fondo-cita");
+svgElement.appendChild(fondo);
 
-  const cita = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  cita.setAttribute("x", 10);
-  cita.setAttribute("y", height - 10);
-  cita.setAttribute("font-size", "10px");
-  cita.setAttribute("fill", "#333");
-  cita.setAttribute("font-family", "'Noto Sans', sans-serif");
-  cita.setAttribute("id", "marca-descarga");
-  const fecha = new Date().toISOString().split("T")[0];
-  cita.textContent = `Fuente: Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. Consultado el ${fecha}`;
-  svgElement.appendChild(cita);
+const cita = document.createElementNS("http://www.w3.org/2000/svg", "text");
+cita.setAttribute("x", width / 2);
+cita.setAttribute("y", height + 20);
+cita.setAttribute("text-anchor", "middle");
+cita.setAttribute("font-size", "10px");
+cita.setAttribute("fill", "#333");
+cita.setAttribute("font-family", "'Noto Sans', sans-serif");
+cita.setAttribute("id", "marca-descarga");
+const fecha = new Date().toISOString().split("T")[0];
+cita.textContent = `Fuente: Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. Consultado el ${fecha}`;
+svgElement.appendChild(cita);
 
-  /// ==============================
-  // SERIALIZACIÓN Y DESCARGA
-  // ==============================
-  const serializer = new XMLSerializer();
-  const svgString = serializer.serializeToString(svgElement);
+// ==============================
+// SERIALIZACIÓN Y DESCARGA
+// ==============================
+const serializer = new XMLSerializer();
+const svgString = serializer.serializeToString(svgElement);
 
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d");
+const canvas = document.createElement("canvas");
+canvas.width = width;
+canvas.height = height; // Se mantiene en 720
+const context = canvas.getContext("2d");
 
-  const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(svgBlob);
-  const image = new Image();
+// ==============================
+// AJUSTES INTERNOS SIN CAMBIAR TAMAÑO DE CANVAS
+// ==============================
+// Aquí puedes opcionalmente mover el contenido del SVG hacia abajo un poco
+// para hacer espacio visual para el título sin alterar height
+// pero eso ya lo resolviste con el `viewBox`
 
-  image.onload = function () {
-    context.drawImage(image, 0, 0, width, height);
-    URL.revokeObjectURL(url);
-    const png = canvas.toDataURL("image/png");
+const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+const url = URL.createObjectURL(svgBlob);
+const image = new Image();
 
-    const a = document.createElement("a");
-    a.href = png;
-    a.download = nombreArchivo;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  };
+image.onload = function () {
+  context.drawImage(image, 0, 0, width, height); // Mantiene 1280x720
+  URL.revokeObjectURL(url);
+  const png = canvas.toDataURL("image/png");
 
-  image.src = url;
+  const a = document.createElement("a");
+  a.href = png;
+  a.download = nombreArchivo;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+};
 
+image.src = url;
   // ==============================
   // LIMPIEZA DE ELEMENTOS TEMPORALES
   // ==============================
