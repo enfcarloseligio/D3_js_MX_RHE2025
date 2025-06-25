@@ -58,6 +58,11 @@ section {
   align-items: center;
 }
 
+section p, h3, h4, h5, h6 {
+  text-align: left;
+  width: 100%;
+}
+
 /* ===================================================
    ESTILOS TIPOGRAFÍAS
 =================================================== */
