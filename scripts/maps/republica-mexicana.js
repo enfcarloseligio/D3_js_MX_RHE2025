@@ -71,7 +71,7 @@ Promise.all([
   "Tabasco": "../entidades/tabasco.html",
   "Tamaulipas": "../entidades/tamaulipas.html",
   "Tlaxcala": "../entidades/tlaxcala.html",
-  "Veracruz": "../entidades/veracruz.html",
+  "Veracruz de Ignacio de la Llave": "../entidades/veracruz.html",
   "Yucatán": "../entidades/yucatan.html",
   "Zacatecas": "../entidades/zacatecas.html"
   };
