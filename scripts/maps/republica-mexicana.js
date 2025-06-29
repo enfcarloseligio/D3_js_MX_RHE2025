@@ -42,13 +42,13 @@ Promise.all([
   const path = d3.geoPath().projection(projection);
 
   const enlacesEntidad = {
-      "Aguascalientes": "../entidades/aguascalientes.html",
+  "Aguascalientes": "../entidades/aguascalientes.html",
   "Baja California": "../entidades/baja-california.html",
   "Baja California Sur": "../entidades/baja-california-sur.html",
   "Campeche": "../entidades/campeche.html",
   "Chiapas": "../entidades/chiapas.html",
   "Chihuahua": "../entidades/chihuahua.html",
-  "Ciudad de México": "../entidades/cdmx.html",
+  "Ciudad de México": "../entidades/ciudad-de-mexico.html",
   "Coahuila": "../entidades/coahuila.html",
   "Colima": "../entidades/colima.html",
   "Durango": "../entidades/durango.html",
