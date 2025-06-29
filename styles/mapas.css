@@ -118,8 +118,9 @@
 }
 
 .tabla-datos thead {
-  background-color: #002f2a;
+  background-color: var(--color-Verde-Abismo);
   color: white;
+  font-weight: bold;
 }
 
 .tabla-datos td.municipio {
@@ -129,6 +130,14 @@
 
 .tabla-datos td.numero {
   text-align: right;
+}
+
+/* Estilo para la fila de totales */
+.fila-total td {
+  background-color: var(--color-Verde-Abismo);
+  color: white;
+  font-weight: 700 !important;
+  font-size: 1.05em;
 }
 
 /* ===================================================

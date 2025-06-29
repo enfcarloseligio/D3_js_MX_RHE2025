@@ -9,7 +9,7 @@ export function generarTablaMunicipios(rutaCSV) {
     const tabla = document.createElement("table");
     tabla.className = "tabla-datos";
 
-    // Encabezado
+    // Crear encabezado de la tabla
     const thead = document.createElement("thead");
     thead.innerHTML = `
       <tr>
@@ -22,7 +22,7 @@ export function generarTablaMunicipios(rutaCSV) {
 
     const tbody = document.createElement("tbody");
 
-    // Orden inicial: dejar registros 888 (No disponible) y 999 (Total) al final
+    // Ordenar datos para colocar "No disponible" (888) y "Total" (999) al final
     data.sort((a, b) => {
       if (a.id === "999") return 1;
       if (b.id === "999") return -1;
@@ -31,45 +31,60 @@ export function generarTablaMunicipios(rutaCSV) {
       return a.municipio.localeCompare(b.municipio);
     });
 
-    // Crear filas con datos
+    // Generar filas dinámicamente
     data.forEach(d => {
       const fila = document.createElement("tr");
-      fila.dataset.id = d.id; // Guardamos el id para uso posterior
+      fila.dataset.id = d.id;
 
+      // Aplicar clase especial a la fila de totales (id 999)
+      if (d.id === "999") {
+        fila.classList.add("fila-total");
+      }
+
+      // Celda: Municipio
       const celdaMunicipio = document.createElement("td");
       celdaMunicipio.className = "municipio";
       celdaMunicipio.textContent = d.municipio;
 
+      // Celda: Enfermeras
       const celdaEnfermeras = document.createElement("td");
       celdaEnfermeras.className = "numero";
       celdaEnfermeras.textContent = Number(d.enfermeras).toLocaleString("es-MX");
 
+      // Celda: Población
       const celdaPoblacion = document.createElement("td");
       celdaPoblacion.className = "numero";
       celdaPoblacion.textContent = Number(d.población).toLocaleString("es-MX");
 
+      // Celda: Tasa
       const celdaTasa = document.createElement("td");
       celdaTasa.className = "numero";
       celdaTasa.textContent = (+d.tasa).toFixed(2);
 
+      // Añadir celdas a la fila
       fila.appendChild(celdaMunicipio);
       fila.appendChild(celdaEnfermeras);
       fila.appendChild(celdaPoblacion);
       fila.appendChild(celdaTasa);
 
+      // Añadir fila al cuerpo de la tabla
       tbody.appendChild(fila);
     });
 
+    // Armar la tabla
     tabla.appendChild(thead);
     tabla.appendChild(tbody);
 
+    // Envolver tabla para scroll
     const envoltorio = document.createElement("div");
     envoltorio.className = "tabla-scroll";
     envoltorio.appendChild(tabla);
 
+    // Inyectar en el contenedor
     contenedor.appendChild(envoltorio);
 
-    activarOrdenamientoTabla(tabla); // Activar ordenamiento interactivo
+    // Activar ordenamiento interactivo
+    activarOrdenamientoTabla(tabla);
   }).catch(error => {
     console.error("Error al cargar la tabla de municipios:", error);
   });
@@ -139,3 +154,4 @@ export function habilitarDescargaExcel(nombreArchivo = "tasas-enfermeras-municip
     XLSX.writeFile(wb, nombreArchivo);
   });
 }
+const fila = document.createElement("tr");
