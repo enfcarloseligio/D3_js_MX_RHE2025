@@ -1,4 +1,3 @@
-
 // ==============================
 // CONFIGURACIÓN GLOBAL PARA MAPAS DE ENTIDADES
 // ==============================
@@ -120,11 +119,11 @@ export function inyectarControlesBasicos(svg, g, urlCasa = "../entidades/republi
   }
 
   const botones = [
-    { id: "zoom-in", label: "+", title: "Acercar" },
-    { id: "zoom-out", label: "–", title: "Alejar" },
-    { id: "zoom-reset", label: "⟳", title: "Restablecer" },
-    { id: "zoom-home", label: "🏠", title: "Volver al mapa nacional" }
-  ];
+  { id: "zoom-in",    label: "+",  title: "Acercar" },
+  { id: "zoom-out",   label: "–",  title: "Alejar" },
+  { id: "zoom-reset", label: "⟳",  title: "Restablecer" },
+  { id: "zoom-home",  label: "🏠", title: "Volver al mapa nacional" }
+];
 
   botones.forEach(({ id, label, title }) => {
     let btn = document.getElementById(id);

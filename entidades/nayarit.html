@@ -83,7 +83,7 @@
 <script type="module">
   import { generarTablaMunicipios, habilitarDescargaExcel } from '../scripts/utils/tabla-municipios.js';
 
-  generarTablaMunicipios('../data/tasas/tasas-enfermeras-nayarit.csv');
+  generarTablaMunicipios('../data/rate/nayarit.csv');
 
   const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
   habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);

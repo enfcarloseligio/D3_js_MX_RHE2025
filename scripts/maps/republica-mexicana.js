@@ -138,7 +138,7 @@ Promise.all([
     selectorZoomReset: "#zoom-reset"
   });
 
-  generarTablaNacional("../data/tasas-enfermeras-mx.csv");
+  generarTablaNacional("../data/rate/republica-mexicana.csv");
   habilitarDescargaExcel("enfermeras-nacional.xlsx");
 }).catch(error => {
   console.error("Error al cargar los datos del mapa nacional:", error);
