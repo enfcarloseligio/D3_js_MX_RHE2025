@@ -34,25 +34,30 @@
 
     <h2>Distribución de enfermeras en los municipios de Nayarit</h2>
     <p>
-      A continuación se muestra un mapa interactivo que representa la tasa de enfermeras por cada mil habitantes en los municipios de Nayarit. 
-      Utiliza los botones de zoom (+/–) para acercar o alejar el mapa, y el botón de reinicio (⟳) para volver a la vista general. Al pasar el cursor sobre cada municipio, podrás ver la tasa específica de enfermeras por cada mil habitantes.
-      Para consultar la información por municipio, puedes hacer uso de los controles de zoom y pasar el cursor sobre cada área del mapa. Esto te permitirá identificar con precisión la tasa de enfermeras por cada mil habitantes en cada región.
+      A continuación se presenta un mapa interactivo que muestra la distribución de profesionales de enfermería por cada mil habitantes en los municipios de Nayarit.
+      Utiliza los botones de zoom (+/–) para acercar o alejar el mapa, el botón de reinicio (⟳) para volver a la vista general y el ícono de la casa 🏠 para regresar al mapa de la República Mexicana.
+      Al colocar el cursor sobre cada municipio, podrás consultar la tasa específica de profesionales de enfermería por cada mil habitantes. Esta información permite identificar con precisión las regiones con mayor o menor cobertura, y sirve de apoyo para la planificación de recursos humanos en salud a nivel local.
     </p>
-
 
     <div id="mapa-nayarit" class="mapa-wrapper">
       <!-- Aquí se inyecta el mapa SVG dinámicamente -->
       <div class="zoom-controles"></div>
     </div>
 
+    <!-- NOTA Y FUENTE -->
     <p id="nota">
-      <em>
-        Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
-        <br>Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
-      </em>
+      <span style="font-weight: bold;">Nota:</span>
+      <span style="font-style: italic;">
+        La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y en los registros del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE), con corte estadístico al 28 de enero de 2025.
+      </span>
+      <br>
+      <span style="font-weight: bold;">Fuente:</span>
+      <span style="font-style: italic;">
+        Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
+      </span>
     </p>
 
-    <!-- Botones para descarga del mapa -->
+    <!-- BOTONES DE DESCARGA DEL MAPA -->
     <div class="descarga-container">
       <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
       <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
@@ -79,7 +84,7 @@
 
 </main>
 
-<!-- Cargar tabla y activar descarga -->
+<!-- CARGA DE DATOS Y EXPORTACIÓN -->
 <script type="module">
   import { generarTablaMunicipios, habilitarDescargaExcel } from '../scripts/utils/tabla-municipios.js';
 
