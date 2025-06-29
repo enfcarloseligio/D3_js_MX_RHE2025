@@ -199,11 +199,14 @@ export function descargarComoPNG(
   nombreEntidad = ""
 ) {
   const svgElement = document.querySelector(svgSelector);
+
+  // === Extensiones del área de visualización ===
   const extraTop = 50;
   const extraBottom = 40;
   const newHeight = height + extraTop + extraBottom;
   svgElement.setAttribute("viewBox", `0 ${-extraTop} ${width} ${newHeight}`);
 
+  // === Fondo semitransparente del título ===
   const fondoTitulo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondoTitulo.setAttribute("x", -100);
   fondoTitulo.setAttribute("y", -extraTop);
@@ -214,12 +217,14 @@ export function descargarComoPNG(
   fondoTitulo.setAttribute("id", "fondo-titulo");
   svgElement.appendChild(fondoTitulo);
 
+  // === Título centrado en la parte superior ===
   const titulo = document.createElementNS("http://www.w3.org/2000/svg", "text");
   titulo.setAttribute("x", width / 2);
   titulo.setAttribute("y", -extraTop + 30);
   titulo.setAttribute("text-anchor", "middle");
   titulo.setAttribute("font-size", "20px");
   titulo.setAttribute("font-family", "'Noto Sans', sans-serif");
+  titulo.setAttribute("font-weight", "bold");
   titulo.setAttribute("fill", "#111");
   titulo.setAttribute("id", "titulo-descarga");
   titulo.textContent = nombreEntidad
@@ -227,6 +232,7 @@ export function descargarComoPNG(
     : `Tasa de enfermeras por cada mil habitantes (2025)`;
   svgElement.appendChild(titulo);
 
+  // === Fondo semitransparente de la fuente/cita ===
   const fondo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondo.setAttribute("x", -100);
   fondo.setAttribute("y", height);
@@ -237,18 +243,24 @@ export function descargarComoPNG(
   fondo.setAttribute("id", "fondo-cita");
   svgElement.appendChild(fondo);
 
+  // === Cita inferior con fecha dinámica ===
   const cita = document.createElementNS("http://www.w3.org/2000/svg", "text");
   cita.setAttribute("x", width / 2);
-  cita.setAttribute("y", height + 20);
+  cita.setAttribute("y", height + 20); // verticalmente ajustado
   cita.setAttribute("text-anchor", "middle");
-  cita.setAttribute("font-size", "10px");
+  cita.setAttribute("dominant-baseline", "middle");
+  cita.setAttribute("font-size", "14px");
   cita.setAttribute("fill", "#333");
   cita.setAttribute("font-family", "'Noto Sans', sans-serif");
   cita.setAttribute("id", "marca-descarga");
   const fecha = new Date().toISOString().split("T")[0];
-  cita.textContent = `Fuente: Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. Consultado el ${fecha}`;
+  cita.textContent =
+    `Fuente: Secretaría de Salud. (enero, 2025). ` +
+    `Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. ` +
+    `Consultado el ${fecha}`;
   svgElement.appendChild(cita);
 
+  // === Serialización del SVG y creación del canvas ===
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgElement);
   const canvas = document.createElement("canvas");
@@ -256,6 +268,7 @@ export function descargarComoPNG(
   canvas.height = height;
   const context = canvas.getContext("2d");
 
+  // === Conversión a imagen y descarga como PNG ===
   const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(svgBlob);
   const image = new Image();
@@ -275,6 +288,7 @@ export function descargarComoPNG(
 
   image.src = url;
 
+  // === Limpieza de elementos auxiliares del SVG (título y cita) ===
   setTimeout(() => {
     svgElement.querySelector("#titulo-descarga")?.remove();
     svgElement.querySelector("#fondo-titulo")?.remove();

@@ -35,7 +35,7 @@ Promise.all([
     .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']);
 
   const projection = d3.geoMercator()
-    .scale(1500)
+    .scale(2000)
     .center([-102, 24])
     .translate([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
 
