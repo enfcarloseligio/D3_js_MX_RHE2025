@@ -22,12 +22,12 @@ export function generarTablaMunicipios(rutaCSV) {
 
     const tbody = document.createElement("tbody");
 
-    // Ordenar datos para colocar "No disponible" (888) y "Total" (999) al final
+    // Ordenar datos para colocar "No disponible" (8888) y "Total" (9999) al final
     data.sort((a, b) => {
-      if (a.id === "999") return 1;
-      if (b.id === "999") return -1;
-      if (a.id === "888") return 1;
-      if (b.id === "888") return -1;
+      if (a.id === "9999") return 1;
+      if (b.id === "9999") return -1;
+      if (a.id === "8888") return 1;
+      if (b.id === "8888") return -1;
       return a.municipio.localeCompare(b.municipio);
     });
 
@@ -37,7 +37,7 @@ export function generarTablaMunicipios(rutaCSV) {
       fila.dataset.id = d.id;
 
       // Aplicar clase especial a la fila de totales (id 999)
-      if (d.id === "999") {
+      if (d.id === "9999") {
         fila.classList.add("fila-total");
       }
 
@@ -113,9 +113,9 @@ function activarOrdenamientoTabla(tabla) {
 
       const filas = Array.from(tabla.querySelectorAll("tbody tr"));
 
-      // Separar filas con id 888 y 999 (datos especiales que deben ir al final)
-      const especiales = filas.filter(f => ["888", "999"].includes(f.dataset.id));
-      const normales = filas.filter(f => !["888", "999"].includes(f.dataset.id));
+      // Separar filas con id 8888 y 9999 (datos especiales que deben ir al final)
+      const especiales = filas.filter(f => ["8888", "9999"].includes(f.dataset.id));
+      const normales = filas.filter(f => !["8888", "9999"].includes(f.dataset.id));
 
       // Ordenar filas normales según la columna seleccionada
       normales.sort((a, b) => {
