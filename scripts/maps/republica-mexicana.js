@@ -17,7 +17,7 @@ const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución naciona
 const tooltip = crearTooltip();
 
 Promise.all([
-  d3.json("../data/maps/republica-mexicana.json"),
+  d3.json("../data/maps/republica-mexicana.geojson"),
   d3.csv("../data/rate/republica-mexicana.csv")
 ]).then(([geoData, tasas]) => {
   const tasaMap = {};

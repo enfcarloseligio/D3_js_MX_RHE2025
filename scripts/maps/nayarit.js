@@ -26,7 +26,7 @@ const tooltip = crearTooltip();
 // ==============================
 
 Promise.all([
-  d3.json("../data/maps/nayarit.json"),
+  d3.json("../data/maps/nayarit.geojson"),
   d3.csv("../data/rate/nayarit.csv")
 ]).then(([geoData, tasas]) => {
 
