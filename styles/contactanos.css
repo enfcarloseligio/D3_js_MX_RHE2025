@@ -1,0 +1,14 @@
+.contacto ul {
+  list-style: none;
+  padding: 0;
+}
+
+.contacto li {
+  margin-bottom: 1rem;
+}
+
+.migas {
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  color: #444;
+}

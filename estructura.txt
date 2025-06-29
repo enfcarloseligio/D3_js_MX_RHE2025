@@ -14,15 +14,13 @@ E:.
 ¦       banner.html
 ¦       footer.html
 ¦       header.html
-¦       layout-entidiades.html
+¦       layout-entidades.html
 ¦       
 +---data
-¦   ¦   entidades-mx.json
-¦   ¦   tasas-enfermeras-mx.csv
-¦   ¦   
 ¦   +---maps
 ¦   ¦       aguascalientes.json
 ¦   ¦       nayarit.json
+¦   ¦       republica-mexicana.json
 ¦   ¦       
 ¦   +---rate
 ¦           aguascalientes.csv
@@ -48,6 +46,7 @@ E:.
 ¦           puebla.csv
 ¦           queretaro.csv
 ¦           quintana-roo.csv
+¦           republica-mexicana.csv
 ¦           san-luis-potosi.csv
 ¦           sinaloa.csv
 ¦           sonora.csv
