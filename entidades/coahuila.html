@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- REEMPLAZAR: Descripción con el nombre del estado -->
+  <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de {{ESTADO}} 2025." />
+  
+  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería" />
+  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025" />
+  
+  <!-- REEMPLAZAR: Título de la pestaña -->
+  <title>Distribución de Enfermeras en el Estado de {{ESTADO}} - Gobierno de México</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../styles/mapas.css" />
+
+  <!-- Librerías externas -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- REEMPLAZAR: Nombre del archivo JS del mapa -->
+  <script type="module" src="../scripts/maps/{{archivoJS}}.js"></script>
+
+  <!-- Script para inyectar header, banner y footer -->
+  <script src="../scripts/inyectar-layout.js" defer></script>
+</head>
+
+<body>
+<main>
+
+  <!-- SECCIÓN PRINCIPAL DEL MAPA -->
+  <section class="mapa-entidad">
+    <!-- REEMPLAZAR: Título H1 con el nombre del estado -->
+    <h1>¿Cuántas enfermeras hay en {{ESTADO}} en 2025?</h1>
+    
+    <!-- REEMPLAZAR: Total de enfermeras y municipios -->
+    <p class="bienvenida">
+      En el año 2025, el estado de {{ESTADO}} cuenta con un total de <strong>{{TOTAL_ENFERMERAS}}</strong> enfermeras distribuidas en sus {{TOTAL_MUNICIPIOS}} municipios, de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE). Esta cifra refleja los esfuerzos del sistema de salud por garantizar el acceso equitativo a los servicios de enfermería en toda la entidad.
+    </p>
+
+    <!-- REEMPLAZAR: Nombre del estado -->
+    <h2>Distribución de enfermeras en los municipios de {{ESTADO}}</h2>
+    <p>
+      A continuación se muestra un mapa interactivo que representa la tasa de enfermeras por cada mil habitantes en los municipios de {{ESTADO}}. 
+      Utiliza los botones de zoom (+/–) para acercar o alejar el mapa, y el botón de reinicio (⟳) para volver a la vista general. Al pasar el cursor sobre cada municipio, podrás ver la tasa específica de enfermeras por cada mil habitantes.
+    </p>
+
+    <!-- REEMPLAZAR: ID del contenedor de mapa con el nombre del archivo JS -->
+    <div id="mapa-{{archivoJS}}" class="mapa-wrapper">
+      <!-- Aquí se inyecta el mapa SVG dinámicamente -->
+      <div class="zoom-controles"></div>
+    </div>
+
+    <p id="nota">
+      <em>
+        Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
+        <br>Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
+      </em>
+    </p>
+
+    <!-- Botones para descargar el mapa -->
+    <div class="descarga-container">
+      <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
+      <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
+    </div>
+  </section>
+
+  <!-- SECCIÓN DE TABLA -->
+  <!-- REEMPLAZAR: clase con el nombre del archivo JS (opcional) -->
+  <section class="tabla-{{archivoJS}}">
+    <!-- REEMPLAZAR: Nombre del estado -->
+    <h2>Tasa de enfermeras por municipio en {{ESTADO}} (2025)</h2>
+    <p>
+      Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras, su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones en salud pública, distribución de recursos y evaluación de cobertura.
+    </p>
+
+    <div class="tabla-scroll">
+      <div id="tabla-contenido">
+        <!-- La tabla se carga con JS -->
+      </div>
+    </div>
+
+    <div class="descarga-container">
+      <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- REEMPLAZAR: nombre del archivo CSV con el de la entidad -->
+<script type="module">
+  import { generarTablaMunicipios, habilitarDescargaExcel } from '../scripts/utils/tabla-municipios.js';
+
+  generarTablaMunicipios('../data/tasas/tasas-enfermeras-{{archivoJS}}.csv');
+
+  const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
+  habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
+</script>
+
+</body>
+</html>
