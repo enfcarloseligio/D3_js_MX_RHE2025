@@ -26,7 +26,7 @@ const tooltip = crearTooltip();
 // ==============================
 
 Promise.all([
-  d3.json("../data/maps/aguascalientes.json"),
+  d3.json("../data/maps/aguascalientes.geojson"),
   d3.csv("../data/rate/aguascalientes.csv")
 ]).then(([geoData, tasas]) => {
 
