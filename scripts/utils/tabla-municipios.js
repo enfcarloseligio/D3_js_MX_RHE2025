@@ -1,10 +1,15 @@
+// ===============================================
+// FUNCIÓN PRINCIPAL PARA GENERAR LA TABLA
+// ===============================================
 export function generarTablaMunicipios(rutaCSV) {
   d3.csv(rutaCSV).then(data => {
     const contenedor = document.getElementById("tabla-contenido");
 
+    // Crear estructura base de la tabla
     const tabla = document.createElement("table");
     tabla.className = "tabla-datos";
 
+    // Encabezado
     const thead = document.createElement("thead");
     thead.innerHTML = `
       <tr>
@@ -17,8 +22,19 @@ export function generarTablaMunicipios(rutaCSV) {
 
     const tbody = document.createElement("tbody");
 
+    // Orden inicial: dejar registros 888 (No disponible) y 999 (Total) al final
+    data.sort((a, b) => {
+      if (a.id === "999") return 1;
+      if (b.id === "999") return -1;
+      if (a.id === "888") return 1;
+      if (b.id === "888") return -1;
+      return a.municipio.localeCompare(b.municipio);
+    });
+
+    // Crear filas con datos
     data.forEach(d => {
       const fila = document.createElement("tr");
+      fila.dataset.id = d.id; // Guardamos el id para uso posterior
 
       const celdaMunicipio = document.createElement("td");
       celdaMunicipio.className = "municipio";
@@ -26,11 +42,11 @@ export function generarTablaMunicipios(rutaCSV) {
 
       const celdaEnfermeras = document.createElement("td");
       celdaEnfermeras.className = "numero";
-      celdaEnfermeras.textContent = Number(d.enfermeras).toLocaleString('es-MX');
+      celdaEnfermeras.textContent = Number(d.enfermeras).toLocaleString("es-MX");
 
       const celdaPoblacion = document.createElement("td");
       celdaPoblacion.className = "numero";
-      celdaPoblacion.textContent = Number(d.población).toLocaleString('es-MX');
+      celdaPoblacion.textContent = Number(d.población).toLocaleString("es-MX");
 
       const celdaTasa = document.createElement("td");
       celdaTasa.className = "numero";
@@ -53,7 +69,7 @@ export function generarTablaMunicipios(rutaCSV) {
 
     contenedor.appendChild(envoltorio);
 
-    activarOrdenamientoTabla(tabla);
+    activarOrdenamientoTabla(tabla); // Activar ordenamiento interactivo
   }).catch(error => {
     console.error("Error al cargar la tabla de municipios:", error);
   });
@@ -76,13 +92,18 @@ function activarOrdenamientoTabla(tabla) {
       // Limpiar todas las flechas
       tabla.querySelectorAll(".flecha-orden").forEach(span => span.textContent = "");
 
-      // Asignar nueva flecha a este th
+      // Mostrar flecha en la columna activa
       const flecha = th.querySelector(".flecha-orden");
       if (flecha) flecha.textContent = nuevoOrden === "asc" ? "▲" : "▼";
 
       const filas = Array.from(tabla.querySelectorAll("tbody tr"));
 
-      filas.sort((a, b) => {
+      // Separar filas con id 888 y 999 (datos especiales que deben ir al final)
+      const especiales = filas.filter(f => ["888", "999"].includes(f.dataset.id));
+      const normales = filas.filter(f => !["888", "999"].includes(f.dataset.id));
+
+      // Ordenar filas normales según la columna seleccionada
+      normales.sort((a, b) => {
         const celdaA = a.children[index].textContent.trim().replace(/,/g, "");
         const celdaB = b.children[index].textContent.trim().replace(/,/g, "");
 
@@ -94,8 +115,9 @@ function activarOrdenamientoTabla(tabla) {
         return 0;
       });
 
+      // Reinsertar filas: primero normales, después especiales
       const tbody = tabla.querySelector("tbody");
-      filas.forEach(fila => tbody.appendChild(fila));
+      [...normales, ...especiales].forEach(fila => tbody.appendChild(fila));
 
       th.setAttribute("data-orden", nuevoOrden);
     });
