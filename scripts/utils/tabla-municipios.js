@@ -14,8 +14,8 @@ export function generarTablaMunicipios(rutaCSV) {
     thead.innerHTML = `
       <tr>
         <th><span class="flecha-orden"></span>Municipio</th>
-        <th><span class="flecha-orden"></span>Enfermeras</th>
         <th><span class="flecha-orden"></span>Población</th>
+        <th><span class="flecha-orden"></span>Enfermeras</th>
         <th><span class="flecha-orden"></span>Tasa por cada mil habitantes</th>
       </tr>
     `;
@@ -46,15 +46,15 @@ export function generarTablaMunicipios(rutaCSV) {
       celdaMunicipio.className = "municipio";
       celdaMunicipio.textContent = d.municipio;
 
-      // Celda: Enfermeras
-      const celdaEnfermeras = document.createElement("td");
-      celdaEnfermeras.className = "numero";
-      celdaEnfermeras.textContent = Number(d.enfermeras).toLocaleString("es-MX");
-
       // Celda: Población
       const celdaPoblacion = document.createElement("td");
       celdaPoblacion.className = "numero";
       celdaPoblacion.textContent = Number(d.población).toLocaleString("es-MX");
+
+      // Celda: Enfermeras
+      const celdaEnfermeras = document.createElement("td");
+      celdaEnfermeras.className = "numero";
+      celdaEnfermeras.textContent = Number(d.enfermeras).toLocaleString("es-MX");
 
       // Celda: Tasa
       const celdaTasa = document.createElement("td");
@@ -63,8 +63,8 @@ export function generarTablaMunicipios(rutaCSV) {
 
       // Añadir celdas a la fila
       fila.appendChild(celdaMunicipio);
-      fila.appendChild(celdaEnfermeras);
       fila.appendChild(celdaPoblacion);
+      fila.appendChild(celdaEnfermeras);
       fila.appendChild(celdaTasa);
 
       // Añadir fila al cuerpo de la tabla
@@ -154,4 +154,3 @@ export function habilitarDescargaExcel(nombreArchivo = "tasas-enfermeras-municip
     XLSX.writeFile(wb, nombreArchivo);
   });
 }
-const fila = document.createElement("tr");
