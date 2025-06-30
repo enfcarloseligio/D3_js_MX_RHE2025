@@ -3,7 +3,6 @@
 // ==============================
 
 import { crearTooltip, mostrarTooltip, ocultarTooltip } from '../utils/tooltip.js';
-
 import {
   crearSVGBase,
   MAP_WIDTH,
@@ -13,6 +12,13 @@ import {
   crearEtiquetaMunicipio,
   inyectarControlesBasicos
 } from '../utils/config-mapa.js';
+
+// ==============================
+// INSERCIÓN DE AÑO EN EL HTML
+// ==============================
+
+const currentYear = new Date().getFullYear();
+document.querySelectorAll(".year").forEach(el => el.textContent = currentYear);
 
 // ==============================
 // CREACIÓN DEL SVG Y TOOLTIP
@@ -40,16 +46,19 @@ Promise.all([
     };
   });
 
+  // Insertar total de enfermeras si hay fila con id = 9999
+  const total = tasas.find(d => d.id === "9999");
+  if (total) {
+    const spanTotal = document.getElementById("total-enfermeras");
+    if (spanTotal) spanTotal.textContent = Number(total.enfermeras).toLocaleString("es-MX");
+  }
+
   const colorScale = d3.scaleLinear()
     .domain([0.76, 1.55, 2.06, 3.45, 5.32])
     .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']);
 
   const projection = d3.geoMercator().fitSize([MAP_WIDTH, MAP_HEIGHT], geoData);
   const path = d3.geoPath().projection(projection);
-
-  // ==============================
-  // ESCALADO INICIAL DEL MAPA
-  // ==============================
 
   g.attr("transform", "scale(1.0) translate(0,0)");
 
@@ -80,10 +89,7 @@ Promise.all([
       d3.select(this).attr("stroke-width", 0.5);
     });
 
-  // ==============================
-  // ETIQUETAS DE MUNICIPIOS
-  // ==============================
-
+  // Etiquetas
   const labelsGroup = g.append("g")
     .attr("id", "etiquetas-municipios")
     .style("display", "none");
@@ -96,35 +102,15 @@ Promise.all([
     });
   });
 
-  // ==============================
-  // LEYENDA
-  // ==============================
-
+  // Leyenda
   crearLeyenda(svg, {
     dominio: [0.76, 5.32],
     pasos: [0.76, 1.56, 2.06, 3.45, 5.32],
     colores: ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']
   });
 
-  // ==============================
-  // CONTROLES (Zoom + Casa)
-  // ==============================
-
+  // Controles
   inyectarControlesBasicos(svg, g, "../entidades/republica-mexicana.html");
-
-  // ==============================
-  // INSERCIÓN DE AÑO Y TOTAL DINÁMICO
-  // ==============================
-  document.addEventListener("DOMContentLoaded", () => {
-    const currentYear = new Date().getFullYear();
-    document.querySelectorAll(".year").forEach(el => el.textContent = currentYear);
-
-    const total = tasas.find(d => d.id === "9999");
-    if (total) {
-      const spanTotal = document.getElementById("total-enfermeras");
-      if (spanTotal) spanTotal.textContent = Number(total.enfermeras).toLocaleString("es-MX");
-    }
-  });
 
 }).catch(error => {
   console.error("Error al cargar datos del mapa de Nayarit:", error);
@@ -134,48 +120,25 @@ Promise.all([
 // DESCARGA DE IMÁGENES PNG
 // ==============================
 
-// Obtener automáticamente el nombre de la entidad desde la URL
 const nombreEntidadArchivo = location.pathname.split("/").pop().replace(".html", "");
 const nombreEntidad = nombreEntidadArchivo
   .split("-")
   .map(p => p.charAt(0).toUpperCase() + p.slice(1))
   .join(" ");
 
-// ==============================
-// BOTÓN: Descargar SIN etiquetas de municipios
-// ==============================
-
 document.getElementById("descargar-sin-etiquetas").addEventListener("click", () => {
   const etiquetas = document.getElementById("etiquetas-municipios");
   if (etiquetas) etiquetas.style.display = "none";
-
   setTimeout(() => {
-    descargarComoPNG(
-      "#mapa-nayarit svg",
-      `mapa-enfermeras-${nombreEntidadArchivo}-sin-nombres.png`,
-      MAP_WIDTH,
-      MAP_HEIGHT,
-      nombreEntidad
-    );
+    descargarComoPNG("#mapa-nayarit svg", `mapa-enfermeras-${nombreEntidadArchivo}-sin-nombres.png`, MAP_WIDTH, MAP_HEIGHT, nombreEntidad);
   }, 100);
 });
-
-// ==============================
-// BOTÓN: Descargar CON etiquetas de municipios
-// ==============================
 
 document.getElementById("descargar-con-etiquetas").addEventListener("click", () => {
   const etiquetas = document.getElementById("etiquetas-municipios");
   if (etiquetas) etiquetas.style.display = "block";
-
   setTimeout(() => {
-    descargarComoPNG(
-      "#mapa-nayarit svg",
-      `mapa-enfermeras-${nombreEntidadArchivo}-con-nombres.png`,
-      MAP_WIDTH,
-      MAP_HEIGHT,
-      nombreEntidad
-    );
+    descargarComoPNG("#mapa-nayarit svg", `mapa-enfermeras-${nombreEntidadArchivo}-con-nombres.png`, MAP_WIDTH, MAP_HEIGHT, nombreEntidad);
     if (etiquetas) etiquetas.style.display = "none";
   }, 100);
 });

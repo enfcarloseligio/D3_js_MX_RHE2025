@@ -16,10 +16,6 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-  <!-- Scripts internos -->
-  <script type="module" src="../scripts/maps/nayarit.js"></script>
-  <script src="../scripts/inyectar-layout.js"></script>
 </head>
 
 <body>
@@ -94,11 +90,9 @@
   habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
 </script>
 
-<!-- SCRIPT PARA AÑO DINÁMICO -->
-<script>
-  const currentYear = new Date().getFullYear();
-  document.querySelectorAll(".year").forEach(el => el.textContent = currentYear);
-</script>
+<!-- INYECTA LAYOUT Y SCRIPT PRINCIPAL -->
+<script src="../scripts/inyectar-layout.js"></script>
+<script type="module" src="../scripts/maps/nayarit.js"></script>
 
 </body>
 </html>
