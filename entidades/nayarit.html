@@ -27,9 +27,9 @@
 
   <!-- SECCIÓN PRINCIPAL DEL MAPA -->
   <section class="mapa-entidad">
-    <h1>¿Cuántas enfermeras hay en Nayarit en 2025?</h1>
+    <h1>¿Cuántas enfermeras hay en Nayarit en <span class="year"></span>?</h1>
     <p class="bienvenida">
-      En el año 2025, el estado de Nayarit cuenta con un total de <strong>2,205 enfermeras</strong> distribuidas en sus 20 municipios, de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE). Esta cifra refleja los esfuerzos del sistema de salud por garantizar el acceso equitativo a los servicios de enfermería en toda la entidad.
+      En el año <span class="year"></span>, el estado de Nayarit cuenta con un total de <strong><span id="total-enfermeras"></span> enfermeras</strong> distribuidas en sus 20 municipios, de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE). Este dato es clave para el análisis y planificación de los recursos humanos en salud a nivel estatal.
     </p>
 
     <h2>Distribución de enfermeras en los municipios de Nayarit</h2>
@@ -46,15 +46,15 @@
 
     <!-- NOTA Y FUENTE -->
     <p id="nota">
-      <span style="font-weight: bold;">Nota:</span>
-      <span style="font-style: italic;">
-        La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y en los registros del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE), con corte estadístico al 28 de enero de 2025.
-      </span>
+      <strong>Nota:</strong>
+      <em>
+        La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y en los registros del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE), con corte estadístico al 28 de enero de <span class="year"></span>.
+      </em>
       <br>
-      <span style="font-weight: bold;">Fuente:</span>
-      <span style="font-style: italic;">
-        Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
-      </span>
+      <strong>Fuente:</strong>
+      <em>
+        Secretaría de Salud. (enero, <span class="year"></span>). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
+      </em>
     </p>
 
     <!-- BOTONES DE DESCARGA DEL MAPA -->
@@ -66,7 +66,7 @@
 
   <!-- SECCIÓN DE TABLA DINÁMICA -->
   <section class="tabla-nayarit">
-    <h2>Tasa de enfermeras por municipio en Nayarit (2025)</h2>
+    <h2>Tasa de enfermeras por municipio en Nayarit (<span class="year"></span>)</h2>
     <p>
       Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras, su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones en salud pública, distribución de recursos y evaluación de cobertura.
     </p>
@@ -92,6 +92,12 @@
 
   const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
   habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
+</script>
+
+<!-- SCRIPT PARA AÑO DINÁMICO -->
+<script>
+  const currentYear = new Date().getFullYear();
+  document.querySelectorAll(".year").forEach(el => el.textContent = currentYear);
 </script>
 
 </body>

@@ -112,6 +112,20 @@ Promise.all([
 
   inyectarControlesBasicos(svg, g, "../entidades/republica-mexicana.html");
 
+  // ==============================
+  // INSERCIÓN DE AÑO Y TOTAL DINÁMICO
+  // ==============================
+  document.addEventListener("DOMContentLoaded", () => {
+    const currentYear = new Date().getFullYear();
+    document.querySelectorAll(".year").forEach(el => el.textContent = currentYear);
+
+    const total = tasas.find(d => d.id === "9999");
+    if (total) {
+      const spanTotal = document.getElementById("total-enfermeras");
+      if (spanTotal) spanTotal.textContent = Number(total.enfermeras).toLocaleString("es-MX");
+    }
+  });
+
 }).catch(error => {
   console.error("Error al cargar datos del mapa de Nayarit:", error);
 });
