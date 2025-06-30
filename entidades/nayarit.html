@@ -16,84 +16,99 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- INYECTA LAYOUT Y SCRIPT PRINCIPAL -->
+
+  <!-- Layout general y script del mapa -->
   <script src="../scripts/inyectar-layout.js"></script>
   <script type="module" src="../scripts/maps/nayarit.js"></script>
 </head>
 
 <body>
-<main>
+  <main>
 
-  <!-- SECCIÓN PRINCIPAL DEL MAPA -->
-  <section class="mapa-entidad">
-    <h1>¿Cuántas enfermeras hay en Nayarit en <span class="year"></span>?</h1>
-    <p class="bienvenida">
-      En el año <span class="year"></span>, el estado de Nayarit cuenta con un total de <strong><span id="total-enfermeras"></span> enfermeras</strong> distribuidas en sus 20 municipios, de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE). Este dato es clave para el análisis y planificación de los recursos humanos en salud a nivel estatal.
-    </p>
+    <!-- Migas de pan -->
+    <nav aria-label="breadcrumb" class="migas">
+      <a href="../index.html">Inicio</a> &gt;
+      <a href="../entidades/republica-mexicana.html">República</a> &gt;
+      <span>Nayarit</span>
+    </nav>
 
-    <h2>Distribución de enfermeras en los municipios de Nayarit</h2>
-    <p>
-      A continuación se presenta un mapa interactivo que muestra la distribución de profesionales de enfermería por cada mil habitantes en los municipios de Nayarit.
-      Utiliza los botones de zoom (+/–) para acercar o alejar el mapa, el botón de reinicio (⟳) para volver a la vista general y el ícono de la casa 🏠 para regresar al mapa de la República Mexicana.
-      Al colocar el cursor sobre cada municipio, podrás consultar la tasa específica de profesionales de enfermería por cada mil habitantes. Esta información permite identificar con precisión las regiones con mayor o menor cobertura, y sirve de apoyo para la planificación de recursos humanos en salud a nivel local.
-    </p>
+    <!-- SECCIÓN PRINCIPAL DEL MAPA -->
+    <section class="mapa-entidad">
+      <h1>¿Cuántas enfermeras hay en Nayarit en <span class="year"></span>?</h1>
+      <p class="bienvenida">
+        En el año <span class="year"></span>, el estado de Nayarit cuenta con un total de
+        <strong><span id="total-enfermeras"></span> enfermeras</strong> distribuidas en sus 20 municipios,
+        de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
+        Este dato es clave para el análisis y planificación de los recursos humanos en salud a nivel estatal.
+      </p>
 
-    <div id="mapa-nayarit" class="mapa-wrapper">
-      <!-- Aquí se inyecta el mapa SVG dinámicamente -->
-      <div class="zoom-controles"></div>
-    </div>
+      <h2>Distribución de enfermeras en los municipios de Nayarit <span class="year"></span></h2>
+      <p>
+        A continuación se presenta un mapa interactivo que muestra la distribución de profesionales de enfermería por cada mil habitantes en los municipios de Nayarit.
+        Utiliza los botones de zoom (+/–) para acercar o alejar el mapa, el botón de reinicio (⟳) para volver a la vista general y el ícono de la casa 🏠 para regresar al mapa de la República Mexicana.
+        Al colocar el cursor sobre cada municipio, podrás consultar la tasa específica de profesionales de enfermería por cada mil habitantes.
+        Esta información permite identificar con precisión las regiones con mayor o menor cobertura, y sirve de apoyo para la planificación de recursos humanos en salud a nivel local.
+      </p>
 
-    <!-- NOTA Y FUENTE -->
-    <p id="nota">
-      <strong>Nota:</strong>
-      <em>
-        La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y en los registros del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE), con corte estadístico al 28 de enero de <span class="year"></span>.
-      </em>
-      <br>
-      <strong>Fuente:</strong>
-      <em>
-        Secretaría de Salud. (enero, <span class="year"></span>). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
-      </em>
-    </p>
-
-    <!-- BOTONES DE DESCARGA DEL MAPA -->
-    <div class="descarga-container">
-      <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
-      <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
-    </div>
-  </section>
-
-  <!-- SECCIÓN DE TABLA DINÁMICA -->
-  <section class="tabla-nayarit">
-    <h2>Tasa de enfermeras por municipio en Nayarit (<span class="year"></span>)</h2>
-    <p>
-      Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras, su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones en salud pública, distribución de recursos y evaluación de cobertura.
-    </p>
-
-    <div class="tabla-scroll">
-      <div id="tabla-contenido">
-        <!-- Tabla cargada dinámicamente con JS -->
+      <div id="mapa-nayarit" class="mapa-wrapper">
+        <!-- Aquí se inyecta el mapa SVG dinámicamente -->
+        <div class="zoom-controles"></div>
       </div>
-    </div>
 
-    <div class="descarga-container">
-      <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
-    </div>
-  </section>
+      <!-- NOTA Y FUENTE -->
+      <p id="nota">
+          <strong>Nota:</strong>
+          La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI)
+          y en los registros del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE),
+          con corte estadístico al 28 de enero de 2025.
+          Los intervalos de color en el mapa se establecieron con base en el valor mínimo, los cuartiles (Q1, Q2 o mediana, y Q3), y el valor máximo de la distribución.
+        <br />
+        <strong>Fuente:</strong>
+          Secretaría de Salud. (enero, 2025).
+          Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
+      </p>
 
-</main>
+      <!-- BOTONES DE DESCARGA DEL MAPA -->
+      <div class="descarga-container">
+        <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
+        <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
+      </div>
+    </section>
 
-<!-- CARGA DE DATOS Y EXPORTACIÓN -->
-<script type="module">
-  import { insertarAñoDinamico } from "../code.js";
-  import { generarTablaMunicipios, habilitarDescargaExcel } from '../scripts/utils/tabla-municipios.js';
+    <!-- SECCIÓN DE TABLA DINÁMICA -->
+    <section class="tabla-nayarit">
+      <h2>Tasa de enfermeras por municipio en Nayarit <span class="year"></span></h2>
+      <p>
+        Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras,
+        su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones
+        en salud pública, distribución de recursos y evaluación de cobertura.
+      </p>
 
-  insertarAñoDinamico();
+      <div class="tabla-scroll">
+        <div id="tabla-contenido">
+          <!-- Tabla cargada dinámicamente con JS -->
+        </div>
+      </div>
 
-  const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
-  generarTablaMunicipios(`../data/rate/${nombreEntidad}.csv`);
-  habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
-</script>
+      <div class="descarga-container">
+        <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
+      </div>
+    </section>
+  </main>
 
+  <!-- SCRIPTS FINALES -->
+  <script type="module">
+    import { insertarAñoDinamico } from "../code.js";
+    import {
+      generarTablaMunicipios,
+      habilitarDescargaExcel
+    } from '../scripts/utils/tabla-municipios.js';
+
+    insertarAñoDinamico();
+
+    const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
+    generarTablaMunicipios(`../data/rate/${nombreEntidad}.csv`);
+    habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
+  </script>
 </body>
 </html>
