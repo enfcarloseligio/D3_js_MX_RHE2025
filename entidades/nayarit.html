@@ -16,6 +16,9 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- INYECTA LAYOUT Y SCRIPT PRINCIPAL -->
+  <script src="../scripts/inyectar-layout.js"></script>
+  <script type="module" src="../scripts/maps/nayarit.js"></script>
 </head>
 
 <body>
@@ -82,17 +85,15 @@
 
 <!-- CARGA DE DATOS Y EXPORTACIÓN -->
 <script type="module">
+  import { insertarAñoDinamico } from "../code.js";
   import { generarTablaMunicipios, habilitarDescargaExcel } from '../scripts/utils/tabla-municipios.js';
 
-  generarTablaMunicipios('../data/rate/nayarit.csv');
+  insertarAñoDinamico();
 
   const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
+  generarTablaMunicipios(`../data/rate/${nombreEntidad}.csv`);
   habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
 </script>
-
-<!-- INYECTA LAYOUT Y SCRIPT PRINCIPAL -->
-<script src="../scripts/inyectar-layout.js"></script>
-<script type="module" src="../scripts/maps/nayarit.js"></script>
 
 </body>
 </html>

@@ -14,13 +14,6 @@ import {
 } from '../utils/config-mapa.js';
 
 // ==============================
-// INSERCIÓN DE AÑO EN EL HTML
-// ==============================
-
-const currentYear = new Date().getFullYear();
-document.querySelectorAll(".year").forEach(el => el.textContent = currentYear);
-
-// ==============================
 // CREACIÓN DEL SVG Y TOOLTIP
 // ==============================
 
