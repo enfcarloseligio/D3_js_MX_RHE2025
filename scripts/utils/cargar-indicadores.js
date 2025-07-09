@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const etiquetas = {
       enfermeras: { nombre: "Enfermeras registradas", unidad: "" },
-      tasa: { nombre: "Tasa nacional", unidad: "por cada mil habitantes" },
+      tasa: { nombre: "Tasa nacional", unidad: "" },
       edad: { nombre: "Promedio de edad", unidad: "años" },
       licenciatura: { nombre: "Con nivel académico", unidad: "%" },
     };

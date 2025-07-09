@@ -19,6 +19,9 @@
   <!-- Scripts internos -->
   <script src="code.js" defer></script>
   <script src="scripts/inyectar-layout.js"></script>
+  <script src="scripts/utils/window.indicadoresSIARHE.js"></script>
+
+
 </head>
 
 <body>
@@ -45,27 +48,29 @@
     </section>
 
         <!-- SECCIÓN DE INDICADORES CLAVE -->
-    <section class="indicadores-clave">
-      <h2 class="titulo-seccion">Indicadores clave</h2>
-      <div class="indicadores-grid">
-        <div class="indicador">
-          <strong>135,418</strong>
-          <p>Enfermeras registradas</p>
-        </div>
-        <div class="indicador">
-          <strong>2.50</strong>
-          <p>Tasa nacional<br>por cada mil habitantes</p>
-        </div>
-        <div class="indicador">
-          <strong>39.6 años</strong>
-          <p>Promedio de edad</p>
-        </div>
-        <div class="indicador">
-          <strong>71%</strong>
-          <p>Con nivel académico</p>
-        </div>
-      </div>
-    </section>
+<section class="indicadores-clave">
+  <h2 class="titulo-seccion">Indicadores clave</h2>
+  <div class="indicadores-grid">
+    <div class="indicador">
+      <strong><span data-indicador="enfermeras"></span></strong>
+      <p>Enfermeras registradas</p>
+    </div>
+    <div class="indicador">
+      <strong><span data-indicador="tasa"></span></strong>
+      <p>Tasa nacional<br>por cada mil habitantes</p>
+    </div>
+    <div class="indicador">
+      <strong><span data-indicador="edad"></span></strong>
+      <p>Promedio de edad (años)</p>
+    </div>
+    <div class="indicador">
+      <strong><span data-indicador="licenciatura"></span>%</strong>
+      <p>Con nivel académico</p>
+    </div>
+  </div>
+</section>
+
+
     
     <!-- SECCIÓN DE ACCESOS DESTACADOS -->
     <section class="accesos-destacados">

@@ -106,6 +106,7 @@ G:.
 ¦           tabla-municipios.js
 ¦           config-mapa.js
 ¦           tooltip.js
+¦           cargar-indicadores.js
 ¦           
 +---data
 ¦   +---rate
@@ -323,6 +324,7 @@ G:.
         +---98
         ¦       d0e628f842cf8ede31029c4975c911bbc6be6f
         ¦       27b4060d7afd260a83fb66ab008e1124866fe6
+        ¦       bb686b8a60f792da954ace864bf8555453d747
         ¦       
         +---0c
         ¦       246677bb7e1c29f7736f31f39c4e18acde8b36
@@ -336,6 +338,7 @@ G:.
         ¦       f7cce74ce6720bb3732ca32f9b8d3bf21bc096
         ¦       16beb3f24d905e45daf9b223e170602f396a02
         ¦       8b63558722c1735cb6eab726956d41f72af367
+        ¦       fea6457e699abea3aef217500d509cc1b4e2c6
         ¦       
         +---ab
         ¦       2819c87685ca980488b01deb4f5a22f7dd1f72
@@ -366,6 +369,7 @@ G:.
         ¦       ac23e9f6bba801729f2042aa1221439983a10f
         ¦       98ec9fe5e187f2760c01087d06d8f02526efb2
         ¦       432d3def9fdacc0eb426bbc6b9c9f75a3945db
+        ¦       730c2c5cffdd6a5bcb3323395fe52adbd55646
         ¦       
         +---07
         ¦       edc9321fbeaf127fad58e964122bbceb49e659
@@ -601,6 +605,7 @@ G:.
         +---e7
         ¦       9960fa0972f38eeba3af8f6f60dd950a9f366b
         ¦       797d50c2063e7e4566d38c93a37cf9f5fe9554
+        ¦       b2d8cff5d607a5dec8d745c1e27fc355949d29
         ¦       
         +---94
         ¦       f19d888084ce757fe0673a71db5e3645e02a79
@@ -635,6 +640,7 @@ G:.
         +---e0
         ¦       f83717e0fc83616541ad5c94b09f3979d75324
         ¦       2d6c0023d011eb206ce7a5ca86964b7957fc3c
+        ¦       d300bdba02588f37a090cd8b7c05a9c64e591e
         ¦       
         +---aa
         ¦       ff6521e2cc97a0595f870f2df83cc0e221f14a
@@ -791,6 +797,7 @@ G:.
         ¦       be7d45866cc5c6928195c37cffcd5b9c7ed756
         ¦       fcb76cb5239d0ffcd18b6db571bf9c4392d8e6
         ¦       45a39635e26fdc00af8dcad29abbcd6627913a
+        ¦       5a96d953d64b84cc51e8a050d5c3b3f65faa23
         ¦       
         +---03
         ¦       09fbe09cfc830f671dec0c2437f53412624674
@@ -886,6 +893,7 @@ G:.
         ¦       
         +---2f
         ¦       478b2d9b41a4df4a16b4a09629e38ab428c56f
+        ¦       37f0290a6b5ac081693b0130d9b280cb055bf0
         ¦       
         +---2e
         ¦       4e8231e5cdb8ddda17b525895c5c25baa8abd5
@@ -955,6 +963,7 @@ G:.
         ¦       
         +---21
         ¦       3eb56e61523fc1a3f879db456991a4be8f2ad3
+        ¦       9cf23ddc9f46accd39c8e8d68f756c5d2900be
         ¦       
         +---63
         ¦       7da64ac39369d2cd4015e87cc8a3104a35624c
@@ -1001,6 +1010,7 @@ G:.
         ¦       
         +---b4
         ¦       ac8a84f56e6a4a97cc2c9847338bc2eb2844f7
+        ¦       f8e8ec78665ba347612a6fb32eb8452dae83df
         ¦       
         +---66
         ¦       926ae541106edc02f547a1bcbcf56280bd640d
@@ -1142,6 +1152,9 @@ G:.
         ¦       dde7d51002e2e59249d74f3e65efdd04077090
         ¦       
         +---8b
-                f8cf5e9424430d68a5863c5b42158aba140a4d
-                127f8b523322bc01cb6450035217b9a83ac944
+        ¦       f8cf5e9424430d68a5863c5b42158aba140a4d
+        ¦       127f8b523322bc01cb6450035217b9a83ac944
+        ¦       
+        +---90
+                a0b6d6b830e49fdce85b4b1bc02129ac8a4723
                 

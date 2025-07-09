@@ -39,6 +39,10 @@
 
 .indicadores-clave {
   text-align: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .titulo-seccion {
@@ -49,10 +53,11 @@
 }
 
 .indicadores-grid {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 30px;
-  flex-wrap: wrap;
+  width: 100%;
+  justify-items: center;
 }
 .indicador {
   background-color: var(--color-Carmesí-Clásico);
@@ -61,6 +66,9 @@
   border-radius: 10px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.1);
   transition: transform 0.2s ease;
+  width: 100%; /* Fuerza que todas llenen su celda */
+  max-width: 240px; /* Limita que no crezcan de más */
+  text-align: center;
 }
 
 .indicador:hover {
@@ -77,5 +85,6 @@
   font-size: 0.95rem;
   margin: 0;
   line-height: 1.4;
+  text-align: center;
 }
 
