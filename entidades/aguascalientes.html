@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de Aguascalientes 2025." />
+  <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de Aguascalientes por municipios." />
   <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería" />
   <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025" />
-  <title>Distribución de Enfermeras en el Estado de Aguascalientes - Gobierno de México</title>
+  <title>SIARHE | Distribución de Profesionales de Enfermería de Aguascalientes</title>
 
   <!-- Estilos -->
   <link rel="stylesheet" href="../styles.css" />
@@ -18,63 +18,73 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
   <!-- Scripts internos -->
-  <script type="module" src="../scripts/maps/aguascalientes.js"></script>
   <script src="../scripts/inyectar-layout.js"></script>
-</head>
+  <script type="module" src="../scripts/maps/aguascalientes.js"></script>
+  </head>
 
 <body>
-<main>
+  <main>
+    <!-- Migas de pan -->
+    <nav aria-label="breadcrumb" class="migas">
+      <a href="../index.html">Inicio</a> &gt;
+      <a href="../entidades/republica-mexicana.html">República</a> &gt;
+      <span>Aguascalientes</span>
+    </nav>
+    <!-- SECCIÓN PRINCIPAL DEL MAPA -->
+    <section class="mapa-entidad">
+      <h1>¿Cuántas enfermeras hay en Aguascalientes en <span class="year"></span>?</h1>
+      <p class="bienvenida">
+        En el año <span class="year"></span>, el estado de Aguascalientes cuenta con un total de <strong>[TOTAL ENFERMERAS]</strong> distribuidas en sus municipios, de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE). Esta cifra refleja los esfuerzos del sistema de salud por garantizar el acceso equitativo a los servicios de enfermería en toda la entidad.
+      </p>
 
-  <!-- SECCIÓN PRINCIPAL DEL MAPA -->
-  <section class="mapa-entidad">
-    <h1>¿Cuántas enfermeras hay en Aguascalientes en 2025?</h1>
-    <p class="bienvenida">
-      En el año 2025, el estado de Aguascalientes cuenta con un total de <strong>[TOTAL ENFERMERAS]</strong> distribuidas en sus municipios, de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE). Esta cifra refleja los esfuerzos del sistema de salud por garantizar el acceso equitativo a los servicios de enfermería en toda la entidad.
-    </p>
+      <h2>Distribución de enfermeras por cada mil habitantes en los municipios de Aguascalientes</h2>
+      <p>
+        A continuación se muestra un mapa interactivo que representa la tasa de enfermeras por cada mil habitantes en los municipios de Aguascalientes. Esta tasa permite identificar las regiones con mayor o menor cobertura de personal de enfermería, lo que es clave para la planificación en salud.
+      </p>
 
-    <h2>Distribución de enfermeras por cada mil habitantes en los municipios de Aguascalientes</h2>
-    <p>
-      A continuación se muestra un mapa interactivo que representa la tasa de enfermeras por cada mil habitantes en los municipios de Aguascalientes. Esta tasa permite identificar las regiones con mayor o menor cobertura de personal de enfermería, lo que es clave para la planificación en salud.
-    </p>
-
-    <div id="mapa-aguascalientes" class="mapa-wrapper">
-      <!-- Aquí se inyecta el mapa SVG dinámicamente -->
-      <div class="zoom-controles"></div>
-    </div>
-
-    <p id="nota">
-      <em>
-        Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
-        <br>Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
-      </em>
-    </p>
-
-    <!-- Botones para descarga del mapa -->
-    <div class="descarga-container">
-      <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
-      <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
-    </div>
-  </section>
-
-  <!-- SECCIÓN DE TABLA DINÁMICA -->
-  <section class="tabla-nayarit">
-    <h2>Tasa de enfermeras por municipio en Aguascalientes (2025)</h2>
-    <p>
-      Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras, su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones en salud pública, distribución de recursos y evaluación de cobertura.
-    </p>
-
-    <div class="tabla-scroll">
-      <div id="tabla-contenido">
-        <!-- Tabla cargada dinámicamente con JS -->
+      <div id="mapa-aguascalientes" class="mapa-wrapper">
+        <!-- Aquí se inyecta el mapa SVG dinámicamente -->
+        <div class="zoom-controles"></div>
       </div>
-    </div>
+      <!-- NOTA Y FUENTE -->
+      <p id="nota">
+          <strong>Nota:</strong>
+          La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI)
+          y en los registros del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE),
+          con corte estadístico al 28 de enero de 2025.
+          Los intervalos de color en el mapa se establecieron con base en el valor mínimo, los cuartiles (Q1, Q2 o mediana, y Q3), y el valor máximo de la distribución.
+        <br />
+        <strong>Fuente:</strong>
+          Secretaría de Salud. (enero, 2025).
+          Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema Informático].
+      </p>>
 
-    <div class="descarga-container">
-      <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
-    </div>
-  </section>
+      <!-- Botones para descarga del mapa -->
+      <div class="descarga-container">
+        <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
+        <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
+      </div>
+    </section>
 
-</main>
+    <!-- SECCIÓN DE TABLA DINÁMICA -->
+    <section class="tabla-nayarit">
+      <h2>Tasa de enfermeras por municipio en Aguascalientes<span class="year"></span></h2>
+      <p>
+        Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras, su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones en salud pública, distribución de recursos y evaluación de cobertura.
+      </p>
+
+      <div class="tabla-scroll">
+        <div id="tabla-contenido">
+          <!-- Tabla cargada dinámicamente con JS -->
+        </div>
+      </div>
+
+      <div class="descarga-container">
+        <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
+      </div>
+    </section>
+
+  </main>
 
 <!-- Cargar tabla y activar descarga -->
 <script type="module">
@@ -85,6 +95,11 @@
   const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
   habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
 </script>
+  <!-- Script final para insertar año -->
+  <script type="module">
+    import { insertarAñoDinamico } from "../code.js";
+    insertarAñoDinamico();
+  </script>
 
 </body>
 </html>
