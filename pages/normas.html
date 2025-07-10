@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Metadatos -->
+  <meta name="description" content="Normas del Sistema de Información Administrativa de Recursos Humanos en Enfermería." />
+  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería" />
+  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México" />
+  <title>SIARHE | Normas del SIARHE</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="../styles.css" />
+
+  <!-- Librerías externas -->
+
+  <!-- Scripts internos -->
+  <script src="../scripts/inyectar-layout.js"></script>
+</head>
+
+<body>
+  <main class="contenido-principal">
+
+    <!-- Migas de pan -->
+    <nav aria-label="breadcrumb" class="migas">
+      <a href="../index.html">Inicio</a> &gt;
+      <span>Normas</span>
+    </nav>
+
+    <!-- Contenido principal -->
+    <section>
+      <h1>Título H1 <span class="year"></span></h1>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </p>
+
+      <h2>Título H2 <span class="year"></span></h2>
+      <p>
+        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.
+        Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+      </p>
+    </section>
+
+  </main>
+
+  <!-- Script final para insertar año -->
+  <script type="module">
+    import { insertarAñoDinamico } from "../code.js";
+    insertarAñoDinamico();
+  </script>
+</body>
+</html>
