@@ -1,8 +1,9 @@
 (async function inyectarLayout() {
   try {
-    // Calcular ruta base según profundidad del path
-    const depth = window.location.pathname.split("/").filter(Boolean).length;
-    const basePath = "../".repeat(depth - 1); // -1 porque "/" ya cuenta como nivel raíz
+    // Calcular ruta base según la profundidad del path (ignora nombre del archivo)
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const depth = pathParts.length;
+    const basePath = depth > 1 ? "../".repeat(depth - 1) : "";
 
     // Inyectar header
     const headerHtml = await fetch(`${basePath}componentes/header.html`).then(res => res.text());
@@ -23,6 +24,7 @@
     console.error("Error al inyectar layout:", error);
   }
 })();
+
 
 (function insertarFavicon() {
   const faviconUrl = "https://framework-gb.cdn.gob.mx/applications/cms/favicon.png";
