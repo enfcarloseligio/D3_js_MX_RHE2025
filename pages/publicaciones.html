@@ -3,45 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contáctanos - Dirección de Enfermería</title>
-  <meta name="description" content="Contacto oficial de la Dirección de Enfermería, adscrita a la Dirección de Calidad y Educación en Salud." />
+  
+  <!-- Metadatos -->
+  <meta name="description" content="Descripción de la página." />
+  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería" />
+  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México" />
+  <title>Título de la página</title>
+
+  <!-- Favicon institucional -->
+  <link rel="shortcut icon" href="https://framework-gb.cdn.gob.mx/applications/cms/favicon.png" />
+  <link rel="icon" href="https://framework-gb.cdn.gob.mx/applications/cms/favicon.png" type="image/png" />
+
+  <!-- Estilos -->
   <link rel="stylesheet" href="../styles.css" />
-  <link rel="stylesheet" href="../styles/contactanos.css" />
-  <script src="../scripts/inyectar-layout.js"></script>
+
+  <!-- Scripts base -->
+  <script src="../scripts/inyectar-layout.js" defer></script>
 </head>
 
 <body>
-  <div id="header"></div>
+  <main class="contenido-principal">
 
-  <main class="contenido-general">
+    <!-- Migas de pan -->
     <nav aria-label="breadcrumb" class="migas">
-      <a href="../index.html">Inicio</a> > <span>Contáctanos</span>
+      <a href="../index.html">Inicio</a> &gt;
+      <span>Migas de pan</span>
     </nav>
-    <section class="contacto">
-    <h1>Contacto</h1>
 
-    <p>
-        Para dudas, sugerencias o comentarios relacionados con este sitio web, puedes comunicarte con la 
-        <strong>Dirección de Enfermería</strong>, adscrita a la <strong>Dirección General de Calidad y Educación en Salud</strong>, a través de los siguientes medios:
-    </p><br>
-      <ul>
-        <li>
-          <strong>Correo electrónico:</strong>
-          <a href="mailto:siarhe@salud.gob.mx">
-            <img src="../img/icono-correo.svg" alt="Ícono de correo" style="vertical-align: middle; height: 1em;" />
-            siarhe@salud.gob.mx
-          </a>
-        </li>
-        <li>
-          <strong>Teléfonos:</strong> 55 2000 3400 Ext. 53410 y 53412
-        </li>
-        <li>
-          <strong>Dirección:</strong> Av. Marina Nacional 60, 8º Piso, ala "B", Col. Tacuba, C.P. 11410, Alcaldía Miguel Hidalgo, Ciudad de México.
-        </li>
-      </ul>
+    <!-- Contenido principal -->
+    <section>
+      <h1>Título H1 <span class="year"></span></h1>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+      </p>
+
+      <h2>Título H2 <span class="year"></span></h2>
+      <p>
+        Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.
+        Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.
+      </p>
     </section>
+
   </main>
 
-  <div id="footer"></div>
+  <!-- Script final para insertar año -->
+  <script type="module">
+    import { insertarAñoDinamico } from "../code.js";
+    insertarAñoDinamico();
+  </script>
 </body>
 </html>
