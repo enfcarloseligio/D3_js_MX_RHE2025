@@ -1,18 +1,22 @@
 (async function inyectarLayout() {
   try {
+    // Calcular ruta base según profundidad del path
+    const depth = window.location.pathname.split("/").filter(Boolean).length;
+    const basePath = "../".repeat(depth - 1); // -1 porque "/" ya cuenta como nivel raíz
+
     // Inyectar header
-    const headerHtml = await fetch("../componentes/header.html").then(res => res.text());
+    const headerHtml = await fetch(`${basePath}componentes/header.html`).then(res => res.text());
     document.body.insertAdjacentHTML("afterbegin", headerHtml);
 
     // Inyectar banner justo antes del <main>
-    const bannerHtml = await fetch("../componentes/banner.html").then(res => res.text());
+    const bannerHtml = await fetch(`${basePath}componentes/banner.html`).then(res => res.text());
     const main = document.querySelector("main");
     if (main) {
       main.insertAdjacentHTML("beforebegin", bannerHtml);
     }
 
     // Inyectar footer
-    const footerHtml = await fetch("../componentes/footer.html").then(res => res.text());
+    const footerHtml = await fetch(`${basePath}componentes/footer.html`).then(res => res.text());
     document.body.insertAdjacentHTML("beforeend", footerHtml);
 
   } catch (error) {
