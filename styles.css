@@ -231,9 +231,9 @@ body {
   display: none;
   flex-direction: column;
   cursor: pointer;
-  padding: 10px;
+  padding: 5px;
   position: absolute;
-  right: 10px;
+  right: 5px;
   top: 5px;
   z-index: 200;
 }
@@ -264,7 +264,7 @@ body {
   display: block;
   height: 40px;
   line-height: 40px;
-  padding: 0px 15px;
+  padding: 0px 8px;
   color: #fff;
   text-decoration: none;
   font-size: 0.95rem;
@@ -415,6 +415,22 @@ body {
 
   .submenu-lista a:hover {
     background-color: var(--color-Guinda-Imperial);
+  }
+}
+
+/* ===================================================
+   AJUSTE PARA TABLETS Y MÓVILES HORIZONTALES (769px–1024px)
+   Evita desbordamiento del menú horizontal en pantallas intermedias
+=================================================== */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .menu {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .menu li {
+    flex: 0 0 auto;
+    text-align: center;
   }
 }
 
