@@ -245,7 +245,7 @@ body {
   margin: 4px 0;
   display: block;
   transition: 0.3s;
-}
+  }
 
 /* Menú principal */
 .menu {
@@ -261,10 +261,14 @@ body {
 }
 
 .menu a {
+  width: 100%;
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   height: 40px;
   line-height: 40px;
-  padding: 0px 15px;
+  padding: 0px 10px;
   color: #fff;
   text-decoration: none;
   font-size: 0.95rem;
@@ -332,6 +336,28 @@ body {
   display: block;
 }
 
+@media screen and (max-width: 850px) and (min-width: 769px) {
+  .menu {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .menu::-webkit-scrollbar {
+    display: none;
+  }
+
+  .menu > li {
+    flex: 0 0 auto;
+  }
+
+  .menu a {
+    white-space: nowrap;
+  }
+}
+
+
 /* ===================================================
    RESPONSIVE MENU (HAMBURGUESA)
 =================================================== */
@@ -347,6 +373,7 @@ body {
     position: relative;
     z-index: 100;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   }
 
   .menu-icon {
@@ -382,6 +409,7 @@ body {
   }
 
   .menu li {
+    width: 100%;
     text-align: center;
     padding: 0;
   }
