@@ -1,10 +1,10 @@
-/* ===================================================
-   RECURSOS Y VARIABLES GLOBALES
-=================================================== */
+/* ==========================================================================
+   VARIABLES Y RECURSOS GLOBALES
+========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap');
 
-/* Variables de color institucional */
 :root {
+  /* Colores institucionales */
   --color-Gris-Neutro-Urbano: #98989A;
   --color-Negro-Profundo: #161a1d;
   --color-Carmesí-Clásico: #9b2247;
@@ -14,45 +14,48 @@
   --color-Marfil-Dorado: #e6d194;
   --color-Oro-Antiguo: #a57f2c;
 
-  /* Variables tipográficas */
+  /* Tipografía */
   --font-base-pc: 16px;
   --font-base-tablet: 15px;
   --font-base-mobile: 14px;
-  --font-weight-normal: 400;
-  --font-weight-semi: 600;
   --font-note-small: 12px;
   --font-note-smaller: 11px;
+  --font-weight-normal: 400;
+  --font-weight-semi: 600;
 
+  /* Espaciados */
   --spacing-horizontal-pc: 40px;
   --spacing-horizontal-tablet: 24px;
   --spacing-horizontal-mobile: 16px;
   --spacing-vertical: 20px;
-
 }
-/* ===================================================
-   ESTILOS GLOBALES
-=================================================== */
+
+/* ==========================================================================
+   RESET BÁSICO Y CUERPO
+========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 0;
-  padding: 0;
   font-family: 'Noto Sans', sans-serif;
   font-size: var(--font-base-pc);
   font-weight: var(--font-weight-normal);
   color: var(--color-Negro-Profundo);
   line-height: 1.6;
   background-color: #ffffff;
-  box-sizing: border-box;
 }
 
 section {
   max-width: 1200px;
   width: 100%;
-  padding: 10px 10px;
+  padding: 10px;
   margin: 0 auto;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -63,89 +66,62 @@ section p, h3, h4, h5, h6 {
   width: 100%;
 }
 
-/* ===================================================
-   ESTILOS TIPOGRAFÍAS
-=================================================== */
-
-/* TITULOS PARA PC */
-h1 {
-  font-size: 2.5rem; /* 40px en PC */
-  font-weight: var(--font-weight-semi);
-  color: var(--color-Guinda-Imperial);
-  text-align: center;
-}
-
-h2 {
-  font-size: 2.125rem; /* 34px */
-  font-weight: var(--font-weight-semi);
-  color: var(--color-Carmesí-Clásico);
-  text-align: center;
-}
-
-h3, h4, h5, h6 {
+/* ==========================================================================
+   TIPOGRAFÍA
+========================================================================== */
+h1, h2, h3, h4, h5, h6 {
   font-weight: var(--font-weight-semi);
   color: var(--color-Negro-Profundo);
+  text-align: center;
 }
 
-h3 { font-size: 1.5rem; }   /* 24px */
-h4 { font-size: 1.25rem; }  /* 20px */
-h5 { font-size: 1.125rem; } /* 18px */
-h6 { font-size: 1rem; }     /* 16px */
+h1 { font-size: 2.5rem; color: var(--color-Guinda-Imperial); }
+h2 { font-size: 2.125rem; color: var(--color-Carmesí-Clásico); }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+h5 { font-size: 1.125rem; }
+h6 { font-size: 1rem; }
 
-/* Notas */
 #nota, .texto-nota {
   font-size: var(--font-note-small);
   font-style: italic;
   color: var(--color-Negro-Profundo);
 }
 
-/* TABLET */
+/* ==========================================================================
+   MEDIA QUERIES TIPOGRAFÍA
+========================================================================== */
 @media (max-width: 1024px) {
-  body {
-    font-size: var(--font-base-tablet);
-  }
+  body { font-size: var(--font-base-tablet); }
 
-  h1 { font-size: 2rem; }     /* 32px */
-  h2 { font-size: 1.875rem; } /* 30px */
-  h3 { font-size: 1.5rem; }
-  h4 { font-size: 1.25rem; }
-  h5 { font-size: 1.125rem; }
-  h6 { font-size: 1rem; }
-
-  .texto-nota {
-    font-size: 13px;
-  }
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.875rem; }
+  .texto-nota { font-size: 0.8125rem; }
 }
 
-/* MÓVIL */
 @media (max-width: 768px) {
-  body {
-    font-size: var(--font-base-mobile);
-  }
+  body { font-size: var(--font-base-mobile); }
 
-  h1 { font-size: 1.875rem; } /* 30px */
-  h2 { font-size: 1.625rem; } /* 26px */
-  h3 { font-size: 1.375rem; } /* 22px */
-  h4 { font-size: 1.125rem; } /* 18px */
-  h5 { font-size: 1rem; }     /* 16px */
-  h6 { font-size: 0.9375rem; }/* 15px */
+  h1 { font-size: 1.875rem; }
+  h2 { font-size: 1.625rem; }
+  h3 { font-size: 1.375rem; }
+  h4 { font-size: 1.125rem; }
+  h5 { font-size: 1rem; }
+  h6 { font-size: 0.9375rem; }
 
-  .texto-nota {
-    font-size: var(--font-note-smaller);
-  }
+  .texto-nota { font-size: var(--font-note-smaller); }
 }
 
-/* ===================================================
-   HEADER INSTITUCIONAL (GOBIERNO DE MÉXICO)
-=================================================== */
+/* ==========================================================================
+   HEADER INSTITUCIONAL
+========================================================================== */
 .gob-header {
-  width: 100%;
   position: sticky;
   top: 0;
   z-index: 100;
+  width: 100%;
   background-color: var(--color-Guinda-Imperial);
 }
-
 
 .gob-barra {
   background-color: var(--color-Guinda-Imperial);
