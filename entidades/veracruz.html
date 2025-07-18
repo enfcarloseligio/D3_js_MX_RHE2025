@@ -3,15 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- REEMPLAZAR: Descripción con el nombre del estado -->
-  <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de {{ESTADO}} 2025." />
-  
+  <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de Veracruz por municipios." />
   <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería" />
   <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025" />
-  
-  <!-- REEMPLAZAR: Título de la pestaña -->
-  <title>Distribución de Enfermeras en el Estado de {{ESTADO}} - Gobierno de México</title>
+  <title>SIARHE | Distribución de Profesionales de Enfermería en el Estado de Veracruz</title>
 
   <!-- Estilos -->
   <link rel="stylesheet" href="../styles.css" />
@@ -22,84 +17,98 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  <!-- REEMPLAZAR: Nombre del archivo JS del mapa -->
-  <script type="module" src="../scripts/maps/{{archivoJS}}.js"></script>
-
-  <!-- Script para inyectar header, banner y footer -->
-  <script src="../scripts/inyectar-layout.js" defer></script>
+  <!-- Layout general y script del mapa -->
+  <script src="../scripts/inyectar-layout.js"></script>
+  <script type="module" src="../scripts/maps/veracruz.js"></script>
 </head>
 
 <body>
-<main>
+  <main>
 
-  <!-- SECCIÓN PRINCIPAL DEL MAPA -->
-  <section class="mapa-entidad">
-    <!-- REEMPLAZAR: Título H1 con el nombre del estado -->
-    <h1>¿Cuántas enfermeras hay en {{ESTADO}} en 2025?</h1>
-    
-    <!-- REEMPLAZAR: Total de enfermeras y municipios -->
-    <p class="bienvenida">
-      En el año 2025, el estado de {{ESTADO}} cuenta con un total de <strong>{{TOTAL_ENFERMERAS}}</strong> enfermeras distribuidas en sus {{TOTAL_MUNICIPIOS}} municipios, de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE). Esta cifra refleja los esfuerzos del sistema de salud por garantizar el acceso equitativo a los servicios de enfermería en toda la entidad.
-    </p>
+    <!-- Migas de pan -->
+    <nav aria-label="breadcrumb" class="migas">
+      <a href="../index.html">Inicio</a> &gt;
+      <a href="../entidades/republica-mexicana.html">República</a> &gt;
+      <span>Veracruz</span>
+    </nav>
 
-    <!-- REEMPLAZAR: Nombre del estado -->
-    <h2>Distribución de enfermeras en los municipios de {{ESTADO}}</h2>
-    <p>
-      A continuación se muestra un mapa interactivo que representa la tasa de enfermeras por cada mil habitantes en los municipios de {{ESTADO}}. 
-      Utiliza los botones de zoom (+/–) para acercar o alejar el mapa, y el botón de reinicio (⟳) para volver a la vista general. Al pasar el cursor sobre cada municipio, podrás ver la tasa específica de enfermeras por cada mil habitantes.
-    </p>
+    <!-- SECCIÓN PRINCIPAL DEL MAPA -->
+    <section class="mapa-entidad">
+      <h1>¿Cuántas enfermeras hay en Veracruz en <span class="year"></span>?</h1>
+      <p class="bienvenida">
+        En el año <span class="year"></span>, el estado de Veracruz cuenta con un total de
+        <strong><span id="total-enfermeras"></span> enfermeras</strong> distribuidas en sus municipios,
+        de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
+        Este dato es clave para el análisis y planificación de los recursos humanos en salud a nivel estatal.
+      </p>
 
-    <!-- REEMPLAZAR: ID del contenedor de mapa con el nombre del archivo JS -->
-    <div id="mapa-{{archivoJS}}" class="mapa-wrapper">
-      <!-- Aquí se inyecta el mapa SVG dinámicamente -->
-      <div class="zoom-controles"></div>
-    </div>
-
-    <p id="nota">
-      <em>
-        Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
-        <br>Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
-      </em>
-    </p>
-
-    <!-- Botones para descargar el mapa -->
-    <div class="descarga-container">
-      <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
-      <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
-    </div>
-  </section>
-
-  <!-- SECCIÓN DE TABLA -->
-  <!-- REEMPLAZAR: clase con el nombre del archivo JS (opcional) -->
-  <section class="tabla-{{archivoJS}}">
-    <!-- REEMPLAZAR: Nombre del estado -->
-    <h2>Tasa de enfermeras por municipio en {{ESTADO}} (2025)</h2>
-    <p>
-      Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras, su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones en salud pública, distribución de recursos y evaluación de cobertura.
-    </p>
-
-    <div class="tabla-scroll">
-      <div id="tabla-contenido">
-        <!-- La tabla se carga con JS -->
+      <h2>Distribución de enfermeras en los municipios de Veracruz <span class="year"></span></h2>
+      <p>
+        A continuación se presenta un mapa interactivo que muestra la distribución de profesionales de enfermería por cada mil habitantes en los municipios de Veracruz.
+        Utiliza los botones de zoom (+/–) para acercar o alejar el mapa, el botón de reinicio (⟳) para volver a la vista general y el ícono de la casa 🏠 para regresar al mapa de la República Mexicana.
+        Al colocar el cursor sobre cada municipio, podrás consultar la tasa específica de profesionales de enfermería por cada mil habitantes.
+        Esta información permite identificar con precisión las regiones con mayor o menor cobertura, y sirve de apoyo para la planificación de recursos humanos en salud a nivel local.
+      </p>
+      <br>
+      <div id="mapa-veracruz" class="mapa-wrapper">
+        <!-- Aquí se inyecta el mapa SVG dinámicamente -->
+        <div class="zoom-controles"></div>
       </div>
-    </div>
 
-    <div class="descarga-container">
-      <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
-    </div>
-  </section>
+      <!-- NOTA Y FUENTE -->
+      <p id="nota">
+          <strong>Nota:</strong>
+          La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI)
+          y en los registros del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE),
+          con corte estadístico al 28 de enero de 2025.
+          Los intervalos de color en el mapa se establecieron con base en el valor mínimo, los cuartiles (Q1, Q2 o mediana, y Q3), y el valor máximo de la distribución.
+        <br />
+        <strong>Fuente:</strong>
+          Secretaría de Salud. (enero, 2025).
+          Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema Informático].
+      </p>
 
-</main>
+      <!-- BOTONES DE DESCARGA DEL MAPA -->
+      <div class="descarga-container">
+        <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
+        <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
+      </div>
+    </section>
 
-<!-- REEMPLAZAR: nombre del archivo CSV con el de la entidad -->
-<script type="module">
-  import { generarTablaMunicipios, habilitarDescargaExcel } from '../scripts/utils/tabla-municipios.js';
+    <!-- SECCIÓN DE TABLA DINÁMICA -->
+    <section class="tabla-veracruz">
+      <h2>Tasa de enfermeras por municipio en Veracruz <span class="year"></span></h2>
+      <p>
+        Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras,
+        su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones
+        en salud pública, distribución de recursos y evaluación de cobertura.
+      </p>
 
-  generarTablaMunicipios('../data/tasas/tasas-enfermeras-{{archivoJS}}.csv');
+      <div class="tabla-scroll">
+        <div id="tabla-contenido">
+          <!-- Tabla cargada dinámicamente con JS -->
+        </div>
+      </div>
 
-  const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
-  habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
-</script>
+      <div class="descarga-container">
+        <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
+      </div>
+    </section>
+  </main>
 
+  <!-- SCRIPTS FINALES -->
+  <script type="module">
+    import { insertarAñoDinamico } from "../code.js";
+    import {
+      generarTablaMunicipios,
+      habilitarDescargaExcel
+    } from '../scripts/utils/tabla-municipios.js';
+
+    insertarAñoDinamico();
+
+    const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
+    generarTablaMunicipios(`../data/rate/${nombreEntidad}.csv`);
+    habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
+  </script>
 </body>
 </html>
