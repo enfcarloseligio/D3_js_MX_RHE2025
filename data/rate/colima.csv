@@ -1,2 +1,13 @@
-id	CVE_ENT	CVE_MUN	municipio	poblaciÃ³n	enfermeras	tasa
-	6					
+id,CVE_ENT,CVE_MUN,municipio,poblaciÃ³n,enfermeras,tasa
+1,6,1,Armería,27626,40,1.447911388
+2,6,2,Colima,157048,1540,9.805919209
+3,6,3,Comala,21661,20,0.923318406
+4,6,4,Coquimatlán,20837,21,1.007822623
+5,6,5,Cuauhtémoc,31267,30,0.959478044
+6,6,6,Ixtlahuacán,5623,61,10.84830162
+7,6,7,Manzanillo,191031,461,2.413220891
+8,6,8,Minatitlán,10231,12,1.172905874
+9,6,9,Tecomán,116305,375,3.224280985
+10,6,10,Villa de Álvarez,149762,245,1.635929007
+8888,8888,8888,No Disponible,0,49,0
+9999,9999,9999,Total Colima,731391,2854,3.902153568
