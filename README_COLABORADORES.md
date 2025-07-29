@@ -30,6 +30,19 @@ Gracias por colaborar en este proyecto. Aquí aprenderás cómo trabajar desde V
 
 ## 🔧 Flujo de trabajo desde Visual Studio Code
 
+### 🔐 Antes de comenzar: Configura tu nombre y correo
+
+Solo la primera vez, en la terminal escribe:
+
+```bash
+git config --global user.name "Tu Nombre"
+git config --global user.email "tunombre@ejemplo.com"
+```
+
+Esto es necesario para que tus commits queden registrados con tu nombre.
+
+---
+
 ### 1. Clona el repositorio (solo la primera vez)
 
 Abre la terminal integrada en VSCode (`Ctrl + ñ`) y ejecuta:

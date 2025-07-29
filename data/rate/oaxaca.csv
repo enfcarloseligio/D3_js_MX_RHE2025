@@ -1,103 +1,103 @@
 id,CVE_ENT,CVE_MUN,municipio,población,enfermeras,tasa
-1,20,1,Abejones,841,1,1.189060642
-2,20,2,Acatlán de Pérez Figueroa,45167,46,1.018442668
-3,20,3,Asunción Cacalotepec,2547,5,1.963093836
-4,20,4,Asunción Cuyotepeji,1107,2,1.806684734
-5,20,5,Asunción Ixtaltepec,15261,16,1.048424088
-6,20,6,Asunción Nochixtlán,20464,77,3.762705238
-7,20,7,Asunción Ocotlán,2395,2,0.835073069
-8,20,8,Asuncion Tlacolulita,734,1,1.36239782
-9,20,9,Ayotzintepec,6857,5,0.729181858
-10,20,10,El Barrio de la Soledad,13474,7,0.519519074
-11,20,11,Calihualá,1402,3,2.139800285
-12,20,12,Candelaria Loxicha,11166,6,0.537345513
-13,20,13,Ciénega de Zimatlán,3043,4,1.314492277
-14,20,14,Ciudad Ixtepec,28082,95,3.382949932
-15,20,15,Coatecas Altas,5356,3,0.560119492
-16,20,16,Coicoyán de las Flores,9563,8,0.836557566
-17,20,17,La Compañía,3607,3,0.831716108
-18,20,18,Concepción Buenavista,752,1,1.329787234
-19,20,19,Concepción Pápalo,2754,4,1.452432825
-20,20,20,Constancia del Rosario,4847,6,1.2378791
-21,20,21,Cosolapa,14488,65,4.486471563
-22,20,22,Cosoltepec,803,2,2.490660025
-23,20,23,Cuilápam de Guerrero,26882,12,0.446395357
-24,20,24,Cuyamecalco Villa de Zaragoza,3644,5,1.372118551
-25,20,25,Chahuites,11356,7,0.61641423
-26,20,26,Chalcatongo de Hidalgo,9035,38,4.205866076
-27,20,27,Chiquihuitlán de Benito Juárez,2179,2,0.917852226
-28,20,28,Heroica Ciudad de Ejutla de Crespo,23148,9,0.388802488
-29,20,29,Eloxochitlán de Flores Magón,4215,4,0.948991696
-30,20,30,El Espinal,8730,0,0
-31,20,31,Tamazulápam del Espíritu Santo,7185,53,7.376478775
-32,20,32,Fresnillo de Trujano,1077,2,1.857010214
-33,20,33,Guadalupe Etla,2929,4,1.365653807
-34,20,34,Guadalupe de Ramírez,1288,1,0.776397516
-35,20,35,Guelatao de Juárez,657,3,4.566210046
-36,20,36,Guevea de Humboldt,5256,7,1.331811263
-37,20,37,Mesones Hidalgo,4424,6,1.356238698
-38,20,38,Villa Hidalgo Yalálag,1885,2,1.061007958
-39,20,39,Heroica Ciudad de Huajuapan de León,78313,373,4.762938465
-40,20,40,Huautepec,6385,3,0.469851214
-41,20,41,Huautla de Jiménez,31710,77,2.428256071
-42,20,42,Ixtlán de Juárez,8385,41,4.889683959
-43,20,43,Juchitán de Zaragoza,113570,129,1.135863344
-44,20,44,Loma Bonita,40934,67,1.63678116
-45,20,45,Magdalena Apasco,7888,6,0.760649087
-46,20,46,Magdalena Jaltepec,2943,2,0.679578661
-47,20,47,Santa Magdalena Jicotlán,81,0,0
-48,20,48,Magdalena Mixtepec,1433,1,0.697836706
-49,20,49,Magdalena Ocotlán,1184,7,5.912162162
-50,20,50,Magdalena Peñasco,3750,7,1.866666667
-51,20,51,Magdalena Teitipac,4764,5,1.049538203
-52,20,52,Magdalena Tequisistlán,5996,7,1.167444963
-53,20,53,Magdalena Tlacotepec,1297,2,1.542020046
-54,20,54,Magdalena Zahuatlán,404,1,2.475247525
-55,20,55,Mariscala de Juárez,3739,3,0.80235357
-56,20,56,Mártires de Tacubaya,1446,2,1.383125864
-57,20,57,Matías Romero Avendaño,38183,109,2.854673546
-58,20,58,Mazatlán Villa de Flores,12722,15,1.179059896
-59,20,59,Miahuatlán de Porfirio Díaz,50375,121,2.401985112
-60,20,60,Mixistlán de la Reforma,2487,3,1.206272618
-61,20,61,Monjas,2893,5,1.728309713
-62,20,62,Natividad,498,2,4.016064257
-63,20,63,Nazareno Etla,4293,5,1.164686699
-64,20,64,Nejapa de Madero,8494,33,3.885095361
-65,20,65,Ixpantepec Nieves,1079,2,1.853568119
-66,20,66,Santiago Niltepec,5342,1,0.187195807
-67,20,67,Oaxaca de Juárez,270955,2093,7.724529903
-68,20,68,Ocotlán de Morelos,23751,5,0.210517452
-69,20,69,La Pe,3052,2,0.655307995
-70,20,70,Pinotepa de Don Luis,6416,24,3.740648379
-71,20,71,Pluma Hidalgo,3255,2,0.614439324
-72,20,72,San José del Progreso,8059,6,0.744509244
-73,20,73,Putla Villa de Guerrero,34652,108,3.116703221
-74,20,74,Santa Catarina Quioquitani,456,1,2.192982456
-75,20,75,Reforma de Pineda,2660,2,0.751879699
-76,20,76,La Reforma,3411,3,0.879507476
-77,20,77,Reyes Etla,4370,9,2.059496568
-78,20,78,Rojas de Cuauhtémoc,1301,3,2.305918524
-79,20,79,Salina Cruz,84438,449,5.317511073
-80,20,80,San Agustín Amatengo,1593,2,1.255492781
-81,20,81,San Agustín Atenango,1871,4,2.137894174
-82,20,82,San Agustín Chayuco,4163,3,0.720634158
-83,20,83,San Agustín de las Juntas,11391,7,0.614520235
-84,20,84,San Agustín Etla,4168,1,0.239923225
-85,20,85,San Agustín Loxicha,26194,23,0.878063679
-86,20,86,San Agustín Tlacotepec,1032,2,1.937984496
-87,20,87,San Agustín Yatareni,5521,4,0.72450643
-88,20,88,San Andrés Cabecera Nueva,2881,1,0.347101701
-89,20,89,San Andrés Dinicuiti,2308,2,0.866551127
-90,20,90,San Andrés Huaxpaltepec,6234,7,1.122874559
-91,20,91,San Andrés Huayapam,6279,4,0.637044115
-92,20,92,San Andrés Ixtlahuaca,1776,2,1.126126126
-93,20,93,San Andrés Lagunas,518,2,3.861003861
-94,20,94,San Andrés Nuxiño,1850,4,2.162162162
-95,20,95,San Andrés Paxtlán,4562,2,0.438404209
-96,20,96,San Andrés Sinaxtla,756,2,2.645502646
-97,20,97,San Andrés Solaga,1771,2,1.129305477
-98,20,98,San Andrés Teotilálpam,4233,4,0.944956296
-99,20,99,San Andrés Tepetlapa,381,2,5.249343832
+1,20,001,Abejones,841,1,1.189060642
+2,20,002,Acatlán de Pérez Figueroa,45167,46,1.018442668
+3,20,003,Asunción Cacalotepec,2547,5,1.963093836
+4,20,004,Asunción Cuyotepeji,1107,2,1.806684734
+5,20,005,Asunción Ixtaltepec,15261,16,1.048424088
+6,20,006,Asunción Nochixtlán,20464,77,3.762705238
+7,20,007,Asunción Ocotlán,2395,2,0.835073069
+8,20,008,Asuncion Tlacolulita,734,1,1.36239782
+9,20,009,Ayotzintepec,6857,5,0.729181858
+10,20,010,El Barrio de la Soledad,13474,7,0.519519074
+11,20,011,Calihualá,1402,3,2.139800285
+12,20,012,Candelaria Loxicha,11166,6,0.537345513
+13,20,013,Ciénega de Zimatlán,3043,4,1.314492277
+14,20,014,Ciudad Ixtepec,28082,95,3.382949932
+15,20,015,Coatecas Altas,5356,3,0.560119492
+16,20,016,Coicoyán de las Flores,9563,8,0.836557566
+17,20,017,La Compañía,3607,3,0.831716108
+18,20,018,Concepción Buenavista,752,1,1.329787234
+19,20,019,Concepción Pápalo,2754,4,1.452432825
+20,20,020,Constancia del Rosario,4847,6,1.2378791
+21,20,021,Cosolapa,14488,65,4.486471563
+22,20,022,Cosoltepec,803,2,2.490660025
+23,20,023,Cuilápam de Guerrero,26882,12,0.446395357
+24,20,024,Cuyamecalco Villa de Zaragoza,3644,5,1.372118551
+25,20,025,Chahuites,11356,7,0.61641423
+26,20,026,Chalcatongo de Hidalgo,9035,38,4.205866076
+27,20,027,Chiquihuitlán de Benito Juárez,2179,2,0.917852226
+28,20,028,Heroica Ciudad de Ejutla de Crespo,23148,9,0.388802488
+29,20,029,Eloxochitlán de Flores Magón,4215,4,0.948991696
+30,20,030,El Espinal,8730,0,0
+31,20,031,Tamazulápam del Espíritu Santo,7185,53,7.376478775
+32,20,032,Fresnillo de Trujano,1077,2,1.857010214
+33,20,033,Guadalupe Etla,2929,4,1.365653807
+34,20,034,Guadalupe de Ramírez,1288,1,0.776397516
+35,20,035,Guelatao de Juárez,657,3,4.566210046
+36,20,036,Guevea de Humboldt,5256,7,1.331811263
+37,20,037,Mesones Hidalgo,4424,6,1.356238698
+38,20,038,Villa Hidalgo Yalálag,1885,2,1.061007958
+39,20,039,Heroica Ciudad de Huajuapan de León,78313,373,4.762938465
+40,20,040,Huautepec,6385,3,0.469851214
+41,20,041,Huautla de Jiménez,31710,77,2.428256071
+42,20,042,Ixtlán de Juárez,8385,41,4.889683959
+43,20,043,Juchitán de Zaragoza,113570,129,1.135863344
+44,20,044,Loma Bonita,40934,67,1.63678116
+45,20,045,Magdalena Apasco,7888,6,0.760649087
+46,20,046,Magdalena Jaltepec,2943,2,0.679578661
+47,20,047,Santa Magdalena Jicotlán,81,0,0
+48,20,048,Magdalena Mixtepec,1433,1,0.697836706
+49,20,049,Magdalena Ocotlán,1184,7,5.912162162
+50,20,050,Magdalena Peñasco,3750,7,1.866666667
+51,20,051,Magdalena Teitipac,4764,5,1.049538203
+52,20,052,Magdalena Tequisistlán,5996,7,1.167444963
+53,20,053,Magdalena Tlacotepec,1297,2,1.542020046
+54,20,054,Magdalena Zahuatlán,404,1,2.475247525
+55,20,055,Mariscala de Juárez,3739,3,0.80235357
+56,20,056,Mártires de Tacubaya,1446,2,1.383125864
+57,20,057,Matías Romero Avendaño,38183,109,2.854673546
+58,20,058,Mazatlán Villa de Flores,12722,15,1.179059896
+59,20,059,Miahuatlán de Porfirio Díaz,50375,121,2.401985112
+60,20,060,Mixistlán de la Reforma,2487,3,1.206272618
+61,20,061,Monjas,2893,5,1.728309713
+62,20,062,Natividad,498,2,4.016064257
+63,20,063,Nazareno Etla,4293,5,1.164686699
+64,20,064,Nejapa de Madero,8494,33,3.885095361
+65,20,065,Ixpantepec Nieves,1079,2,1.853568119
+66,20,066,Santiago Niltepec,5342,1,0.187195807
+67,20,067,Oaxaca de Juárez,270955,2093,7.724529903
+68,20,068,Ocotlán de Morelos,23751,5,0.210517452
+69,20,069,La Pe,3052,2,0.655307995
+70,20,070,Pinotepa de Don Luis,6416,24,3.740648379
+71,20,071,Pluma Hidalgo,3255,2,0.614439324
+72,20,072,San José del Progreso,8059,6,0.744509244
+73,20,073,Putla Villa de Guerrero,34652,108,3.116703221
+74,20,074,Santa Catarina Quioquitani,456,1,2.192982456
+75,20,075,Reforma de Pineda,2660,2,0.751879699
+76,20,076,La Reforma,3411,3,0.879507476
+77,20,077,Reyes Etla,4370,9,2.059496568
+78,20,078,Rojas de Cuauhtémoc,1301,3,2.305918524
+79,20,079,Salina Cruz,84438,449,5.317511073
+80,20,080,San Agustín Amatengo,1593,2,1.255492781
+81,20,081,San Agustín Atenango,1871,4,2.137894174
+82,20,082,San Agustín Chayuco,4163,3,0.720634158
+83,20,083,San Agustín de las Juntas,11391,7,0.614520235
+84,20,084,San Agustín Etla,4168,1,0.239923225
+85,20,085,San Agustín Loxicha,26194,23,0.878063679
+86,20,086,San Agustín Tlacotepec,1032,2,1.937984496
+87,20,087,San Agustín Yatareni,5521,4,0.72450643
+88,20,088,San Andrés Cabecera Nueva,2881,1,0.347101701
+89,20,089,San Andrés Dinicuiti,2308,2,0.866551127
+90,20,090,San Andrés Huaxpaltepec,6234,7,1.122874559
+91,20,091,San Andrés Huayapam,6279,4,0.637044115
+92,20,092,San Andrés Ixtlahuaca,1776,2,1.126126126
+93,20,093,San Andrés Lagunas,518,2,3.861003861
+94,20,094,San Andrés Nuxiño,1850,4,2.162162162
+95,20,095,San Andrés Paxtlán,4562,2,0.438404209
+96,20,096,San Andrés Sinaxtla,756,2,2.645502646
+97,20,097,San Andrés Solaga,1771,2,1.129305477
+98,20,098,San Andrés Teotilálpam,4233,4,0.944956296
+99,20,099,San Andrés Tepetlapa,381,2,5.249343832
 100,20,100,San Andrés Yaá,393,2,5.089058524
 101,20,101,San Andrés Zabache,748,1,1.336898396
 102,20,102,San Andrés Zautla,5326,6,1.126549005

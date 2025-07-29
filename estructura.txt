@@ -9,6 +9,7 @@ G:.
 ¦   README.md
 ¦   code.js
 ¦   estructura.bat
+¦   README_COLABORADORES.md
 ¦   
 +---pages
 ¦   ¦   contactanos.html
@@ -160,12 +161,12 @@ G:.
 ¦   ¦       tamaulipas.csv
 ¦   ¦       ciudad-de-mexico.csv
 ¦   ¦       puebla.csv
-¦   ¦       durango.csv
 ¦   ¦       morelos.csv
 ¦   ¦       chiapas.csv
 ¦   ¦       guerrero.csv
 ¦   ¦       michoacan.csv
 ¦   ¦       sonora.csv
+¦   ¦       durango.csv
 ¦   ¦       
 ¦   +---maps
 ¦   ¦       nayarit.geojson
@@ -281,15 +282,20 @@ G:.
         ¦       
         +---c2
         ¦       a0953dcb65138f8fe6755d8d62ae10ec9fd282
+        ¦       c4f3ece7d5e01dcbae73db9a321dad2d21464b
         ¦       
         +---b9
         ¦       38746dbc0186a677430fc6ab3560834d9f95ea
         ¦       c84f18a5ad7073439cfbfb79d47b5d253668dd
+        ¦       10ec81156d979d2ed691d001ba2c526d6d4cb3
+        ¦       4452ad1852f8595cd8a5b50c246d81f59cbc49
         ¦       
         +---a4
         ¦       94cc6e06dc85ccd31041afe432698dc0cf8d83
         ¦       3b282448179c270f85b6594ea0e5d8d1b8c465
         ¦       be1d609eab5bbca409cb164d919d0f3f06745d
+        ¦       8bef39c8c878ee38b5dee2fef7888a3bba4659
+        ¦       cdcdd45285da861e497b0c84197225b93864ed
         ¦       
         +---6e
         ¦       3c1eb992c41fb1be9858c0229d5709e9bbae47
@@ -304,10 +310,13 @@ G:.
         +---b3
         ¦       92a0a7ccc496969470855f48aa3ec65a0f1ab4
         ¦       8ceece147a8ed1f75927175147524177d2566c
+        ¦       48ab0801dc7a8023e04a760fccc536d5b42143
+        ¦       8c6f7a323bd4f7762c8bb2e02f0c69ae6dc0e6
         ¦       
         +---80
         ¦       621c058fe64037771b1b3d74599c2a2bb7c9d6
         ¦       fca3efc393fbd961f46fd03890556ea3400a98
+        ¦       0b9ebbd51dc76617ecc4a9852d667cca0bdc00
         ¦       
         +---a3
         ¦       dc231882a14aebdfad7352015dde4e4eb4040d
@@ -333,6 +342,7 @@ G:.
         ¦       43eed79e195c7075b63908fcfc7755acda9f9b
         ¦       923b75fd3dd7fd25019b63846ab1110d3dd5f8
         ¦       f89d053186fe6ac41e651167171204edf5071d
+        ¦       c3757d4b5f093a5a47bef6bcda425460063471
         ¦       
         +---06
         ¦       f128f27bfc78fc35e8c4e7158bab05831d0dfb
@@ -344,6 +354,7 @@ G:.
         ¦       5f3a35cbcbc41b381c98490583bba604d5b2cc
         ¦       bda6abcdee1aaebaa9ecb689a281a96850bb04
         ¦       623a8d65a429d397f313c41420d6a260c4fe8e
+        ¦       a65ed42b054c885cff2b8de59c5a545bb177c8
         ¦       
         +---c8
         ¦       fdd2ffc36091f739b27b2caaf47e37b2843486
@@ -355,6 +366,7 @@ G:.
         ¦       ce4335e75929a51d9e999f63bc1e05ea400c6d
         ¦       60de405cbf3dcc1b262fc96c38bad129eeed35
         ¦       6eb09afef30bf17028904839339f5fc72a51a1
+        ¦       ee056b426ac37fa7bd34323cf577b798d682cb
         ¦       
         +---98
         ¦       d0e628f842cf8ede31029c4975c911bbc6be6f
@@ -392,6 +404,7 @@ G:.
         ¦       6e00023045e863643cdf93cdb4340453d18e87
         ¦       a20c6fb55cc70a9c34824219b6a1947502ba6a
         ¦       11997ace144f50809f85452cf41232fb6488f6
+        ¦       938b940ad597490bb563cfd48f20f39521035b
         ¦       
         +---9b
         ¦       ff4457f60c1c5548e12ebd5e7644885509ec17
@@ -402,12 +415,14 @@ G:.
         +---19
         ¦       f9bae203a397443d65b9beca1c0046e44dbc9e
         ¦       b90f98096dddb1f5874172d4da5cd914c0f052
+        ¦       0c61b511d3254a086cef2ca89a2ab464e41b29
         ¦       
         +---47
         ¦       ac23e9f6bba801729f2042aa1221439983a10f
         ¦       98ec9fe5e187f2760c01087d06d8f02526efb2
         ¦       432d3def9fdacc0eb426bbc6b9c9f75a3945db
         ¦       730c2c5cffdd6a5bcb3323395fe52adbd55646
+        ¦       f990fc4ea08eb38163a415200a519c33632f55
         ¦       
         +---07
         ¦       edc9321fbeaf127fad58e964122bbceb49e659
@@ -420,6 +435,7 @@ G:.
         +---77
         ¦       6e0df8f3d5677409f249eb44c800ff0d401e49
         ¦       028e37726b18a02d8fc37e2671fc4da01630de
+        ¦       616b9427cd2cb1cded362ebe2d8209f1ea2d4f
         ¦       
         +---9e
         ¦       ac10ad156481604106cf526008f051b4aee9d0
@@ -441,11 +457,13 @@ G:.
         ¦       5b0e490938fc8618caaaf206db04119049d50e
         ¦       a1a0148aea902b785c105692e34106fcfbdaef
         ¦       7b9c3dc9e8ec8fad2fb62d78a9591fa37f3e86
+        ¦       00785ebdf27717cbde6d99dd27be13112c0189
         ¦       
         +---dd
         ¦       81e744daf53f9fcf326c3b14a2a4d9fa56a989
         ¦       78d1f2d7fe6605735fe0b2232e2cfdc3f0970d
         ¦       8cf99e844d393bf3140a8934cddcaadfa57716
+        ¦       6d381665af29cc20a1d2199b7b90a38524689c
         ¦       
         +---17
         ¦       13d2ea785c85b4ebd64d9be834e6573f4a67cc
@@ -477,12 +495,15 @@ G:.
         +---1a
         ¦       a8a150d91c43afb332e81e0567a2b13ce7b3d8
         ¦       ec1b2a4d9c6df15719245adb6bbe49c5e8a52c
+        ¦       df6299c260a7cc6b3de68fce99d1c539cc2ae4
+        ¦       fc23ef330aa8ebc889cd2c7a61f9fb07251b33
         ¦       
         +---3e
         ¦       d67d893c8c1392fa24fc6bf16d441b013d9ad0
         ¦       3a7d4140bf3ec824d92b3cd1814f66d3e3d5d4
         ¦       629c136ecc18c430ed46b5716fefe41bb0cb94
         ¦       64d3a5793ae3fe4d6340e144d4fb025c5deffa
+        ¦       abcec949368b7d0dd0f7195d650cf30744c2f2
         ¦       
         +---48
         ¦       8f5e00374c61b858331c83b0adaa895bb1de5e
@@ -541,6 +562,8 @@ G:.
         ¦       5456ef062c9e9a94f1ebe8b8080be1205b6544
         ¦       d48efbb09c56f5c28d4cb58a443aa29a4a5091
         ¦       f5286dd37ad3e1ad55b778e9fb572d7f17d730
+        ¦       f64fe1d691b17cb33ed4b5a84d9c36370b0ae6
+        ¦       fed0b8a5ed3b98fcf690a8dab0b07aff67837d
         ¦       
         +---b0
         ¦       a553e87950ef046e60fec5c262517b4c53297f
@@ -552,6 +575,7 @@ G:.
         ¦       b430ea8591a33a4885477d58994d12de77cdb9
         ¦       228b742d629e754bd9cca3df2f34007dca1439
         ¦       020065c6d40cc15494b090d1e34f54fc1ba673
+        ¦       38eae996000dffd2c1151048ba83cedbe20cd7
         ¦       
         +---43
         ¦       d2488618c3797f9f40c9536ad1c5052e308ede
@@ -562,6 +586,7 @@ G:.
         ¦       ef9c40f6a3bbcf1423ad59da6ca19a476e5714
         ¦       a0ab5988afb8b2b3c6f136d664cec7afd53f6e
         ¦       b0eba7cd53b8209493fd479c33d6c2408b21fc
+        ¦       1a046b7c4fa40d4dbd109209da7013f934678b
         ¦       
         +---e9
         ¦       4b7728a88b5910e20a2a7844985e8815ddb5c6
@@ -598,17 +623,22 @@ G:.
         ¦       95180937b6e0c9da4e1f07db4052de8fccc670
         ¦       4e5baebcf840a9e4d48cb3d844564c630d8cfe
         ¦       1a1c53ac3ba41d8259926a09ab03bfc6dd9657
+        ¦       82e88f13a6f61f9b3ec8ead738688fc42d0cb0
         ¦       
         +---59
         ¦       cbd889cb0408aedbf332ea5c5ad3808a8ce6f4
         ¦       a2190ad2f0d1347bf3162c930b820960365bff
         ¦       124ba57debb9a20847e9200bb24dac96182d7f
         ¦       3a69288d9945d3955b467bc01b3ef91c21299d
+        ¦       ed38acbfc1e0c1e4f677749c49c9e601a33abb
+        ¦       3c33fa7915acdf2a0dc1662211eb74d76c55c3
+        ¦       469170ee6948042822e42e5a2cebbaef309ae1
         ¦       
         +---d2
         ¦       712f451b33a9f9dff1b44f0275429caaecb801
         ¦       3794df1d85e7cf4097c645481926bcd4a9fbd9
         ¦       acef094da47b5457b1954a6780ad2413f8ceb5
+        ¦       6820ee3a94905ace8ba186e122dde8a31a72b1
         ¦       
         +---73
         ¦       72836c76977185b476dee3e6c83871380fe3f4
@@ -625,10 +655,14 @@ G:.
         ¦       c261d231a92f916b37f0fcc44402c41c4c3eac
         ¦       2bc4c6a4cff9e69e57372a61270d7bb5c469a1
         ¦       360d9261b1800284eacc1f9a2a70368571fd34
+        ¦       bea81056d38e24c6066cfdb7fccd82443c3ba5
+        ¦       14b1ea6b56bddcd51c5c87b32ee8779e26a0a5
         ¦       
         +---d5
         ¦       65b22d6170c349a40416fa0de8b15100d5f34b
         ¦       3123da99bad3978f54f3363239e985b5a143f7
+        ¦       7f0f828b2d270a0e62573c5268a9a013c7d1da
+        ¦       b8026ecbcfee2bc9586f1541b8d8b46fe553d8
         ¦       
         +---2d
         ¦       9d58ac7821c10f73adfbb70c215367bf7e8077
@@ -642,12 +676,14 @@ G:.
         ¦       ee8b0162bf29535381e9d6396230147721fe43
         ¦       35efb349cc980102a8e5ca2e1b42e0aa9bc5de
         ¦       021fa436ea3c5ffac9b7769c879d8b1a383f08
+        ¦       0d28d4c4bd1d3312cf1272df9cf7a7d93a43cc
         ¦       
         +---ea
         ¦       3e115de8ddd9bb0ac27bd3a26d5ad19a7084fd
         ¦       b779bc0f304048ded273865b456e2e78244c8a
         ¦       f8405ab8a8e843243b2e8eb8af3eeb179ab223
         ¦       d0962b0825cc63b948cbe0c0b8469e2ee4d22b
+        ¦       165612820888bc695f9fbd0ecc750c4189b514
         ¦       
         +---18
         ¦       3c37e4fd6f0b2ca27a50e020cd2d12bcbaed2d
@@ -661,6 +697,8 @@ G:.
         ¦       dd40afe9de1b8c22079e1cb283a36fa0ae3487
         ¦       f6eecb0161fd96491cec8158acc8a237396d30
         ¦       7d0f288f6a49eb18fdbe37be94d3f4407daecb
+        ¦       f09a20b4d281dc19ac57d9169d104157514a81
+        ¦       1007a7e95d30d57debcd0e4e458eb7c93b9394
         ¦       
         +---9a
         ¦       00d2d1ab92ecffc5581f0a11a58071821a7b19
@@ -684,12 +722,14 @@ G:.
         ¦       b2d8cff5d607a5dec8d745c1e27fc355949d29
         ¦       484736ec7624fd8de1327e3d73322f96497df2
         ¦       a27490586ba062ed35c3333799325031e860ca
+        ¦       1007d37e26644e6f2f405e1cc654495b7d8fae
         ¦       
         +---94
         ¦       f19d888084ce757fe0673a71db5e3645e02a79
         ¦       c0aa05b3bd1cdf99079ddbe22a5b6baa65b33b
         ¦       88893cccf91d43205f2783b04b79d33f8416be
         ¦       fb9fd66b6fdc31eab4aed2a98d43d555c172fd
+        ¦       75527174ab44fe34db2ecd191901ec18f0e3ce
         ¦       
         +---bf
         ¦       0a27a0bf23628e459ce8fd7f933db41afb08e2
@@ -727,6 +767,7 @@ G:.
         ¦       2d6c0023d011eb206ce7a5ca86964b7957fc3c
         ¦       d300bdba02588f37a090cd8b7c05a9c64e591e
         ¦       0749e061e48b7204e33e9cacae29252c93dbbb
+        ¦       c0b0ade37d4f7f7d9e0970c4b1e38455a08d5b
         ¦       
         +---aa
         ¦       ff6521e2cc97a0595f870f2df83cc0e221f14a
@@ -738,6 +779,7 @@ G:.
         +---87
         ¦       d1695bed23a26ec69b843caab09c584684f73d
         ¦       eb6c64e76b16a12b81d156d486acd6a2f780cd
+        ¦       63ed1c5121685ebfc4c1dd791adce76b012903
         ¦       
         +---4e
         ¦       7d45874bc36b9072644fb3ea5f510e9ca06c7b
@@ -755,6 +797,7 @@ G:.
         ¦       9b9dec5fb0d24e2c9527d148a3e870e8dab57f
         ¦       f02d16a5f92a41f82c369e143ef43bc472444c
         ¦       452c9a15e15fc129e0fc2469029c39958ee871
+        ¦       d7a50cbbeadb41c01c455ac2bf12a60ba0eff0
         ¦       
         +---ce
         ¦       b04d539af0f8b92fbac15dfebd62c4a7a6af4d
@@ -768,6 +811,7 @@ G:.
         ¦       1e57b8612b1be5d1b59cdfdd1ac575bc49a962
         ¦       0b30967d9b4ab4182d0b32420e613cc32b6c61
         ¦       5cbb41aa3ef3cb286cecddcb2fdfe756c7e91f
+        ¦       7745d267e8b6fb7ef204b0cbff07785d8100e5
         ¦       
         +---eb
         ¦       3fa87a469594a5315d2f3cbb75cb1342fb6abe
@@ -799,6 +843,7 @@ G:.
         ¦       ca9fb24bfc6e593acd57188b0de27cb02c6286
         ¦       dda4c7cc5ef6d3fa0762303e8bd39e2e130361
         ¦       14e124a13f8163cf95d0822d60bca1d1e35c39
+        ¦       3ae3f3ac0826e618c2cb6fbc34f421283302db
         ¦       
         +---ba
         ¦       17b3ae5efbf538b7ef54379460454d07e5a518
@@ -824,6 +869,7 @@ G:.
         ¦       78bf8d7066e07a3f6ecda697ff2de810aff82d
         ¦       ec23eb98c362125432265b6138304920cb3d8c
         ¦       82d5f17fa56f60db8e77ca23d0f7f24cb7c737
+        ¦       a35e6b9c4a8c0a0d240b11c017f5318af3091e
         ¦       
         +---29
         ¦       905cb35e0bd60a302609ea1acb4695736826c2
@@ -842,10 +888,12 @@ G:.
         ¦       d613f19373647d92bbee24165d006f039097f9
         ¦       c0bd6d509f981c11aa916d142692e51439ef52
         ¦       c2370832b154a58ff3b90c68dbc1c0e3e54643
+        ¦       979787297998784ecc103fbd2107b32318543e
         ¦       
         +---f1
         ¦       f2547912e21f8c979ae6e7fcb7561613eec2a7
         ¦       432321fe504c2c5f6aab36f69ba9ab8fb2b693
+        ¦       bda0f6a0e24994c7d7d1956a86c01b789e6ca4
         ¦       
         +---a5
         ¦       cd0671aa8fa114707378a224b8db7474c41939
@@ -860,6 +908,7 @@ G:.
         ¦       
         +---a6
         ¦       91080aa6ad85928116399f9e6d9825be534b93
+        ¦       521751de126d2b9a8e10521eb96b646d29bb72
         ¦       
         +---99
         ¦       e682dc5b2d94712a3fc8e817969dff93b3b67b
@@ -873,17 +922,22 @@ G:.
         ¦       bf5687b4bbda709e640e7d58dae221d48c2a49
         ¦       d32d1559373dda296397a9c75dd11e7a7e0d12
         ¦       9490aa701b0690c1c6f83191b3291f5932a11c
+        ¦       5b5a3ba1461d147b1a469df84b26439f49a473
+        ¦       5938e955440c54bfc49b7a0ee9966525c022de
         ¦       
         +---7f
         ¦       191d541ae879d9fdfc5709f348ef7b2925f768
         ¦       c20faf609b9961aa88b55cf543186375f784d9
         ¦       bd649a2c43c08b4ba3fdabdd850b7e84bc155d
+        ¦       ce0cf6e4fb01982892e6d537036d6de44ef2fe
+        ¦       147e3e34cb44e3559791c1fc240c25baa86015
         ¦       
         +---0f
         ¦       ce173cd6c82cf0b6fb957161483d9d69d77fc5
         ¦       a026b45cfef8812baa01c0e4292c3881706c79
         ¦       04cac89ddd9b981d2c11e7918706dcf2a31ebe
         ¦       f43fc9d97889fd60848e71e1eda930d93c01ef
+        ¦       bf7914afb3e38c3bae5a4db5c321bd3ebb43b0
         ¦       
         +---info
         +---pack
@@ -910,12 +964,14 @@ G:.
         ¦       fcb76cb5239d0ffcd18b6db571bf9c4392d8e6
         ¦       45a39635e26fdc00af8dcad29abbcd6627913a
         ¦       5a96d953d64b84cc51e8a050d5c3b3f65faa23
+        ¦       cf3a366b3cd46f249a4e2f7556db6eaaab4720
         ¦       
         +---03
         ¦       09fbe09cfc830f671dec0c2437f53412624674
         ¦       239de269e1955e3f74238ddf558241b75015b9
         ¦       b30fa37e3c1c47b34342bbc8c355e23b3306cd
         ¦       8be56e3089b7c2cbe46422fa9da06890528f3f
+        ¦       3ca34b748493054418d4d2a0abad25a4c0f7dc
         ¦       
         +---be
         ¦       6cabb7adeffec57bff5020b5be42637c52c491
@@ -944,6 +1000,8 @@ G:.
         ¦       983d9b76af719ae784355905f4967c1d98f102
         ¦       debfbad3389f6da6fced381e62cc000fa75044
         ¦       62cd9ed08d6dff176df264faf5deec8226d057
+        ¦       30d15336e62d9f2d611a1d8b1f50101ca1dd94
+        ¦       be4826402cc16623ab20297e71d8d7a1b51d8e
         ¦       
         +---c1
         ¦       235641a88d7955dab70cb42e9d217046dff084
@@ -954,6 +1012,8 @@ G:.
         ¦       cf307f61d918f0905d70bce9e36bcc5b21ef80
         ¦       8eb1f959e62d49ec7d20087a70256870bd1601
         ¦       91d1788ff6951fa66d055bf2488ede188a84e6
+        ¦       9b6e6e004e7539934ce245467b55f66ac808d9
+        ¦       23681e1f03a07bcf2d9dc6c68e9a7b62bb4a24
         ¦       
         +---64
         ¦       fe2482898996adf42641d0454a577189af2b27
@@ -963,6 +1023,7 @@ G:.
         +---8d
         ¦       112f9a27184e5ea842f4958007ca23e28bfd53
         ¦       fe14ea7a20313e37a2214e16053646a2967971
+        ¦       5a50ab8f6eedadc117f8156fc35351b7686f88
         ¦       
         +---ad
         ¦       c056c2d38143e1dab1e681f5f62206b34f4a70
@@ -977,6 +1038,7 @@ G:.
         +---14
         ¦       fcc95e4e170f063b9dc56a65c2af2996779667
         ¦       8b04856ba4a62d3d7f0021c7d18bdaa207b081
+        ¦       cf253790bf38322250bc09441d0d269ec79be1
         ¦       
         +---46
         ¦       ed9c6a7c5c622b4c0a2cefe6eca5933d9a344d
@@ -991,10 +1053,12 @@ G:.
         +---79
         ¦       d30c05e33336574badb4183680379b8239581c
         ¦       68f1934216cdd687080e1842f4b0292e57297e
+        ¦       74e4f9dd30c914e2c5b631546957da6c89aaf3
         ¦       
         +---11
         ¦       15d0bdb5c6ca396df8ff9f6921f5f8169b0442
         ¦       6f847a443ca182574a7b6f1b5d0da1863af53b
+        ¦       19cc72c6a0a4edc3d786df23d0969ecfb394a5
         ¦       
         +---fc
         ¦       46ffbc08a51defd5c67a3c9151b2c4339df345
@@ -1013,6 +1077,8 @@ G:.
         ¦       0d41331ddd0ba27027a14ea3e51708ee4ac213
         ¦       576c7e3eaa6a2c32a2ed91a8c65dcc6fcbcddf
         ¦       f5cbdf2b139695f474792f674e83933e0f4478
+        ¦       c3a382ae6255686113f99814c52414a4489ab9
+        ¦       061497dc904b574da920874bccdc272656b545
         ¦       
         +---9c
         ¦       b160b67b105ebf379b993fab6bc78dcaf2eafc
@@ -1035,10 +1101,13 @@ G:.
         ¦       28d986663bdc0698c7afd03908cd35bbbc739d
         ¦       7ee2cd0c31b0480906a420d2bf16a4d882d4ff
         ¦       fd0878dcd53c0abe38c9d7dc7a1486fd74673e
+        ¦       8537d31e4147eb2504f05ceb393c78ef55335a
+        ¦       c07bcd51b0066856969d4f0bf447447010f651
         ¦       
         +---ef
         ¦       9d4b1cdfd386e152e316f9a98853260e72d80a
         ¦       c8b387f3d38d504e1c4b34334e4f76027a25de
+        ¦       e4ecf38dd3f3f554aeb62986cd9e0dd6d7db0f
         ¦       
         +---d9
         ¦       5add5d2dd35552f02cbd628e01aee7d1918a3c
@@ -1052,6 +1121,7 @@ G:.
         ¦       c25814abd2a0176aba48393edac7690ba98ea6
         ¦       77ed8e6c14787553688e9b82dbbc5de3d9b07d
         ¦       a010cd51045295d56746a057ac3efe5f906f33
+        ¦       17ad52c6a148f5769de9fd57181056429f5984
         ¦       
         +---af
         ¦       63884de48efd68b7197d2d2111e0e63af72ee8
@@ -1072,11 +1142,13 @@ G:.
         +---7d
         ¦       4c4a99b2205b44213604027cfe2ed06469f98c
         ¦       967d7f639eff4bc31efb6bffcc3134ae84bd29
+        ¦       9ff86413b7e8616c6d174ab17ee470fd8828b4
         ¦       
         +---7a
         ¦       e1721b9d222075a3373b5fbaaac2d33638d94d
         ¦       1bf95608fec51fd2c1aed8a1c8b747eb4ca0a4
         ¦       51e1e905b164b25379ad11c82aaeeaa800c4f9
+        ¦       ae6025aa8a6d4dc9aaa1f474f9e1a3718174ea
         ¦       
         +---f7
         ¦       feeab97923f07456998132d205b2b46bd98d7e
@@ -1089,6 +1161,7 @@ G:.
         +---bd
         ¦       be9999f0599eb3af6c19b4a8070c9b6a36d43c
         ¦       339b31935deefb79140cc8f7d83da7a471ac10
+        ¦       e281a6e41270812f7f5eaa79dae907ba1bf3bd
         ¦       
         +---5b
         ¦       162827653e56aebe9255f3d09cf3ecfc56d0c2
@@ -1107,9 +1180,12 @@ G:.
         ¦       
         +---d6
         ¦       1aebad9f0276b7a96f7f3a20601ecacc41ae70
+        ¦       0eea7c4f73012c92f80186dc50d2cf02d00676
+        ¦       f9ac15fe810efc07b45b7ee4e01f1751889bc6
         ¦       
         +---f8
         ¦       2e33620bbb8573f8ccac6dabf429efb40c41f0
+        ¦       3bd65fae354e3d93b7fe8b37901624b0f36fe4
         ¦       
         +---21
         ¦       3eb56e61523fc1a3f879db456991a4be8f2ad3
@@ -1120,10 +1196,12 @@ G:.
         ¦       
         +---86
         ¦       0475ef03757062369726a08067986dc3e9068f
+        ¦       06b57cd61a4d970a919d2d19acc4a67ec85df8
         ¦       
         +---76
         ¦       bdb626a7ad3f69fc4d6a1a9971031714a1eb28
         ¦       2582035eba5a010ccf1de5af710df46a2c259c
+        ¦       d46fdb518e9151b1bd9a2d78b86d2c78d7e78b
         ¦       
         +---ee
         ¦       8e01967f95f387fcb54b8454dfaad171cb6392
@@ -1143,11 +1221,14 @@ G:.
         ¦       
         +---a0
         ¦       8aa7526393ca5ba96a7180bf1ccfa70c0acc9a
+        ¦       7bd41248bbbfbaddc18a5fa06a852dcb576f29
+        ¦       b4d7850efad939672c8063af7b8b5e3d20d2c0
         ¦       
         +---1e
         ¦       424b079bcbd8d89992c841be67f1ae2ee8fa9a
         ¦       bc269a928a40db7757efbecff715d8ef7d4a66
         ¦       4175f19841e225dea696000fc17c76e1c800cc
+        ¦       6e21b4b738af41a9d3dc561c8031b9b881ea7f
         ¦       
         +---f9
         ¦       afbebf09553373ee5be72850d8b615c223e0c7
@@ -1164,6 +1245,8 @@ G:.
         +---e3
         ¦       193f7339a6c9a59b958f2abee61ac481b57334
         ¦       22ac674555583970adad8416b91b56a1396d5e
+        ¦       13a5b2bbf6362b4bf156daced236c46d035eac
+        ¦       a4515ae4c47f6fe2fae46f7d071c433f8a8287
         ¦       
         +---b4
         ¦       ac8a84f56e6a4a97cc2c9847338bc2eb2844f7
@@ -1187,6 +1270,8 @@ G:.
         ¦       0473b06b770f3cd7b2da583c7772ddeb7cda2c
         ¦       d6fcdf507957a313013f7e1a2742eeb2984e9a
         ¦       6b1f80d30a3eb7f8dbd88d15b4dc28d47bff87
+        ¦       65f47269657a9362a49b9953d20a706cf75a36
+        ¦       525d7fc3104ff5b025520bb86a1b57ee3e5a21
         ¦       
         +---51
         ¦       f5fb5c0afc5276355e9f95261d6944b5e695c4
@@ -1196,6 +1281,8 @@ G:.
         +---55
         ¦       572fa878922008f6aadd416f450b42e9a35ed7
         ¦       4864e269294de5a3a3fbd33d1a5f989028733a
+        ¦       b0160911601f65b1cc9a1be27650d8d4a551d9
+        ¦       097848481a670e7d179390eb6d5e4bee20d7fa
         ¦       
         +---ca
         ¦       08fc009eed456dcc5590f8c57217b2135dd15c
@@ -1216,6 +1303,7 @@ G:.
         ¦       3cb21c79a79c94ceb5d732a5fcc93082c26ab7
         ¦       61e7ec41cc41699cd0dd8d1d1e283b28ca6373
         ¦       88f91b208dc7ed1da6127f59d3239bc9c46481
+        ¦       63a2ea513a6ea84295b74d2a66b4b9ce043a92
         ¦       
         +---25
         ¦       01f8500701b299f0348337fe88f2cd279991de
@@ -1236,6 +1324,7 @@ G:.
         +---24
         ¦       7ad78435347a93f7bee188ec75bf34a0f2ffce
         ¦       eed50b5ec183e65ffdea55743796a4566c0477
+        ¦       2b54631e039ea7d69ab8e130554720a87f7205
         ¦       
         +---a9
         ¦       4828b86fc3ad0e7412dc24e4f75e0a898b8ef5
@@ -1244,6 +1333,8 @@ G:.
         ¦       04d90661ee02741386cb51a5204155f13aa58e
         ¦       1c9ea914368785943eebeff939843a1520f4e6
         ¦       d85ab00284fc91bc20e28da27c86e1e2b4ed63
+        ¦       5f71c0d613d6935550ac710fbfafc6b2466f0d
+        ¦       925e06026ad77f743c414121170e62f430d82b
         ¦       
         +---bc
         ¦       e75f65007f8ab2cdb88eb5156a6f1f5080c033
@@ -1259,6 +1350,7 @@ G:.
         ¦       ab2d3dadcc77c7874f5e273b90e6933e7adf0f
         ¦       bab02569a597beb26b4b2bf03b4fa370db89fb
         ¦       8056f7ed4c33687a0c0c5aed5c04966b8eae24
+        ¦       8c8c697ea3790d4f4ede1595985e12a3288233
         ¦       
         +---d8
         ¦       7fa087fcdea25881a922fa63d6936ef1a45b47
@@ -1266,6 +1358,7 @@ G:.
         ¦       
         +---e8
         ¦       3cf87398db8e2f13296a117118bf7e025ab6a9
+        ¦       cecbc4da708a3fa5a0b80721f78372cc101d8f
         ¦       
         +---82
         ¦       a5221e2f261203c9f1b17066c2f96dc1838cb7
@@ -1303,11 +1396,13 @@ G:.
         ¦       e986954067984d02e32d472d1ae3ca9db86a41
         ¦       b0208e2cf4d95f1019e82ccee1c5e4bda205b7
         ¦       e0258cad8f3096975ae525242c076e570c2998
+        ¦       79bb3a0292daba1aea466a1639fb5f622ddd9a
         ¦       
         +---1f
         ¦       117a4fc7a0da03e91dedc08879284a20cd5ca7
         ¦       ba531fd57f192b4abe9ddc0034600ca919ffdf
         ¦       4696ab5a9c9f880041174e8ccd98ba674ba35f
+        ¦       9533ab5e28ae37a14c38907a15ed994a86bc35
         ¦       
         +---50
         ¦       b3ad3ed60c3ebcf4ebba3d978e5346180c21fb
@@ -1317,12 +1412,17 @@ G:.
         ¦       eb21a98c069294a275feb887cec690c3ea06ec
         ¦       a856266f6fc851faa7bcefe38cdabe23b737aa
         ¦       6e63d5fa721093fcd76f859373ffafa4aa700f
+        ¦       faf6a8b0990e32c59051b4b8e66035136a4699
         ¦       
         +---4c
         ¦       12eababc2a131129d6265c65208b9564d5c4ac
+        ¦       7f7b40b26b4bc52ae72c5696a720b36a2ea39b
+        ¦       d2c4ba5e6fbbf81bbe572a1b7e3017c9e7edef
         ¦       
         +---ed
         ¦       5dcfed54c164d9c2ebaf032b7e1c91738dd1f1
+        ¦       5895101c82876e1dea1382912b7a68751dd3c3
+        ¦       5f0ef6af251b17c998389bd1d76f9f57f671bc
         ¦       
         +---7e
         ¦       528745d7a5ecd2eb5f6ec904de30a7ab9dd75c
@@ -1337,9 +1437,11 @@ G:.
         +---90
         ¦       a0b6d6b830e49fdce85b4b1bc02129ac8a4723
         ¦       d9126e5ba3209c803d2c6c5e1c0bf7337877ea
+        ¦       8579bad1ca0cf099c8db8d590d1a237c7fc282
         ¦       
         +---6c
         ¦       d7527a2dbc0292dded57368106019c1514254e
+        ¦       4aff3716509c6009810d0d51499d288ec65da9
         ¦       
         +---4f
         ¦       4641f99fc8a9a5c7b243f7bf52c67209e20c54
@@ -1362,6 +1464,7 @@ G:.
         ¦       
         +---e2
         ¦       1e5f353cf7302680a59823d29825aa41ede8c7
+        ¦       6ebb5105499c199ff678667d6020f44b8b6d29
         ¦       
         +---6a
         ¦       2a084625b2197d6707e41e063540d154a448e8
@@ -1371,12 +1474,14 @@ G:.
         ¦       
         +---49
         ¦       1c029908af9c3f48860394347d184362805a61
+        ¦       b1b8e57759a541551447461269cb7c2c55c244
         ¦       
         +---0a
         ¦       5712f733095fc62f5da959bf8519cae6155975
         ¦       
         +---de
         ¦       9b3080a9a7fbdc1c89a259a0c57f80d0d6ba4b
+        ¦       0732434cfc1d9ff0f48eeb8cd96bd55dc1357b
         ¦       
         +---0b
         ¦       784f7922a174b546a07becef670a3f831ba556
@@ -1384,15 +1489,20 @@ G:.
         ¦       
         +---c4
         ¦       013fd18a6f4c39603fde2b0f4b6289790e4be9
+        ¦       357dbeb805785327d7b75c5383c8aee8e1fc25
+        ¦       67eabd3dd408961c31dfa35e17137795aa06a6
         ¦       
         +---b2
         ¦       28bb3e615e77de9e23956b603fb1e0ab7e5d44
         ¦       
         +---84
         ¦       be0438bcb164a6d0f54b6c03041bfeb42fd698
+        ¦       509ac66bcbdc841cf2dcccde9edb090ca7e6f4
         ¦       
         +---9f
         ¦       55da136636c6315dfa0b0805cc713f0d664c28
+        ¦       d89bf58f03df45cbb237794dcc1b38db370e67
+        ¦       b36410cbef2077a03345ce54e7e7de835468d2
         ¦       
         +---a2
         ¦       dcd88fbf4440e432d76a41d71ec97147cc008f
@@ -1411,5 +1521,34 @@ G:.
         ¦       cb0f9514dab4d170d0637eac4eaaf2289e9254
         ¦       
         +---27
-                1bc2b5493505c991ef141044a66be2f0406e19
+        ¦       1bc2b5493505c991ef141044a66be2f0406e19
+        ¦       
+        +---b7
+        ¦       6cde292cc48f975a9a39b42a0cf8e2bb409ec5
+        ¦       
+        +---8a
+        ¦       4c3c8e94398358e3a039d3bdadfa6c1e4835a3
+        ¦       
+        +---3d
+        ¦       e1f9492a97e384c1a7aa1971312e574c74d36e
+        ¦       d98be2bdb4843a3896e1e9773024896ad0b56d
+        ¦       
+        +---fb
+        ¦       fd27893eed6b1dbce665265e8da2ec3684fa95
+        ¦       
+        +---ac
+        ¦       256910ee8e7b39e8a7b0a75eb145f926f909c0
+        ¦       483c828d37e85a99c3296cc25314eb7a2e4345
+        ¦       
+        +---f6
+        ¦       9b6d8f54298ee7563e609c9d2d2b888c2ba443
+        ¦       
+        +---69
+        ¦       aaa89e328572dfb8c86f59c019a9992bcfa201
+        ¦       
+        +---3a
+        ¦       13b1377e8c65a46014e20ea9b7f97c232102f2
+        ¦       
+        +---c6
+                a5f7c794ff4b6e9d91b0e9da90626fe05903d0
                 
