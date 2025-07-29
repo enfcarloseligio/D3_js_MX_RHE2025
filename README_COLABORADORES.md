@@ -1,124 +1,60 @@
 
-# 🧩 Guía para colaborar en este proyecto (paso a paso)
+# 🛡️ Reglas de colaboración y protección del repositorio
 
-## 👋 Bienvenida
-
-Gracias por querer colaborar. Aquí aprenderás cómo enviar tus cambios al proyecto de forma organizada.  
-No te preocupes si nunca has usado Git o GitHub, te explicamos paso por paso.
+Este repositorio está protegido para asegurar la calidad y trazabilidad del trabajo colaborativo. A continuación, se detallan las reglas establecidas para la rama principal (`main`).
 
 ---
 
-## ✅ Requisitos básicos
+## 🔐 Protección de la rama `main`
 
-Antes de empezar, necesitas:
-
-1. Tener instalado **Git** → [Descargar Git](https://git-scm.com/)
-2. Tener instalado **Visual Studio Code** → [Descargar VSCode](https://code.visualstudio.com/)
-3. Tener una cuenta en **GitHub** y haber aceptado la invitación como colaborador.
-
----
-
-## 🧭 Glosario simple
-
-| Término         | Significado sencillo |
-|-----------------|----------------------|
-| **Clonar**      | Descargar el proyecto a tu computadora. |
-| **Rama**        | Una copia paralela del proyecto donde puedes trabajar sin afectar el original. |
-| **Commit**      | Guardar los cambios que hiciste. |
-| **Push**        | Enviar tus cambios a GitHub. |
-| **Pull request**| Solicitar que tus cambios sean revisados y agregados al proyecto principal. |
+- No se permiten modificaciones directas.
+- Todo cambio debe hacerse mediante **Pull Request (PR)**.
+- Se requiere al menos **1 aprobación** antes de fusionar un PR.
+- Cada nuevo commit **revoca aprobaciones anteriores**.
+- El historial debe ser **lineal** (sin commits con merge automáticos).
+- Están **bloqueados los push forzados y eliminaciones** de la rama.
+- Solo administradores pueden hacer push directo (para correcciones urgentes).
 
 ---
 
-## 🔧 Pasos para colaborar
+## 🔁 Flujo de trabajo para colaborar
 
-### 1. Clona el repositorio (descargar el proyecto)
+1. Crea una nueva rama:
+   ```bash
+   git checkout -b nombre-de-tu-cambio
+   ```
 
-Abre VSCode y en la terminal (`Ctrl + ñ`), escribe:
+2. Realiza tus cambios y haz commit:
+   ```bash
+   git add .
+   git commit -m "Descripción clara del cambio"
+   ```
 
-```bash
-git clone https://github.com/enfcarloseligio/D3_js_MX_RHE2025.git
-cd D3_js_MX_RHE2025
-```
+3. Envía tus cambios a GitHub:
+   ```bash
+   git push origin nombre-de-tu-cambio
+   ```
 
----
-
-### 2. Crea una nueva rama (tu espacio de trabajo)
-
-```bash
-git checkout -b mi-cambio
-```
-
-Ejemplo:
-
-```bash
-git checkout -b mapa-veracruz
-```
+4. Abre un Pull Request hacia `main`.
+5. Espera revisión y aprobación.
 
 ---
 
-### 3. Haz tus cambios
+## 👤 Rol del administrador
 
-- Edita los archivos necesarios (HTML, CSS, JS o CSV).
-- Guarda los archivos como normalmente lo haces.
-
----
-
-### 4. Guarda tus cambios (commit)
-
-```bash
-git add .
-git commit -m "Agregué el mapa de Veracruz"
-```
+- Puede aprobar y hacer merge de PR.
+- Tiene permisos para hacer push directo a `main` si es necesario.
+- Revisa los PR y resuelve conflictos.
 
 ---
 
-### 5. Envía los cambios a GitHub (push)
+## 📣 Recomendaciones
 
-```bash
-git push origin mapa-veracruz
-```
-
----
-
-### 6. Crea un Pull Request
-
-1. Entra a GitHub: [https://github.com/enfcarloseligio/D3_js_MX_RHE2025](https://github.com/enfcarloseligio/D3_js_MX_RHE2025)
-2. Verás un botón que dice **"Compare & pull request"**
-3. Haz clic, añade un título y una breve descripción
-4. Haz clic en **"Create pull request"**
-
-Después, el administrador revisará tus cambios y los aprobará si todo está bien ✅
+- Nombres de ramas claros: `feature/mapa-tabasco`, `fix/leyenda-escala`
+- Mensajes de commit explicativos
+- No trabajar en `main`, ni para pruebas
+- Solicitar ayuda si algo no funciona
 
 ---
 
-## 💡 Consejos importantes
-
-- No trabajes directamente en la rama `main`.
-- Crea una nueva rama para cada cambio.
-- Usa mensajes de commit claros y específicos.
-- Si algo falla, ¡pregunta! Nadie nace sabiendo.
-
----
-
-## 📩 ¿Dudas?
-
-Envía un mensaje al administrador o comenta dentro del Pull Request.  
-Estamos para ayudarte 😊
-
----
-
-### 🧪 ¿Cómo subir esta guía a GitHub?
-
-Una vez que pegues este texto en Visual Studio Code:
-
-1. Guarda el archivo con `Ctrl + S`.
-2. En la terminal integrada escribe:
-
-```bash
-git add README_COLABORADORES.md
-git commit -m "Agrego guía para colaboradores principiantes"
-git push origin main
-```
-
-¡Y listo! 🎉
+¿Tienes dudas? Comenta en tu PR o escribe al admin del proyecto.
