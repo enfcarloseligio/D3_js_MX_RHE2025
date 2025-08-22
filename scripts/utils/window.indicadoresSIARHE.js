@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
       enfermeras: parseFloat(row.enfermeras || 0),
       tasa: parseFloat(row.tasa || 0),
       edad: parseFloat(row.edad || 0),
-      licenciatura: parseFloat(row.licenciatura || 0),
+      profesional: parseFloat(row.profesional || 0),
     };
 
     // Formateador con comas
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (valor !== undefined) {
         let texto = formatear.format(valor);
-        if (key === "licenciatura") texto += "%";
+        if (key === "profesional") texto += "%";
         el.textContent = texto;
       }
     });

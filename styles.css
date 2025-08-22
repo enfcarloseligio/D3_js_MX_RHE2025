@@ -42,13 +42,17 @@
 body {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   font-family: 'Noto Sans', sans-serif;
   font-size: var(--font-base-pc);
   font-weight: var(--font-weight-normal);
   color: var(--color-Negro-Profundo);
   line-height: 1.6;
   background-color: #ffffff;
+}
+
+main, header, footer {
+  width: 100%;
 }
 
 section {
@@ -58,12 +62,27 @@ section {
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
 }
 
-section p, h3, h4, h5, h6 {
+/* Textos dentro de section */
+section p,
+section h3,
+section h4,
+section h5,
+section h6 {
   text-align: left;
   width: 100%;
+}
+
+section > * {
+  width: 100%;
+}
+
+.migas {
+  max-width: 1200px; 
+  width: 100%;
+  margin: auto; 
 }
 
 /* ==========================================================================
@@ -177,17 +196,6 @@ h6 { font-size: 1rem; }
 /* ===================================================
    MENU INSTITUCIONAL
 =================================================== */
-
-/* Reset básico */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Noto Sans', sans-serif;
-}
 
 /* Contenedor del menú */
 .menu-principal {

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Metadatos -->
+  <meta name="description" content="Mapa interactivo con la ubicación de las clínicas de catéteres en México." />
+  <meta name="author" content="Secretaría de Salud - DGCES - Dirección de Enfermería" />
+  <meta name="keywords" content="enfermería, salud, SIARHE, clínicas de catéteres, México" />
+  <title>SIARHE | Clínicas de Catéteres 2025</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="../styles.css" />
+  <link rel="stylesheet" href="../styles/mapas.css" />
+
+  <!-- Librerías necesarias (cuando actives el mapa) -->
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+
+  <!-- Layout general -->
+  <script src="../scripts/inyectar-layout.js"></script>
+</head>
+
+<body>
+  <main>
+    <!-- Migas -->
+    <nav class="migas" aria-label="breadcrumb">
+      <a href="../index.html">Inicio</a> &gt;
+      <span>Clínicas de Catéteres</span>
+    </nav>
+
+    <!-- Sección del mapa -->
+    <section class="mapa-entidad">
+      <h1>Clínicas de Catéteres 2025</h1>
+      <p class="bienvenida">
+        Mapa nacional con marcadores de las clínicas de catéteres registradas.
+      </p>
+
+      <div id="mapa-clinicas" class="mapa-wrapper" aria-label="Mapa de clínicas de catéteres">
+        <!-- El SVG se insertará aquí vía JS -->
+        <div class="zoom-controles" aria-label="Controles de zoom">
+          <button id="zoom-in" class="boton" aria-label="Acercar">+</button>
+          <button id="zoom-out" class="boton" aria-label="Alejar">−</button>
+          <button id="zoom-reset" class="boton" aria-label="Reiniciar zoom">⟳</button>
+        </div>
+      </div>
+
+      <!-- Leyenda -->
+      <div id="legend"></div>
+
+      <!-- Nota metodológica -->
+      <p id="nota">
+        <em>Fuente: SIARHE (corte 2025). Coordenadas reportadas por las unidades médicas.</em>
+      </p>
+    </section>
+  </main>
+
+  <!-- Script del mapa (actívalo cuando tengas listo el JS) -->
+  <script type="module" src="../scripts/maps/clinicas-cateteres.js"></script>
+
+  <!-- Año dinámico -->
+  <script type="module">
+    import { insertarAñoDinamico } from "../code.js";
+    insertarAñoDinamico();
+  </script>
+</body>
+</html>

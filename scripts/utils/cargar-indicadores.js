@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
       enfermeras: { nombre: "Enfermeras registradas", unidad: "" },
       tasa: { nombre: "Tasa nacional", unidad: "" },
       edad: { nombre: "Promedio de edad", unidad: "años" },
-      licenciatura: { nombre: "Con nivel académico", unidad: "%" },
+      profesional: { nombre: "Con nivel profesional", unidad: "%" },
     };
 
     const formatearNumero = new Intl.NumberFormat("en-US", {
