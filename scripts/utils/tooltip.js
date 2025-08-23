@@ -29,3 +29,30 @@ export function mostrarTooltip(tooltip, event, nombre, datos) {
 export function ocultarTooltip(tooltip) {
   tooltip.style("display", "none");
 }
+
+// Tooltip específico para clínicas
+export function mostrarTooltipClinica(tooltip, event, campos) {
+  // Helpers locales
+  const safe = v => (v != null && String(v).trim() !== "" ? String(v).trim() : "N/D");
+  const fmt6 = n => (Number.isFinite(n) ? Number(n).toFixed(6) : "N/D");
+
+  // Espera propiedades: clues, institucion, entidad, municipio, localidad, lat, lon
+  const html = `
+    <strong>Clínica de catéter</strong><br>
+    <div style="margin-top:4px;">
+      <div><strong>CLUES:</strong> ${safe(campos.clues)}</div>
+      <div><strong>Institución:</strong> ${safe(campos.institucion)}</div>
+      <div><strong>Entidad:</strong> ${safe(campos.entidad)}</div>
+      <div><strong>Municipio:</strong> ${safe(campos.municipio)}</div>
+      <div><strong>Localidad:</strong> ${safe(campos.localidad)}</div>
+      <div><strong>Latitud:</strong> ${fmt6(campos.lat)}</div>
+      <div><strong>Longitud:</strong> ${fmt6(campos.lon)}</div>
+    </div>
+  `;
+
+  tooltip
+    .html(html)
+    .style("left", (event.pageX + 10) + "px")
+    .style("top", (event.pageY - 28) + "px")
+    .style("display", "block");
+}
