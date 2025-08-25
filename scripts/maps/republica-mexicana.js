@@ -30,9 +30,37 @@ Promise.all([
     };
   });
 
-  const colorScale = d3.scaleLinear()
-    .domain([2.04, 2.43, 2.73, 3.34, 5.95])
-    .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']);
+  // ======== CUARTILES DINÁMICOS (ids 1..32) ========
+  const colores = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']; // paleta institucional
+  const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
+  const valores = tasas
+    .filter(d => idsEntidades.has(String(d.id)))
+    .map(d => +d.tasa)
+    .filter(v => Number.isFinite(v))
+    .sort(d3.ascending);
+
+  let min = d3.min(valores);
+  let max = d3.max(valores);
+  let q1 = d3.quantileSorted(valores, 0.25);
+  let q2 = d3.quantileSorted(valores, 0.50);
+  let q3 = d3.quantileSorted(valores, 0.75);
+
+  // Fallback si hubiera pocos datos válidos
+  if (!Number.isFinite(min) || !Number.isFinite(max)) {
+    min = 0; q1 = 1; q2 = 2; q3 = 3; max = 4;
+  } else {
+    const eps = 1e-12; // evita cortes iguales por empates
+    if (!(q1 > min)) q1 = min + eps;
+    if (!(q2 > q1)) q2 = q1 + eps;
+    if (!(q3 > q2)) q3 = q2 + eps;
+    if (!(max > q3)) max = q3 + eps;
+  }
+
+// Gradiente continuo entre min, Q1, Q2, Q3 y max
+const colorScale = d3.scaleLinear()
+  .domain([min, q1, q2, q3, max]) // stops del gradiente
+  .range(colores)                  // ['#9b2247','orange','#e6d194','green','darkgreen']
+  .interpolate(d3.interpolateRgb); // interpolación suave
 
   const projection = d3.geoMercator()
     .scale(2000)
@@ -42,38 +70,38 @@ Promise.all([
   const path = d3.geoPath().projection(projection);
 
   const enlacesEntidad = {
-  "Aguascalientes": "../entidades/aguascalientes.html",
-  "Baja California": "../entidades/baja-california.html",
-  "Baja California Sur": "../entidades/baja-california-sur.html",
-  "Campeche": "../entidades/campeche.html",
-  "Chiapas": "../entidades/chiapas.html",
-  "Chihuahua": "../entidades/chihuahua.html",
-  "Ciudad de México": "../entidades/ciudad-de-mexico.html",
-  "Coahuila": "../entidades/coahuila.html",
-  "Colima": "../entidades/colima.html",
-  "Durango": "../entidades/durango.html",
-  "Estado de México": "../entidades/estado-de-mexico.html",
-  "Guanajuato": "../entidades/guanajuato.html",
-  "Guerrero": "../entidades/guerrero.html",
-  "Hidalgo": "../entidades/hidalgo.html",
-  "Jalisco": "../entidades/jalisco.html",
-  "Michoacán": "../entidades/michoacan.html",
-  "Morelos": "../entidades/morelos.html",
-  "Nayarit": "../entidades/nayarit.html",
-  "Nuevo León": "../entidades/nuevo-leon.html",
-  "Oaxaca": "../entidades/oaxaca.html",
-  "Puebla": "../entidades/puebla.html",
-  "Querétaro": "../entidades/queretaro.html",
-  "Quintana Roo": "../entidades/quintana-roo.html",
-  "San Luis Potosí": "../entidades/san-luis-potosi.html",
-  "Sinaloa": "../entidades/sinaloa.html",
-  "Sonora": "../entidades/sonora.html",
-  "Tabasco": "../entidades/tabasco.html",
-  "Tamaulipas": "../entidades/tamaulipas.html",
-  "Tlaxcala": "../entidades/tlaxcala.html",
-  "Veracruz de Ignacio de la Llave": "../entidades/veracruz.html",
-  "Yucatán": "../entidades/yucatan.html",
-  "Zacatecas": "../entidades/zacatecas.html"
+    "Aguascalientes": "../entidades/aguascalientes.html",
+    "Baja California": "../entidades/baja-california.html",
+    "Baja California Sur": "../entidades/baja-california-sur.html",
+    "Campeche": "../entidades/campeche.html",
+    "Chiapas": "../entidades/chiapas.html",
+    "Chihuahua": "../entidades/chihuahua.html",
+    "Ciudad de México": "../entidades/ciudad-de-mexico.html",
+    "Coahuila": "../entidades/coahuila.html",
+    "Colima": "../entidades/colima.html",
+    "Durango": "../entidades/durango.html",
+    "Estado de México": "../entidades/estado-de-mexico.html",
+    "Guanajuato": "../entidades/guanajuato.html",
+    "Guerrero": "../entidades/guerrero.html",
+    "Hidalgo": "../entidades/hidalgo.html",
+    "Jalisco": "../entidades/jalisco.html",
+    "Michoacán": "../entidades/michoacan.html",
+    "Morelos": "../entidades/morelos.html",
+    "Nayarit": "../entidades/nayarit.html",
+    "Nuevo León": "../entidades/nuevo-leon.html",
+    "Oaxaca": "../entidades/oaxaca.html",
+    "Puebla": "../entidades/puebla.html",
+    "Querétaro": "../entidades/queretaro.html",
+    "Quintana Roo": "../entidades/quintana-roo.html",
+    "San Luis Potosí": "../entidades/san-luis-potosi.html",
+    "Sinaloa": "../entidades/sinaloa.html",
+    "Sonora": "../entidades/sonora.html",
+    "Tabasco": "../entidades/tabasco.html",
+    "Tamaulipas": "../entidades/tamaulipas.html",
+    "Tlaxcala": "../entidades/tlaxcala.html",
+    "Veracruz de Ignacio de la Llave": "../entidades/veracruz.html",
+    "Yucatán": "../entidades/yucatan.html",
+    "Zacatecas": "../entidades/zacatecas.html"
   };
 
   let ultimoClick = 0;
@@ -89,6 +117,7 @@ Promise.all([
     })
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.5)
+    .attr("vector-effect", "non-scaling-stroke")
     .on("mouseover", function (event, d) {
       const nombre = d.properties.NOMBRE.trim();
       const datos = tasaMap[nombre];
@@ -126,10 +155,11 @@ Promise.all([
     nombresUnicos.add(nombre);
   });
 
+  // Leyenda dinámica con los mismos cortes
   crearLeyenda(svg, {
-    dominio: [2.04, 5.95],
-    pasos: [2.04, 2.43, 2.73, 3.34, 5.95],
-    colores: ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']
+    dominio: [min, max],
+    pasos: [min, q1, q2, q3, max],
+    colores
   });
 
   activarZoomConBotones(svg, g, {
@@ -143,6 +173,7 @@ Promise.all([
 }).catch(error => {
   console.error("Error al cargar los datos del mapa nacional:", error);
 });
+
 
 // ==============================
 // DESCARGA PNG
