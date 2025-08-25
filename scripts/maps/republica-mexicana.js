@@ -188,8 +188,22 @@ function generarTablaNacional(rutaCSV) {
 
     const tbody = document.createElement("tbody");
 
+    // Ordenar datos para colocar "No disponible" (8888) y "Total" (9999) al final
+    data.sort((a, b) => {
+      if (a.id === "9999") return 1;
+      if (b.id === "9999") return -1;
+      if (a.id === "8888") return 1;
+      if (b.id === "8888") return -1;
+      return a.estado.localeCompare(b.estado);
+    });
+
     data.forEach(d => {
       const fila = document.createElement("tr");
+      fila.dataset.id = d.id;
+
+      if (d.id === "9999") {
+        fila.classList.add("fila-total"); // estilo especial para el total
+      }
 
       fila.innerHTML = `
         <td class="municipio">${d.estado}</td>
@@ -230,20 +244,28 @@ function activarOrdenamientoTabla(tabla) {
 
       const filas = Array.from(tabla.querySelectorAll("tbody tr"));
 
-      filas.sort((a, b) => {
-        const celdaA = a.children[index].textContent.trim().replace(/,/g, "");
-        const celdaB = b.children[index].textContent.trim().replace(/,/g, "");
+      // Separar filas especiales (9999 y 8888)
+      const especiales = filas.filter(f => ["8888", "9999"].includes(f.dataset.id));
+      const normales = filas.filter(f => !["8888", "9999"].includes(f.dataset.id));
 
-        const valorA = isNaN(celdaA) ? celdaA.toLowerCase() : parseFloat(celdaA);
-        const valorB = isNaN(celdaB) ? celdaB.toLowerCase() : parseFloat(celdaB);
+      // Ordenar solo las normales
+      normales.sort((a, b) => {
+        const rawA = a.children[index].textContent.trim().replace(/[^\d.-]/g, "");
+        const rawB = b.children[index].textContent.trim().replace(/[^\d.-]/g, "");
+        const isNum = v => /^-?\d+(\.\d+)?$/.test(v);
 
-        if (valorA < valorB) return nuevoOrden === "asc" ? -1 : 1;
-        if (valorA > valorB) return nuevoOrden === "asc" ? 1 : -1;
-        return 0;
+        const valA = isNum(rawA) ? parseFloat(rawA) : rawA.toLowerCase();
+        const valB = isNum(rawB) ? parseFloat(rawB) : rawB.toLowerCase();
+
+        if (typeof valA === "number" && typeof valB === "number") {
+          return nuevoOrden === "asc" ? valA - valB : valB - valA;
+        }
+        return rawA.localeCompare(rawB, 'es', { sensitivity: 'base' }) * (nuevoOrden === "asc" ? 1 : -1);
       });
 
+      // Reinsertar: primero normales, luego especiales
       const tbody = tabla.querySelector("tbody");
-      filas.forEach(fila => tbody.appendChild(fila));
+      [...normales, ...especiales].forEach(f => tbody.appendChild(f));
 
       th.setAttribute("data-orden", nuevoOrden);
     });
