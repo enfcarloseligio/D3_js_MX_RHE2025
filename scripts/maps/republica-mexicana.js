@@ -31,7 +31,7 @@ Promise.all([
   });
 
   const colorScale = d3.scaleLinear()
-    .domain([2.01, 2.39, 2.78, 3.30, 5.89])
+    .domain([2.04, 2.43, 2.73, 3.34, 5.95])
     .range(['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']);
 
   const projection = d3.geoMercator()
@@ -127,8 +127,8 @@ Promise.all([
   });
 
   crearLeyenda(svg, {
-    dominio: [2.01, 5.89],
-    pasos: [2.01, 2.39, 2.78, 3.30, 5.89],
+    dominio: [2.04, 5.95],
+    pasos: [2.04, 2.43, 2.73, 3.34, 5.95],
     colores: ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']
   });
 
