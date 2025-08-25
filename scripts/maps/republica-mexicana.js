@@ -16,52 +16,150 @@ import {
 const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución nacional de enfermeras");
 const tooltip = crearTooltip();
 
+// Host fijo para la leyenda (así evitamos superposiciones)
+const legendHost = svg.append("g").attr("id", "legend-host");
+
 Promise.all([
   d3.json("../data/maps/republica-mexicana.geojson"),
   d3.csv("../data/rate/republica-mexicana.csv")
 ]).then(([geoData, tasas]) => {
-  const tasaMap = {};
+  // ==============================
+  // Normalización de columnas
+  // ==============================
   tasas.forEach(d => {
-    const estado = d.estado.trim();
-    tasaMap[estado] = {
-      tasa: +d.tasa,
-      poblacion: +d.población,
-      enfermeras: +d.enfermeras
+    d.población = +(("población" in d && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
+    d.enfermeras_total = +((d.enfermeras_total ?? d.enfermeras) || 0);
+    d.tasa_total       = +((d.tasa_total ?? d.tasa) || 0);
+
+    d.enfermeras_primer   = +(d.enfermeras_primer   || 0);
+    d.tasa_primer         = +(d.tasa_primer         || 0);
+    d.enfermeras_segundo  = +(d.enfermeras_segundo  || 0);
+    d.tasa_segundo        = +(d.tasa_segundo        || 0);
+    d.enfermeras_tercer   = +(d.enfermeras_tercer   || 0);
+    d.tasa_tercer         = +(d.tasa_tercer         || 0);
+    d.enfermeras_apoyo    = +(d.enfermeras_apoyo    || 0);
+    d.tasa_apoyo          = +(d.tasa_apoyo          || 0);
+    d.enfermeras_escuelas = +(d.enfermeras_escuelas || 0);
+    d.tasa_escuelas       = +(d.tasa_escuelas       || 0);
+  });
+
+  // ==============================
+  // Diccionario por estado
+  // ==============================
+  const dataByEstado = {};
+  tasas.forEach(d => {
+    const estado = (d.estado || "").trim();
+    if (!estado) return;
+    dataByEstado[estado] = {
+      poblacion: d.población,
+
+      enfermeras_total:  d.enfermeras_total,  tasa_total:  d.tasa_total,
+      enfermeras_primer: d.enfermeras_primer, tasa_primer: d.tasa_primer,
+      enfermeras_segundo:d.enfermeras_segundo,tasa_segundo:d.tasa_segundo,
+      enfermeras_tercer: d.enfermeras_tercer, tasa_tercer: d.tasa_tercer,
+      enfermeras_apoyo:  d.enfermeras_apoyo,  tasa_apoyo:  d.tasa_apoyo,
+      enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas
     };
   });
 
-  // ======== CUARTILES DINÁMICOS (ids 1..32) ========
-  const colores = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']; // paleta institucional
+  // ==============================
+  // Configuración de métricas
+  // ==============================
+  const COLORES    = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']; // paleta
+  const COLOR_CERO = '#bfbfbf'; // gris para tasas = 0
   const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
-  const valores = tasas
-    .filter(d => idsEntidades.has(String(d.id)))
-    .map(d => +d.tasa)
-    .filter(v => Number.isFinite(v))
-    .sort(d3.ascending);
 
-  let min = d3.min(valores);
-  let max = d3.max(valores);
-  let q1 = d3.quantileSorted(valores, 0.25);
-  let q2 = d3.quantileSorted(valores, 0.50);
-  let q3 = d3.quantileSorted(valores, 0.75);
+  const METRICAS = {
+    tasa_total:    { label: "Tasa total",           tasaKey: "tasa_total",    countKey: "enfermeras_total" },
+    tasa_primer:   { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",   countKey: "enfermeras_primer" },
+    tasa_segundo:  { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",  countKey: "enfermeras_segundo" },
+    tasa_tercer:   { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",   countKey: "enfermeras_tercer" },
+    tasa_apoyo:    { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",    countKey: "enfermeras_apoyo" },
+    tasa_escuelas: { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas", countKey: "enfermeras_escuelas" }
+  };
 
-  // Fallback si hubiera pocos datos válidos
-  if (!Number.isFinite(min) || !Number.isFinite(max)) {
-    min = 0; q1 = 1; q2 = 2; q3 = 3; max = 4;
-  } else {
-    const eps = 1e-12; // evita cortes iguales por empates
+  let currentMetric = "tasa_total"; // inicial
+
+  // ==============================
+  // Utilidades de cuartiles
+  // ==============================
+  function computeQuartiles(vals) {
+    vals = vals.filter(Number.isFinite).sort((a, b) => a - b);
+    if (!vals.length) return { min: 0, q1: 1, q2: 2, q3: 3, max: 4 };
+
+    let min = vals[0], max = vals[vals.length - 1];
+    let q1  = d3.quantileSorted(vals, 0.25);
+    let q2  = d3.quantileSorted(vals, 0.50);
+    let q3  = d3.quantileSorted(vals, 0.75);
+
+    // evita cortes iguales por empates
+    const eps = 1e-6;
     if (!(q1 > min)) q1 = min + eps;
     if (!(q2 > q1)) q2 = q1 + eps;
     if (!(q3 > q2)) q3 = q2 + eps;
     if (!(max > q3)) max = q3 + eps;
+
+    return { min, q1, q2, q3, max };
   }
 
-// Gradiente continuo entre min, Q1, Q2, Q3 y max
-const colorScale = d3.scaleLinear()
-  .domain([min, q1, q2, q3, max]) // stops del gradiente
-  .range(colores)                  // ['#9b2247','orange','#e6d194','green','darkgreen']
-  .interpolate(d3.interpolateRgb); // interpolación suave
+  function valoresDeMetrica(metricKey) {
+    const key = METRICAS[metricKey].tasaKey;
+    return tasas
+      .filter(d => idsEntidades.has(String(d.id)))
+      .map(d => +d[key])
+      .filter(Number.isFinite);
+  }
 
+  let min, q1, q2, q3, max;
+  let colorScale;
+
+  function recomputeAndPaint() {
+    // 1) cuartiles para la métrica
+    ({ min, q1, q2, q3, max } = computeQuartiles(valoresDeMetrica(currentMetric)));
+
+    // 2) escala continua (gradiente)
+    colorScale = d3.scaleLinear()
+      .domain([min, q1, q2, q3, max])
+      .range(COLORES)
+      .interpolate(d3.interpolateRgb);
+
+    // 3) repintar mapa (gris cuando v <= 0)
+    g.selectAll("path")
+      .transition().duration(350)
+      .attr("fill", d => {
+        const nombre = d.properties.NOMBRE.trim();
+        const item = dataByEstado[nombre];
+        if (!item) return "#ccc";
+
+        const v = +item[METRICAS[currentMetric].tasaKey];
+        if (!Number.isFinite(v)) return "#ccc";
+        if (v <= 0) return COLOR_CERO;
+        return colorScale(v);
+      });
+
+    // 4) LEYENDA: limpiar host y redibujar (sin superponer)
+    legendHost.selectAll("*").remove();
+
+    const pasosCrudos = [min, q1, q2, q3, max];
+    const pasos = [];
+    const seen = new Set();
+    pasosCrudos.forEach(v => {
+      const k = (+v).toFixed(2);
+      if (!seen.has(k)) { seen.add(k); pasos.push(+k); }
+    });
+
+    // dibujar leyenda dentro del host
+    crearLeyenda(legendHost, {
+      dominio: [min, max],
+      pasos,
+      colores: COLORES,
+      // titulo: METRICAS[currentMetric].label // si tu helper lo soporta
+    });
+  }
+
+  // ==============================
+  // Proyección y paths
+  // ==============================
   const projection = d3.geoMercator()
     .scale(2000)
     .center([-102, 24])
@@ -110,19 +208,22 @@ const colorScale = d3.scaleLinear()
     .data(geoData.features)
     .join("path")
     .attr("d", path)
-    .attr("fill", d => {
-      const nombre = d.properties.NOMBRE.trim();
-      const datos = tasaMap[nombre];
-      return datos ? colorScale(datos.tasa) : "#ccc";
-    })
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.5)
     .attr("vector-effect", "non-scaling-stroke")
     .on("mouseover", function (event, d) {
       const nombre = d.properties.NOMBRE.trim();
-      const datos = tasaMap[nombre];
+      const item = dataByEstado[nombre];
+
+      const tasaSel = item ? +item[METRICAS[currentMetric].tasaKey] : NaN;
+      const cntSel  = item ? +item[METRICAS[currentMetric].countKey] : NaN;
+
       d3.select(this).attr("stroke-width", 1.5);
-      mostrarTooltip(tooltip, event, nombre, datos);
+      mostrarTooltip(tooltip, event, nombre, {
+        tasa: tasaSel,
+        población: item?.poblacion,
+        enfermeras: cntSel
+      });
     })
     .on("mousemove", event => {
       tooltip.style("left", (event.pageX + 10) + "px")
@@ -142,6 +243,7 @@ const colorScale = d3.scaleLinear()
       ultimoClick = ahora;
     });
 
+  // Etiquetas (apagadas por default)
   const labelsGroup = g.append("g")
     .attr("id", "etiquetas-municipios")
     .style("display", "none");
@@ -155,12 +257,8 @@ const colorScale = d3.scaleLinear()
     nombresUnicos.add(nombre);
   });
 
-  // Leyenda dinámica con los mismos cortes
-  crearLeyenda(svg, {
-    dominio: [min, max],
-    pasos: [min, q1, q2, q3, max],
-    colores
-  });
+  // Primera renderización
+  recomputeAndPaint();
 
   activarZoomConBotones(svg, g, {
     selectorZoomIn: "#zoom-in",
@@ -168,17 +266,185 @@ const colorScale = d3.scaleLinear()
     selectorZoomReset: "#zoom-reset"
   });
 
-  generarTablaNacional("../data/rate/republica-mexicana.csv");
+  // ==============================
+  // TABLA NACIONAL (dinámica y sincronizada)
+  // ==============================
+
+  let _tablaCache = null;
+  let _tbodyElem  = null;
+
+  function initTablaNacional(rutaCSV) {
+    d3.csv(rutaCSV).then(data => {
+      // normaliza igual que arriba
+      data.forEach(d => {
+        d.población = +(("población" in d && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
+        d.enfermeras_total = +((d.enfermeras_total ?? d.enfermeras) || 0);
+        d.tasa_total       = +((d.tasa_total ?? d.tasa) || 0);
+
+        d.enfermeras_primer   = +(d.enfermeras_primer   || 0);
+        d.tasa_primer         = +(d.tasa_primer         || 0);
+        d.enfermeras_segundo  = +(d.enfermeras_segundo  || 0);
+        d.tasa_segundo        = +(d.tasa_segundo        || 0);
+        d.enfermeras_tercer   = +(d.enfermeras_tercer   || 0);
+        d.tasa_tercer         = +(d.tasa_tercer         || 0);
+        d.enfermeras_apoyo    = +(d.enfermeras_apoyo    || 0);
+        d.tasa_apoyo          = +(d.tasa_apoyo          || 0);
+        d.enfermeras_escuelas = +(d.enfermeras_escuelas || 0);
+        d.tasa_escuelas       = +(d.tasa_escuelas       || 0);
+      });
+
+      _tablaCache = data;
+
+      const contenedor = document.getElementById("tabla-contenido");
+      if (!contenedor) return;
+      contenedor.innerHTML = "";
+
+      const tabla = document.createElement("table");
+      tabla.className = "tabla-datos";
+
+      const thead = document.createElement("thead");
+      thead.innerHTML = `
+        <tr>
+          <th><span class="flecha-orden"></span>Estado</th>
+          <th><span class="flecha-orden"></span>Enfermeras</th>
+          <th><span class="flecha-orden"></span>Población</th>
+          <th><span class="flecha-orden"></span>Tasa por cada mil habitantes</th>
+        </tr>
+      `;
+
+      const tbody = document.createElement("tbody");
+      _tbodyElem = tbody;
+
+      tabla.appendChild(thead);
+      tabla.appendChild(tbody);
+
+      const envoltorio = document.createElement("div");
+      envoltorio.className = "tabla-scroll";
+      envoltorio.appendChild(tabla);
+      contenedor.appendChild(envoltorio);
+
+      updateTablaNacional(currentMetric); // primer pintado con la métrica actual
+      activarOrdenamientoTabla(tabla);
+    });
+  }
+
+  function updateTablaNacional(metricKey = "tasa_total") {
+    if (!_tablaCache || !_tbodyElem) return;
+
+    const def = METRICAS[metricKey] || METRICAS["tasa_total"];
+    const { tasaKey, countKey } = def;
+
+    // Copia para ordenar sin mutar cache
+    const data = _tablaCache.slice();
+
+    // Deja 8888 y 9999 al final
+    data.sort((a, b) => {
+      if (a.id === "9999") return 1;
+      if (b.id === "9999") return -1;
+      if (a.id === "8888") return 1;
+      if (b.id === "8888") return -1;
+      return a.estado.localeCompare(b.estado);
+    });
+
+    _tbodyElem.innerHTML = "";
+    data.forEach(d => {
+      const fila = document.createElement("tr");
+      fila.dataset.id = d.id;
+      if (d.id === "9999") fila.classList.add("fila-total");
+
+      const enfermerasSel = +(d[countKey] || 0);
+      const tasaSel       = +(d[tasaKey]  || 0);
+
+      fila.innerHTML = `
+        <td class="municipio">${d.estado}</td>
+        <td class="numero">${Number(enfermerasSel).toLocaleString('es-MX')}</td>
+        <td class="numero">${Number(d.población).toLocaleString('es-MX')}</td>
+        <td class="numero">${tasaSel.toFixed(2)}</td>
+      `;
+      _tbodyElem.appendChild(fila);
+    });
+  }
+
+  function activarOrdenamientoTabla(tabla) {
+    const ths = tabla.querySelectorAll("thead th");
+
+    ths.forEach((th, index) => {
+      th.style.cursor = "pointer";
+      th.setAttribute("data-orden", "asc");
+
+      th.addEventListener("click", () => {
+        const ordenActual = th.getAttribute("data-orden");
+        const nuevoOrden = ordenActual === "asc" ? "desc" : "asc";
+
+        tabla.querySelectorAll(".flecha-orden").forEach(span => span.textContent = "");
+        const flecha = th.querySelector(".flecha-orden");
+        if (flecha) flecha.textContent = nuevoOrden === "asc" ? "▲" : "▼";
+
+        const filas = Array.from(tabla.querySelectorAll("tbody tr"));
+
+        const especiales = filas.filter(f => ["8888", "9999"].includes(f.dataset.id));
+        const normales   = filas.filter(f => !["8888", "9999"].includes(f.dataset.id));
+
+        normales.sort((a, b) => {
+          const rawA = a.children[index].textContent.trim().replace(/[^\d.-]/g, "");
+          const rawB = b.children[index].textContent.trim().replace(/[^\d.-]/g, "");
+          const isNum = v => /^-?\d+(\.\d+)?$/.test(v);
+
+          const valA = isNum(rawA) ? parseFloat(rawA) : rawA.toLowerCase();
+          const valB = isNum(rawB) ? parseFloat(rawB) : rawB.toLowerCase();
+
+          if (typeof valA === "number" && typeof valB === "number") {
+            return nuevoOrden === "asc" ? valA - valB : valB - valA;
+          }
+          return rawA.localeCompare(rawB, 'es', { sensitivity: 'base' }) * (nuevoOrden === "asc" ? 1 : -1);
+        });
+
+        const tbody = tabla.querySelector("tbody");
+        [...normales, ...especiales].forEach(f => tbody.appendChild(f));
+
+        th.setAttribute("data-orden", nuevoOrden);
+      });
+    });
+  }
+
+  function habilitarDescargaExcel(nombreArchivo = "enfermeras-nacional.xlsx") {
+    const boton = document.getElementById("descargar-excel");
+    if (!boton) return;
+
+    boton.addEventListener("click", () => {
+      const tabla = document.querySelector("#tabla-contenido table");
+      if (!tabla) return;
+
+      const sel = document.getElementById("sel-metrica");
+      const metricKey = sel ? sel.value : "tasa_total";
+      const nombreBonito = (METRICAS[metricKey]?.label || "Total").replace(/\s+/g, " ");
+
+      const wb = XLSX.utils.table_to_book(tabla, { sheet: `Resumen ${nombreBonito}` });
+      const nombre = nombreArchivo.replace(".xlsx", ` - ${nombreBonito}.xlsx`);
+      XLSX.writeFile(wb, nombre);
+    });
+  }
+
+  // Inicializa tabla y Excel
+  initTablaNacional("../data/rate/republica-mexicana.csv");
   habilitarDescargaExcel("enfermeras-nacional.xlsx");
+
+  // UI: selector para mapa + tabla
+  const sel = document.getElementById("sel-metrica");
+  if (sel) {
+    sel.addEventListener("change", () => {
+      currentMetric = sel.value;
+      recomputeAndPaint();                // mapa
+      updateTablaNacional(currentMetric); // tabla
+    });
+  }
 }).catch(error => {
   console.error("Error al cargar los datos del mapa nacional:", error);
 });
 
-
 // ==============================
 // DESCARGA PNG
 // ==============================
-
 document.getElementById("descargar-sin-etiquetas").addEventListener("click", () => {
   const etiquetas = document.getElementById("etiquetas-municipios");
   if (etiquetas) etiquetas.style.display = "none";
@@ -195,123 +461,3 @@ document.getElementById("descargar-con-etiquetas").addEventListener("click", () 
     etiquetas.style.display = "none";
   }, 100);
 });
-
-// ==============================
-// TABLA NACIONAL
-// ==============================
-
-function generarTablaNacional(rutaCSV) {
-  d3.csv(rutaCSV).then(data => {
-    const contenedor = document.getElementById("tabla-contenido");
-
-    const tabla = document.createElement("table");
-    tabla.className = "tabla-datos";
-
-    const thead = document.createElement("thead");
-    thead.innerHTML = `
-      <tr>
-        <th><span class="flecha-orden"></span>Estado</th>
-        <th><span class="flecha-orden"></span>Enfermeras</th>
-        <th><span class="flecha-orden"></span>Población</th>
-        <th><span class="flecha-orden"></span>Tasa por cada mil habitantes</th>
-      </tr>
-    `;
-
-    const tbody = document.createElement("tbody");
-
-    // Ordenar datos para colocar "No disponible" (8888) y "Total" (9999) al final
-    data.sort((a, b) => {
-      if (a.id === "9999") return 1;
-      if (b.id === "9999") return -1;
-      if (a.id === "8888") return 1;
-      if (b.id === "8888") return -1;
-      return a.estado.localeCompare(b.estado);
-    });
-
-    data.forEach(d => {
-      const fila = document.createElement("tr");
-      fila.dataset.id = d.id;
-
-      if (d.id === "9999") {
-        fila.classList.add("fila-total"); // estilo especial para el total
-      }
-
-      fila.innerHTML = `
-        <td class="municipio">${d.estado}</td>
-        <td class="numero">${Number(d.enfermeras).toLocaleString('es-MX')}</td>
-        <td class="numero">${Number(d.población).toLocaleString('es-MX')}</td>
-        <td class="numero">${(+d.tasa).toFixed(2)}</td>
-      `;
-      tbody.appendChild(fila);
-    });
-
-    tabla.appendChild(thead);
-    tabla.appendChild(tbody);
-
-    const envoltorio = document.createElement("div");
-    envoltorio.className = "tabla-scroll";
-    envoltorio.appendChild(tabla);
-
-    contenedor.appendChild(envoltorio);
-
-    activarOrdenamientoTabla(tabla);
-  });
-}
-
-function activarOrdenamientoTabla(tabla) {
-  const ths = tabla.querySelectorAll("thead th");
-
-  ths.forEach((th, index) => {
-    th.style.cursor = "pointer";
-    th.setAttribute("data-orden", "asc");
-
-    th.addEventListener("click", () => {
-      const ordenActual = th.getAttribute("data-orden");
-      const nuevoOrden = ordenActual === "asc" ? "desc" : "asc";
-
-      tabla.querySelectorAll(".flecha-orden").forEach(span => span.textContent = "");
-      const flecha = th.querySelector(".flecha-orden");
-      if (flecha) flecha.textContent = nuevoOrden === "asc" ? "▲" : "▼";
-
-      const filas = Array.from(tabla.querySelectorAll("tbody tr"));
-
-      // Separar filas especiales (9999 y 8888)
-      const especiales = filas.filter(f => ["8888", "9999"].includes(f.dataset.id));
-      const normales = filas.filter(f => !["8888", "9999"].includes(f.dataset.id));
-
-      // Ordenar solo las normales
-      normales.sort((a, b) => {
-        const rawA = a.children[index].textContent.trim().replace(/[^\d.-]/g, "");
-        const rawB = b.children[index].textContent.trim().replace(/[^\d.-]/g, "");
-        const isNum = v => /^-?\d+(\.\d+)?$/.test(v);
-
-        const valA = isNum(rawA) ? parseFloat(rawA) : rawA.toLowerCase();
-        const valB = isNum(rawB) ? parseFloat(rawB) : rawB.toLowerCase();
-
-        if (typeof valA === "number" && typeof valB === "number") {
-          return nuevoOrden === "asc" ? valA - valB : valB - valA;
-        }
-        return rawA.localeCompare(rawB, 'es', { sensitivity: 'base' }) * (nuevoOrden === "asc" ? 1 : -1);
-      });
-
-      // Reinsertar: primero normales, luego especiales
-      const tbody = tabla.querySelector("tbody");
-      [...normales, ...especiales].forEach(f => tbody.appendChild(f));
-
-      th.setAttribute("data-orden", nuevoOrden);
-    });
-  });
-}
-
-function habilitarDescargaExcel(nombreArchivo = "enfermeras-nacional.xlsx") {
-  const boton = document.getElementById("descargar-excel");
-  if (!boton) return;
-
-  boton.addEventListener("click", () => {
-    const tabla = document.querySelector("#tabla-contenido table");
-    if (!tabla) return;
-
-    const wb = XLSX.utils.table_to_book(tabla, { sheet: "Resumen Nacional" });
-    XLSX.writeFile(wb, nombreArchivo);
-  });
-}

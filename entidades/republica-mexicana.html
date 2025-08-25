@@ -32,12 +32,27 @@
       <a href="../index.html">Inicio</a> &gt;
       <span>República</span>
     </nav>
+
     <!-- SECCIÓN DEL MAPA NACIONAL -->
     <section class="mapa-entidad">
       <h1>Distribución de Enfermeras por Cada Mil Habitantes en México 2025</h1>
       <p class="bienvenida">
         Visualice la distribución de enfermeras por cada mil habitantes en cada entidad federativa, con base en datos oficiales actualizados.
       </p>
+    <!-- ==============================
+     CONTROL DE MÉTRICA
+     ============================== -->
+<div class="control-metrica" style="margin:8px 0; display:flex; gap:8px; align-items:center">
+  <label for="sel-metrica"><strong>Indicador:</strong></label>
+  <select id="sel-metrica">
+    <option value="tasa_total">Tasa total</option>
+    <option value="tasa_primer">Tasa 1er nivel</option>
+    <option value="tasa_segundo">Tasa 2º nivel</option>
+    <option value="tasa_tercer">Tasa 3er nivel</option>
+    <option value="tasa_apoyo">Tasa en establecimientos de apoyo</option>
+    <option value="tasa_escuelas">Tasa en escuelas</option>
+  </select>
+</div>
 
       <!-- CONTENEDOR DEL MAPA -->
       <div id="mapa-nacional" class="mapa-wrapper">
