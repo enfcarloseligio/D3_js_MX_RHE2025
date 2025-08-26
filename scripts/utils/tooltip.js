@@ -21,27 +21,28 @@ export function crearTooltip() {
 // Helpers internos
 // ==============================
 const labelPorMetrica = (metricKey) => ({
-  "tasa_total":    "Tasa total",
-  "tasa_primer":   "Tasa 1er nivel",
-  "tasa_segundo":  "Tasa 2º nivel",
-  "tasa_tercer":   "Tasa 3er nivel",
-  "tasa_apoyo":    "Tasa en apoyo",
-  "tasa_escuelas": "Tasa en escuelas"
+  "tasa_total":       "Tasa total",
+  "tasa_primer":      "Tasa 1er nivel",
+  "tasa_segundo":     "Tasa 2º nivel",
+  "tasa_tercer":      "Tasa 3er nivel",
+  "tasa_apoyo":       "Tasa en apoyo",
+  "tasa_escuelas":    "Tasa en escuelas",
+  "tasa_no_aplica":   "Tasa no aplica",
+  "tasa_no_asignado": "Tasa no asignado"
 }[metricKey] || "Tasa");
 
 const fmtRate = (n) => (Number.isFinite(n) ? n.toFixed(2) : "Sin datos");
 const fmtNum  = (n) => (Number.isFinite(n) ? Number(n).toLocaleString('es-MX') : "—");
 
-// Detecta y arma {tasa, enfermeras, poblacion, label} a partir de:
+// Arma {tasa, enfermeras, poblacion, label} a partir de:
 // 1) objeto resumido {tasa, poblacion|población, enfermeras}, o
-// 2) registro “ancho” con campos tasa_*/enfermeras_* + metricKey
+// 2) registro “ancho” + metricKey (tasa_*/enfermeras_*)
 function pickDatos(datos, metricKey, labelForced) {
-  // Normaliza población
   const poblacion = Number.isFinite(+datos?.poblacion)
     ? +datos.poblacion
     : (Number.isFinite(+datos?.["población"]) ? +datos["población"] : NaN);
 
-  // Caso A: ya viene resumido (retro-compatible con uso anterior)
+  // Caso A: ya viene resumido (retro-compatible)
   if (datos && ("tasa" in datos || "enfermeras" in datos)) {
     return {
       tasa: Number.isFinite(+datos.tasa) ? +datos.tasa : NaN,
@@ -53,7 +54,7 @@ function pickDatos(datos, metricKey, labelForced) {
 
   // Caso B: registro ancho + metricKey
   if (metricKey) {
-    const tasaKey = metricKey; // p.ej. 'tasa_primer'
+    const tasaKey = metricKey;                           // ej. 'tasa_primer'
     const enfKey  = metricKey.replace(/^tasa_/, "enfermeras_"); // 'enfermeras_primer'
     const tasa = Number.isFinite(+datos?.[tasaKey]) ? +datos[tasaKey] : NaN;
     const enfermeras = Number.isFinite(+datos?.[enfKey]) ? +datos[enfKey] : NaN;
@@ -71,7 +72,6 @@ function pickDatos(datos, metricKey, labelForced) {
     }
   }
 
-  // Fallback sin datos
   return { tasa: NaN, enfermeras: NaN, poblacion, label: labelForced || "Tasa" };
 }
 
@@ -79,9 +79,11 @@ function pickDatos(datos, metricKey, labelForced) {
 // Mostrar / ocultar tooltip
 // ==============================
 //
-// Uso flexible:
-// - mostrarTooltip(tooltip, event, nombre, { tasa, poblacion, enfermeras })
-// - mostrarTooltip(tooltip, event, nombre, registroAncho, { metricKey: 'tasa_primer', label: 'Tasa 1er nivel' })
+// Uso recomendado con tu estructura "ancha":
+// mostrarTooltip(tooltip, event, nombre, registroDelEstado, {
+//   metricKey: METRICAS[currentMetric].tasaKey,
+//   label: METRICAS[currentMetric].label
+// });
 //
 export function mostrarTooltip(tooltip, event, nombre, datos, opts = {}) {
   const metricKey = opts.metricKey || null;

@@ -31,20 +31,39 @@ export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribu
 // CREACIÓN DE LEYENDA GRADIENTE
 // ==============================
 /**
- * Crea una leyenda de colores gradiente para mapas.
+ * Dibuja una leyenda de colores gradiente.
+ * - host: selección D3 (svg o <g>) donde se dibujará la leyenda.
+ * - Limpia cualquier leyenda previa dentro del host (clase .leyenda-gradiente).
+ * - Crea un id de gradiente único si no se pasa 'id'.
  */
-export function crearLeyenda(svg, {
+let __legendCounter = 0;
+export function crearLeyenda(host, {
   dominio,
   pasos,
   colores,
   posicion = { x: 30, y: 50, ancho: 20, alto: 200 },
-  id = "legend-gradient"
+  id = null,
+  titulo = null,
+  chips = null // ej: [{ color:'#bfbfbf', texto:'0.00' }, { color:'#d9d9d9', texto:'s/d' }]
 }) {
   const { x, y, ancho, alto } = posicion;
 
-  const defs = svg.append("defs");
+  // Asegura que 'host' es una selección D3 válida
+  const sel = host && typeof host.select === "function" ? host : d3.select(host);
+
+  // Limpia leyendas previas dentro del host
+  sel.selectAll(".leyenda-gradiente").remove();
+
+  // Contenedor de esta leyenda (así solo eliminamos lo que corresponde)
+  const root = sel.append("g").attr("class", "leyenda-gradiente");
+
+  // ID único para el gradiente si no viene dado
+  const gradId = id || `legend-gradient-${++__legendCounter}`;
+
+  // defs (puede vivir dentro de <g> sin problema)
+  const defs = root.append("defs");
   const linearGradient = defs.append("linearGradient")
-    .attr("id", id)
+    .attr("id", gradId)
     .attr("x1", "0%").attr("y1", "100%")
     .attr("x2", "0%").attr("y2", "0%");
 
@@ -57,13 +76,15 @@ export function crearLeyenda(svg, {
     .attr("offset", d => d.offset)
     .attr("stop-color", d => d.color);
 
-  svg.append("rect")
+  // Rectángulo del gradiente
+  root.append("rect")
     .attr("x", x)
     .attr("y", y)
     .attr("width", ancho)
     .attr("height", alto)
-    .style("fill", `url(#${id})`);
+    .style("fill", `url(#${gradId})`);
 
+  // Eje con ticks en los "pasos"
   const escala = d3.scaleLinear()
     .domain([dominio[0], dominio[1]])
     .range([y + alto, y]);
@@ -72,9 +93,36 @@ export function crearLeyenda(svg, {
     .tickValues(pasos)
     .tickFormat(d3.format(".2f"));
 
-  svg.append("g")
+  root.append("g")
     .attr("transform", `translate(${x + ancho}, 0)`)
     .call(eje);
+
+  // Título opcional arriba de la barra
+  if (titulo) {
+    root.append("text")
+      .attr("x", x + ancho / 2)
+      .attr("y", y - 8)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "12px")
+      .attr("font-family", "'Noto Sans', sans-serif")
+      .text(titulo);
+  }
+
+  // Chips opcionales (por ejemplo "0.00" y "s/d")
+  if (Array.isArray(chips) && chips.length) {
+    const chipGrp = root.append("g").attr("transform", `translate(${x + ancho + 40}, ${y})`);
+    chips.forEach((c, i) => {
+      const gy = chipGrp.append("g").attr("transform", `translate(0, ${i * 18})`);
+      gy.append("rect").attr("width", 12).attr("height", 12).attr("fill", c.color || "#ccc");
+      gy.append("text")
+        .attr("x", 16).attr("y", 10)
+        .attr("font-size", "12px")
+        .attr("font-family", "'Noto Sans', sans-serif")
+        .text(c.texto || "");
+    });
+  }
+
+  return root; // por si quieres mover/ocultar desde fuera
 }
 
 // ==============================
