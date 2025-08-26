@@ -1,4 +1,4 @@
-id,CVE_ENT,estado,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,enfermeras_no_aplica,enfermeras_no_asignado,tasa_no_asignado
+id,CVE_ENT,estado,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
 1,01,Aguascalientes,1425607,5087,3.568304589,856,0.600445985,2967,2.081218737,950,0.666382811,0,0,0,0,94,0.065936826,220,0.15432023
 2,02,Baja California,3769020,9424,2.500384715,1678,0.445208569,7282,1.932067222,27,0.007163666,0,0,0,0,217,0.057574648,220,0.058370611
 3,03,Baja California Sur,798447,2783,3.485516258,537,0.672555599,2140,2.680202944,0,0,0,0,0,0,82,0.102699365,24,0.030058351

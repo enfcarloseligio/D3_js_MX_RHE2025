@@ -41,6 +41,10 @@ Promise.all([
     d.tasa_apoyo          = +(d.tasa_apoyo          || 0);
     d.enfermeras_escuelas = +(d.enfermeras_escuelas || 0);
     d.tasa_escuelas       = +(d.tasa_escuelas       || 0);
+    d.enfermeras_no_aplica   = +(d.enfermeras_no_aplica   || 0);
+    d.tasa_no_aplica         = +(d.tasa_no_aplica         || 0);
+    d.enfermeras_no_asignado = +(d.enfermeras_no_asignado || 0);
+    d.tasa_no_asignado       = +(d.tasa_no_asignado       || 0);
   });
 
   // ==============================
@@ -53,12 +57,21 @@ Promise.all([
     dataByEstado[estado] = {
       poblacion: d.población,
 
-      enfermeras_total:  d.enfermeras_total,  tasa_total:  d.tasa_total,
-      enfermeras_primer: d.enfermeras_primer, tasa_primer: d.tasa_primer,
-      enfermeras_segundo:d.enfermeras_segundo,tasa_segundo:d.tasa_segundo,
-      enfermeras_tercer: d.enfermeras_tercer, tasa_tercer: d.tasa_tercer,
-      enfermeras_apoyo:  d.enfermeras_apoyo,  tasa_apoyo:  d.tasa_apoyo,
-      enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas
+      // Totales
+      enfermeras_total:   d.enfermeras_total,   tasa_total:   d.tasa_total,
+
+      // Niveles
+      enfermeras_primer:  d.enfermeras_primer,  tasa_primer:  d.tasa_primer,
+      enfermeras_segundo: d.enfermeras_segundo, tasa_segundo: d.tasa_segundo,
+      enfermeras_tercer:  d.enfermeras_tercer,  tasa_tercer:  d.tasa_tercer,
+
+      // Otros ámbitos
+      enfermeras_apoyo:   d.enfermeras_apoyo,   tasa_apoyo:   d.tasa_apoyo,
+      enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas,
+
+      // ➕ Añadidos (antes faltaban)
+      enfermeras_no_aplica:   d.enfermeras_no_aplica,   tasa_no_aplica:   d.tasa_no_aplica,
+      enfermeras_no_asignado: d.enfermeras_no_asignado, tasa_no_asignado: d.tasa_no_asignado
     };
   });
 
@@ -75,7 +88,9 @@ Promise.all([
     tasa_segundo:  { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",  countKey: "enfermeras_segundo" },
     tasa_tercer:   { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",   countKey: "enfermeras_tercer" },
     tasa_apoyo:    { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",    countKey: "enfermeras_apoyo" },
-    tasa_escuelas: { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas", countKey: "enfermeras_escuelas" }
+    tasa_escuelas: { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas", countKey: "enfermeras_escuelas" },
+    tasa_no_aplica:   { label: "Tasa no aplica",    tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica" },
+    tasa_no_asignado: { label: "Tasa no asignado",  tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado" }
   };
 
   let currentMetric = "tasa_total"; // inicial
