@@ -4,9 +4,9 @@
 import { crearTooltip, mostrarTooltip, ocultarTooltip } from '../utils/tooltip.js';
 import {
   crearSVGBase, MAP_WIDTH, MAP_HEIGHT,
-  crearLeyenda, activarZoomConBotones,
-  descargarComoPNG, crearEtiquetaMunicipio
+  crearLeyenda, descargarComoPNG, crearEtiquetaMunicipio
 } from '../utils/config-mapa.js';
+import { renderZoomControles } from '../componentes/zoom-controles.js';
 
 // ==============================
 // CREACIÓN DEL MAPA
@@ -14,7 +14,7 @@ import {
 const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución nacional de enfermeras");
 const tooltip = crearTooltip();
 
-// Host fijo para la leyenda (evita superposiciones)
+// Host fijo para la leyenda
 const legendHost = svg.append("g").attr("id", "legend-host");
 
 // ==============================
@@ -29,11 +29,11 @@ Promise.all([
   // Normalización de columnas
   // ==============================
   tasas.forEach(d => {
-    // Población con alias sin/ con acento (ambas disponibles)
+    // Población (alias con y sin acento)
     d["población"] = +(("población" in d && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
-    d.poblacion = d["población"];  // alias consistente
+    d.poblacion = d["población"];
 
-    // Totales (nuevo esquema / legado)
+    // Totales
     d.enfermeras_total = +((d.enfermeras_total ?? d.enfermeras) || 0);
     d.tasa_total       = +((d.tasa_total ?? d.tasa) || 0);
 
@@ -48,6 +48,7 @@ Promise.all([
     d.tasa_apoyo          = +(d.tasa_apoyo          || 0);
     d.enfermeras_escuelas = +(d.enfermeras_escuelas || 0);
     d.tasa_escuelas       = +(d.tasa_escuelas       || 0);
+
     d.enfermeras_no_aplica   = +(d.enfermeras_no_aplica   || 0);
     d.tasa_no_aplica         = +(d.tasa_no_aplica         || 0);
     d.enfermeras_no_asignado = +(d.enfermeras_no_asignado || 0);
@@ -55,14 +56,14 @@ Promise.all([
   });
 
   // ==============================
-  // Diccionario por estado (ancho)
+  // Diccionario por estado
   // ==============================
   const dataByEstado = {};
   tasas.forEach(d => {
     const estado = (d.estado || "").trim();
     if (!estado) return;
     dataByEstado[estado] = {
-      poblacion: d.poblacion, // clave sin acento para JS
+      poblacion: d.poblacion,
 
       enfermeras_total:   d.enfermeras_total,   tasa_total:   d.tasa_total,
       enfermeras_primer:  d.enfermeras_primer,  tasa_primer:  d.tasa_primer,
@@ -83,10 +84,9 @@ Promise.all([
   const COLOR_CERO = '#bfbfbf'; // gris para 0.00
   const COLOR_SIN  = '#d9d9d9'; // gris claro s/d
 
-  const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']; // institucional (tasas)
-  const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c']; // verdes (población)
+  const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen'];
+  const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'];
 
-  // ids 1..32
   const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
 
   const METRICAS = {
@@ -115,7 +115,7 @@ Promise.all([
     let q2  = d3.quantileSorted(vals, 0.50);
     let q3  = d3.quantileSorted(vals, 0.75);
 
-    const eps = 1e-6; // evita cortes iguales
+    const eps = 1e-6;
     if (!(q1 > min)) q1 = min + eps;
     if (!(q2 > q1)) q2 = q1 + eps;
     if (!(q3 > q2)) q3 = q2 + eps;
@@ -125,10 +125,10 @@ Promise.all([
   }
 
   function valoresDeMetrica(metricKey) {
-    const key = METRICAS[metricKey].tasaKey; // 'tasa_*' o 'poblacion'
+    const key = METRICAS[metricKey].tasaKey;
     return tasas
       .filter(d => idsEntidades.has(String(d.id)))
-      .map(d => +d[key === "poblacion" ? "poblacion" : key])  // población sin acento
+      .map(d => +d[key])
       .filter(Number.isFinite);
   }
 
@@ -141,20 +141,16 @@ Promise.all([
   }
 
   function recomputeAndPaint() {
-    // 1) cuartiles
     ({ min, q1, q2, q3, max } = computeQuartiles(valoresDeMetrica(currentMetric)));
 
-    // 2) paleta por métrica
     const PALETTE = paletteFor(currentMetric);
     const esPoblacion = currentMetric === "poblacion";
 
-    // 3) escala continua
     colorScale = d3.scaleLinear()
       .domain([min, q1, q2, q3, max])
       .range(PALETTE)
       .interpolate(d3.interpolateRgb);
 
-    // 4) repintar mapa
     g.selectAll("path")
       .transition().duration(350)
       .attr("fill", d => {
@@ -162,12 +158,11 @@ Promise.all([
         const item = dataByEstado[nombre];
         if (!item) return COLOR_SIN;
         const v = +item[METRICAS[currentMetric].tasaKey];
-        if (!Number.isFinite(v)) return COLOR_SIN; // s/d
-        if (!esPoblacion && v <= 0) return COLOR_CERO; // 0.00 solo aplica a tasas
+        if (!Number.isFinite(v)) return COLOR_SIN;
+        if (!esPoblacion && v <= 0) return COLOR_CERO;
         return colorScale(v);
       });
 
-    // 5) leyenda (limpiar y redibujar)
     legendHost.selectAll("*").remove();
 
     const pasosCrudos = [min, q1, q2, q3, max];
@@ -182,8 +177,8 @@ Promise.all([
       dominio: [min, max],
       pasos,
       colores: PALETTE,
-      titulo: METRICAS[currentMetric].label,          // "Población" o la etiqueta de tasa
-      chips: esPoblacion ? null : [                   // sin chips en Población
+      titulo: METRICAS[currentMetric].label,
+      chips: esPoblacion ? null : [
         { color: COLOR_CERO, texto: "0.00" },
         { color: COLOR_SIN,  texto: "s/d"  }
       ]
@@ -191,7 +186,7 @@ Promise.all([
   }
 
   // ==============================
-  // Proyección y paths base
+  // Proyección y paths
   // ==============================
   const projection = d3.geoMercator()
     .scale(2000)
@@ -250,10 +245,9 @@ Promise.all([
 
       d3.select(this).attr("stroke-width", 1.5);
 
-      // Tooltip: si es población, sólo población (onlyPopulation:true)
       const isPob = currentMetric === "poblacion";
       mostrarTooltip(tooltip, event, nombre, item, {
-        metricKey: METRICAS[currentMetric].tasaKey, // 'tasa_*' o 'poblacion'
+        metricKey: METRICAS[currentMetric].tasaKey,
         label: METRICAS[currentMetric].label,
         onlyPopulation: isPob
       });
@@ -293,10 +287,15 @@ Promise.all([
   // Primera renderización
   recomputeAndPaint();
 
-  activarZoomConBotones(svg, g, {
-    selectorZoomIn: "#zoom-in",
-    selectorZoomOut: "#zoom-out",
-    selectorZoomReset: "#zoom-reset"
+  // Inyecta y conecta los controles de zoom con el nuevo componente
+  renderZoomControles("#mapa-nacional", {
+    svg,
+    g,
+    showHome: false,               // En República NO mostramos "Home"
+    homeUrl: null,                 // Ignorado si showHome:false
+    escalaMin: 1,
+    escalaMax: 8,
+    paso: 0.5
   });
 
   // ==============================

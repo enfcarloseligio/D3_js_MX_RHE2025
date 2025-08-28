@@ -20,7 +20,7 @@
   <!-- Layout general -->
   <script src="../scripts/inyectar-layout.js" defer></script>
 
-  <!-- Lógica del mapa nacional -->
+  <!-- Lógica del mapa nacional (deferred por defecto en type="module") -->
   <script type="module" src="../scripts/maps/republica-mexicana.js"></script>
 </head>
 <body>
@@ -44,18 +44,11 @@
       <script type="module">
         import { renderIndicadorControl } from "../scripts/componentes/indicador-control.js";
         renderIndicadorControl("#control-indicador", { defaultValue: "tasa_total" });
-        // Los scripts del mapa ya escuchan #sel-metrica
+        // El mapa escucha #sel-metrica, no hay que tocar nada más aquí.
       </script>
 
-      <!-- Contenedor del mapa -->
-      <div id="mapa-nacional" class="mapa-wrapper">
-        <!-- SVG insertado dinámicamente -->
-        <div class="zoom-controles">
-          <button id="zoom-in" class="boton" aria-label="Acercar">+</button>
-          <button id="zoom-out" class="boton" aria-label="Alejar">–</button>
-          <button id="zoom-reset" class="boton" aria-label="Reiniciar zoom">⟳</button>
-        </div>
-      </div>
+      <!-- Contenedor del mapa (los botones de zoom se inyectan por JS) -->
+      <div id="mapa-nacional" class="mapa-wrapper"></div>
 
       <!-- Nota metodológica -->
       <p id="nota">
