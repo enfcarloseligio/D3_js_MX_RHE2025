@@ -1,17 +1,14 @@
 // ==============================
-// CONFIGURACIÓN GLOBAL PARA MAPAS DE ENTIDADES
+// CONFIGURACIÓN GLOBAL PARA MAPAS
 // ==============================
-
 export const MAP_WIDTH = 1280;
 export const MAP_HEIGHT = 720;
 export const MAP_BACKGROUND = "#e6f0f8";
 
 // ==============================
-// CREACIÓN DE SVG BASE
+// CREAR SVG BASE
 // ==============================
-/**
- * Crea un SVG base con un grupo <g> dentro de un contenedor.
- */
+/** Crea un SVG base con un <g> contenedor. */
 export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribución por entidad federativa") {
   const svg = d3.select(selector)
     .append("svg")
@@ -28,13 +25,17 @@ export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribu
 }
 
 // ==============================
-// CREACIÓN DE LEYENDA GRADIENTE
+// LEYENDA GRADIENTE
 // ==============================
 /**
- * Dibuja una leyenda de colores gradiente.
- * - host: selección D3 (svg o <g>) donde se dibujará la leyenda.
- * - Limpia cualquier leyenda previa dentro del host (clase .leyenda-gradiente).
- * - Admite `tituloSimple` para usar solo una línea (ej. Población).
+ * Dibuja una leyenda vertical con gradiente + eje + título y chips opcionales.
+ * host: svg o <g> (o selector)
+ * dominio: [min, max]
+ * pasos: array con cortes (min, q1, q2, q3, max)
+ * colores: array de colores (mismo largo que pasos)
+ * titulo: texto. Si contiene “población”, se muestra 1 línea "Población".
+ *         En otro caso, se muestra en 2 líneas: "Tasa" y debajo la categoría.
+ * chips: [{color, texto}] (opcional). Para población normalmente null.
  */
 let __legendCounter = 0;
 export function crearLeyenda(host, {
@@ -44,25 +45,18 @@ export function crearLeyenda(host, {
   posicion = { x: 30, y: 50, ancho: 20, alto: 200 },
   id = null,
   titulo = null,
-  tituloSimple = false,
-  tickFormat = d3.format(".2f"),
   chips = null
 }) {
   const { x, y, ancho, alto } = posicion;
-
-  // Asegura que 'host' es una selección D3 válida
   const sel = host && typeof host.select === "function" ? host : d3.select(host);
 
-  // Limpia leyendas previas dentro del host
+  // Limpia solo leyendas previas
   sel.selectAll(".leyenda-gradiente").remove();
 
-  // Contenedor de esta leyenda
   const root = sel.append("g").attr("class", "leyenda-gradiente");
 
-  // ID único para el gradiente
+  // Gradiente
   const gradId = id || `legend-gradient-${++__legendCounter}`;
-
-  // Definición del gradiente
   const defs = root.append("defs");
   const linearGradient = defs.append("linearGradient")
     .attr("id", gradId)
@@ -70,7 +64,7 @@ export function crearLeyenda(host, {
     .attr("x2", "0%").attr("y2", "0%");
 
   linearGradient.selectAll("stop")
-    .data(pasos.map((val, i) => ({
+    .data(pasos.map((_, i) => ({
       offset: `${(i / (pasos.length - 1)) * 100}%`,
       color: colores[i]
     })))
@@ -78,7 +72,7 @@ export function crearLeyenda(host, {
     .attr("offset", d => d.offset)
     .attr("stop-color", d => d.color);
 
-  // Rectángulo del gradiente
+  // Barra
   root.append("rect")
     .attr("x", x)
     .attr("y", y)
@@ -86,36 +80,37 @@ export function crearLeyenda(host, {
     .attr("height", alto)
     .style("fill", `url(#${gradId})`);
 
-  // Eje con ticks
+  // Escala y eje
   const escala = d3.scaleLinear()
     .domain([dominio[0], dominio[1]])
     .range([y + alto, y]);
 
+  // Formato de ticks: población -> miles sin decimales; tasas -> 2 decimales
+  const esPoblacion = titulo && /poblaci/i.test(String(titulo));
+  const fmtTick = esPoblacion ? d3.format(",.0f") : d3.format(".2f");
+
   const eje = d3.axisRight(escala)
     .tickValues(pasos)
-    .tickFormat(tickFormat);
+    .tickFormat(fmtTick);
 
   root.append("g")
     .attr("transform", `translate(${x + ancho}, 0)`)
     .call(eje);
 
-  // ==============================
   // Título
-  // ==============================
   if (titulo) {
-    if (tituloSimple) {
-      // Una sola línea (ej. "Población")
+    if (esPoblacion) {
+      // Una sola línea: "Población"
       root.append("text")
         .attr("x", x + ancho / 2)
         .attr("y", y - 10)
         .attr("text-anchor", "middle")
         .attr("font-size", "12px")
         .attr("font-family", "'Noto Sans', sans-serif")
-        .style("font-weight", "bold")
-        .text(titulo);
+        .text("Población");
     } else {
-      // Dos líneas: fija "Tasa" y debajo la categoría
-      const tituloLinea2 = String(titulo).replace(/^\s*tasa\s*/i, "").trim() || "total";
+      // Dos líneas: "Tasa" + categoría
+      const cat = String(titulo).replace(/^\s*tasa\s*/i, "").trim() || "total";
       const t = root.append("text")
         .attr("x", x + ancho / 2)
         .attr("y", y - 22)
@@ -132,11 +127,11 @@ export function crearLeyenda(host, {
       t.append("tspan")
         .attr("x", x + ancho / 2)
         .attr("dy", 14)
-        .text(tituloLinea2);
+        .text(cat);
     }
   }
 
-  // Chips opcionales
+  // Chips (0.00, s/d)
   if (Array.isArray(chips) && chips.length) {
     const chipGrp = root.append("g").attr("transform", `translate(${x + ancho + 40}, ${y})`);
     chips.forEach((c, i) => {
@@ -154,7 +149,7 @@ export function crearLeyenda(host, {
 }
 
 // ==============================
-// CREAR ETIQUETA DE MUNICIPIO
+// ETIQUETA DE MUNICIPIO/ENTIDAD
 // ==============================
 export function crearEtiquetaMunicipio(grupo, nombre, x, y, opciones = {}) {
   const {
@@ -177,11 +172,10 @@ export function crearEtiquetaMunicipio(grupo, nombre, x, y, opciones = {}) {
 }
 
 // ==============================
-// INYECTAR CONTROLES DE ZOOM
+// CONTROLES DE ZOOM + HOME
 // ==============================
 export function inyectarControlesBasicos(svg, g, urlCasa = "../entidades/republica-mexicana.html") {
   let contenedor = document.querySelector(".zoom-controles");
-
   if (!contenedor) {
     contenedor = document.createElement("div");
     contenedor.className = "zoom-controles";
@@ -214,13 +208,13 @@ export function inyectarControlesBasicos(svg, g, urlCasa = "../entidades/republi
     selectorZoomReset: "#zoom-reset"
   });
 
-  document.getElementById("zoom-home").addEventListener("click", () => {
+  document.getElementById("zoom-home")?.addEventListener("click", () => {
     window.location.href = urlCasa;
   });
 }
 
 // ==============================
-// FUNCIONALIDAD DE ZOOM CON BOTONES
+// ZOOM CON BOTONES
 // ==============================
 export function activarZoomConBotones(svg, g, {
   selectorZoomIn = "#zoom-in",
@@ -230,6 +224,8 @@ export function activarZoomConBotones(svg, g, {
   escalaMax = 8,
   paso = 0.5
 } = {}) {
+  let currentTransform = d3.zoomIdentity; // definir antes por seguridad
+
   const zoom = d3.zoom()
     .scaleExtent([escalaMin, escalaMax])
     .on("zoom", (event) => {
@@ -238,8 +234,6 @@ export function activarZoomConBotones(svg, g, {
     });
 
   svg.call(zoom);
-
-  let currentTransform = d3.zoomIdentity;
 
   document.querySelector(selectorZoomIn)?.addEventListener("click", () => {
     svg.transition().call(zoom.scaleBy, 1 + paso);
@@ -265,14 +259,15 @@ export function descargarComoPNG(
   nombreEntidad = ""
 ) {
   const svgElement = document.querySelector(svgSelector);
+  if (!svgElement) return;
 
-  // Extensión de viewBox
+  // Extiende el viewBox para título y cita
   const extraTop = 50;
   const extraBottom = 40;
   const newHeight = height + extraTop + extraBottom;
   svgElement.setAttribute("viewBox", `0 ${-extraTop} ${width} ${newHeight}`);
 
-  // Fondo del título
+  // Fondo y título
   const fondoTitulo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondoTitulo.setAttribute("x", -100);
   fondoTitulo.setAttribute("y", -extraTop);
@@ -283,7 +278,6 @@ export function descargarComoPNG(
   fondoTitulo.setAttribute("id", "fondo-titulo");
   svgElement.appendChild(fondoTitulo);
 
-  // Texto título
   const titulo = document.createElementNS("http://www.w3.org/2000/svg", "text");
   titulo.setAttribute("x", width / 2);
   titulo.setAttribute("y", -extraTop + 30);
@@ -298,7 +292,7 @@ export function descargarComoPNG(
     : `Tasa de enfermeras por cada mil habitantes (2025)`;
   svgElement.appendChild(titulo);
 
-  // Fondo de la cita
+  // Cita
   const fondo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondo.setAttribute("x", -100);
   fondo.setAttribute("y", height);
@@ -309,7 +303,6 @@ export function descargarComoPNG(
   fondo.setAttribute("id", "fondo-cita");
   svgElement.appendChild(fondo);
 
-  // Texto cita
   const cita = document.createElementNS("http://www.w3.org/2000/svg", "text");
   cita.setAttribute("x", width / 2);
   cita.setAttribute("y", height + 20);
@@ -326,7 +319,7 @@ export function descargarComoPNG(
     `Consultado el ${fecha}`;
   svgElement.appendChild(cita);
 
-  // Serialización y exportación
+  // Serializar y descargar
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgElement);
   const canvas = document.createElement("canvas");
