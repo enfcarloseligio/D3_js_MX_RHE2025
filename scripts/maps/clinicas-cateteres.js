@@ -16,14 +16,20 @@ import {
 
 import { renderZoomControles } from '../componentes/zoom-controles.js';
 
-// ==============================
-// COLORES DE CLÍNICAS
-// ==============================
+// 🎨 Catálogo de tipos + helper para estilos de marcadores
+import { MARCADORES_TIPOS, getEstiloMarcador } from '../utils/marcadores.js';
 
-// Catéter
-const COLOR_CLINICA_CATETER        = "#1e5b4f"; // verde base
-const COLOR_CLINICA_CATETER_HOVER  = "#004d40"; // verde oscuro hover
-const COLOR_CLINICA_CATETER_BORDER = "#ffffff"; // borde blanco
+// Fallback por si el import/clave falla
+const DEFAULT_CLINICA = { fill: '#1e5b4f', hover: '#004d40', stroke: '#ffffff' };
+const ESTILO_CLINICA = (() => {
+  try {
+    const st = getEstiloMarcador(MARCADORES_TIPOS.CATETER);
+    return st || DEFAULT_CLINICA;
+  } catch (_) {
+    console.warn('[clinicas-cateteres] No se pudieron leer colores desde marcadores.js. Uso defaults.');
+    return DEFAULT_CLINICA;
+  }
+})();
 
 // ==============================
 // CREAR SVG + TOOLTIP + HOST LEYENDA
@@ -211,7 +217,7 @@ Promise.all([
         return colorScale(v);
       });
 
-    // Leyenda (formato según métrica)
+    // Leyenda
     const pasosCrudos = [min, q1, q2, q3, max];
     const pasos = [];
     const seen = new Set();
@@ -270,100 +276,97 @@ Promise.all([
   const radioEscalado = el => (RADIO_BASE  * (el.classList.contains("is-hover") ? HOVER_FACTOR : 1)) / currentK;
   const bordeEscalado = el => (STROKE_BASE * (el.classList.contains("is-hover") ? HOVER_FACTOR : 1)) / currentK;
 
-gMarcadores.selectAll("circle")
-  .data(puntos)
-  .enter()
-  .append("circle")
-  .attr("cx", d => projection([d.lon, d.lat])[0])
-  .attr("cy", d => projection([d.lon, d.lat])[1])
-  .attr("r", function() { return radioEscalado(this); })
-  .attr("fill", COLOR_CLINICA_CATETER)               // normal
-  .attr("stroke", COLOR_CLINICA_CATETER_BORDER)      // borde
-  .attr("stroke-width", function() { return bordeEscalado(this); })
-  .style("cursor", "pointer")
-  .on("mouseover", function (event, d) {
-    event.stopPropagation();
-    d3.select(this)
-      .classed("is-hover", true)
-      .attr("fill", COLOR_CLINICA_CATETER_HOVER)     // hover
-      .attr("r",            () => radioEscalado(this))
-      .attr("stroke-width", () => bordeEscalado(this));
-    mostrarTooltipClinica(tooltip, event, d);
-  })
-  .on("mouseout", function (event) {
-    event.stopPropagation();
-    d3.select(this)
-      .classed("is-hover", false)
-      .attr("fill", COLOR_CLINICA_CATETER)           // normal
-      .attr("r",            () => radioEscalado(this))
-      .attr("stroke-width", () => bordeEscalado(this));
-    ocultarTooltip(tooltip);
+  gMarcadores.selectAll("circle")
+    .data(puntos)
+    .enter()
+    .append("circle")
+    .attr("cx", d => projection([d.lon, d.lat])[0])
+    .attr("cy", d => projection([d.lon, d.lat])[1])
+    .attr("r", function() { return radioEscalado(this); })
+    .attr("fill", ESTILO_CLINICA.fill)          // ← colores desde marcadores.js
+    .attr("stroke", ESTILO_CLINICA.stroke)
+    .attr("stroke-width", function() { return bordeEscalado(this); })
+    .style("cursor", "pointer")
+    .on("mouseover", function (event, d) {
+      event.stopPropagation();
+      d3.select(this)
+        .classed("is-hover", true)
+        .attr("fill", ESTILO_CLINICA.hover)
+        .attr("r",            () => radioEscalado(this))
+        .attr("stroke-width", () => bordeEscalado(this));
+      mostrarTooltipClinica(tooltip, event, d);
+    })
+    .on("mousemove", function (event) {
+      event.stopPropagation();
+      tooltip.style("left", (event.pageX + 10) + "px")
+             .style("top",  (event.pageY - 28) + "px");
+    })
+    .on("mouseout", function () {
+      d3.select(this)
+        .classed("is-hover", false)
+        .attr("fill", ESTILO_CLINICA.fill)
+        .attr("r",            () => radioEscalado(this))
+        .attr("stroke-width", () => bordeEscalado(this));
+      ocultarTooltip(tooltip);
+    });
+
+  // ==============================
+  // ZOOM + Botones (componente cableado a TU zoom)
+  // ==============================
+  const zoom = d3.zoom()
+    .scaleExtent([1, 20])
+    .on("zoom", (event) => {
+      currentK = event.transform.k;
+      g.attr("transform", event.transform);
+      gMarcadores.selectAll("circle")
+        .attr("r",            function () { return radioEscalado(this); })
+        .attr("stroke-width", function () { return bordeEscalado(this); });
+    });
+
+  svg.call(zoom);
+
+  renderZoomControles("#mapa-clinicas", {
+    svg,
+    g,
+    zoom,                  // el componente conecta +/−/⟳ a ESTA instancia
+    showHome: true,
+    homeHref: "../entidades/republica-mexicana.html",
+    idsPrefix: "clin",
+    escalaMin: 1,
+    escalaMax: 20,
+    paso: 0.5
   });
 
+  // ==============================
+  // Render inicial + selector
+  // ==============================
+  const sel = document.getElementById("sel-metrica");
+  if (sel) currentMetric = sel.value || currentMetric;
 
-// ==============================
-// ZOOM + Botones (componente lo cablea a TU zoom)
-// ==============================
+  recomputeAndPaint();
 
-// 1) Crea tu zoom (mantiene tamaño visual de los puntos)
-const zoom = d3.zoom()
-  .scaleExtent([1, 20])
-  .on("zoom", (event) => {
-    currentK = event.transform.k;
-    g.attr("transform", event.transform);
+  if (sel) {
+    sel.addEventListener("change", () => {
+      currentMetric = sel.value;
+      recomputeAndPaint();
+    });
+  }
 
-    // mantener tamaño visual de los puntos
-    gMarcadores.selectAll("circle")
-      .attr("r",            function () { return (RADIO_BASE  * (this.classList.contains("is-hover") ? HOVER_FACTOR : 1)) / currentK; })
-      .attr("stroke-width", function () { return (STROKE_BASE * (this.classList.contains("is-hover") ? HOVER_FACTOR : 1)) / currentK; });
+  // ==============================
+  // DESCARGA PNG
+  // ==============================
+  document.getElementById("descargar-sin-etiquetas")?.addEventListener("click", () => {
+    descargarComoPNG("#mapa-clinicas svg", "mapa-clinicas-sin-nombres.png", MAP_WIDTH, MAP_HEIGHT, "México");
   });
 
-// 2) Vincula ESTE zoom al SVG
-svg.call(zoom);
-
-// 3) Inyecta los controles y pásale tu zoom para que los conecte
-renderZoomControles("#mapa-clinicas", {
-  svg,
-  g,
-  zoom,                  // el componente conecta +/−/⟳ a ESTA instancia
-  showHome: true,
-  homeHref: "../entidades/republica-mexicana.html",
-  idsPrefix: "clin",
-  escalaMin: 1,
-  escalaMax: 20,
-  paso: 0.5
-});
-
-// ==============================
-// Render inicial + selector
-// ==============================
-const sel = document.getElementById("sel-metrica");
-if (sel) currentMetric = sel.value || currentMetric;
-
-recomputeAndPaint();
-
-if (sel) {
-  sel.addEventListener("change", () => {
-    currentMetric = sel.value;
-    recomputeAndPaint();
+  document.getElementById("descargar-con-etiquetas")?.addEventListener("click", () => {
+    const etiquetas = document.getElementById("etiquetas-municipios");
+    if (etiquetas) etiquetas.style.display = "block";
+    setTimeout(() => {
+      descargarComoPNG("#mapa-clinicas svg", "mapa-clinicas-con-nombres.png", MAP_WIDTH, MAP_HEIGHT, "México");
+      if (etiquetas) etiquetas.style.display = "none";
+    }, 100);
   });
-}
-
-// ==============================
-// DESCARGA PNG
-// ==============================
-document.getElementById("descargar-sin-etiquetas")?.addEventListener("click", () => {
-  descargarComoPNG("#mapa-clinicas svg", "mapa-clinicas-sin-nombres.png", MAP_WIDTH, MAP_HEIGHT, "México");
-});
-
-document.getElementById("descargar-con-etiquetas")?.addEventListener("click", () => {
-  const etiquetas = document.getElementById("etiquetas-municipios");
-  if (etiquetas) etiquetas.style.display = "block";
-  setTimeout(() => {
-    descargarComoPNG("#mapa-clinicas svg", "mapa-clinicas-con-nombres.png", MAP_WIDTH, MAP_HEIGHT, "México");
-    if (etiquetas) etiquetas.style.display = "none";
-  }, 100);
-});
 
 }).catch(err => {
   console.error("Error al cargar el mapa de clínicas:", err);
