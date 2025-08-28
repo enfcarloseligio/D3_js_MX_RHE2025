@@ -90,15 +90,15 @@ Promise.all([
   const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
 
   const METRICAS = {
-    tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",    countKey: "enfermeras_total", palette: "tasas" },
-    tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",   countKey: "enfermeras_primer", palette: "tasas" },
+    tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",    countKey: "enfermeras_total",   palette: "tasas" },
+    tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",   countKey: "enfermeras_primer",  palette: "tasas" },
     tasa_segundo:     { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",  countKey: "enfermeras_segundo", palette: "tasas" },
-    tasa_tercer:      { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",   countKey: "enfermeras_tercer", palette: "tasas" },
-    tasa_apoyo:       { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",    countKey: "enfermeras_apoyo", palette: "tasas" },
-    tasa_escuelas:    { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas", countKey: "enfermeras_escuelas", palette: "tasas" },
+    tasa_tercer:      { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",   countKey: "enfermeras_tercer",  palette: "tasas" },
+    tasa_apoyo:       { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",    countKey: "enfermeras_apoyo",   palette: "tasas" },
+    tasa_escuelas:    { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas", countKey: "enfermeras_escuelas",palette: "tasas" },
     tasa_no_aplica:   { label: "Tasa no aplica",       tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica", palette: "tasas" },
     tasa_no_asignado: { label: "Tasa no asignado",     tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado", palette: "tasas" },
-    poblacion:        { label: "Población",            tasaKey: "poblacion",     countKey: "poblacion", palette: "poblacion" }
+    poblacion:        { label: "Población",            tasaKey: "poblacion",     countKey: "poblacion",          palette: "poblacion" }
   };
 
   let currentMetric = "tasa_total";
@@ -128,7 +128,7 @@ Promise.all([
     const key = METRICAS[metricKey].tasaKey; // 'tasa_*' o 'poblacion'
     return tasas
       .filter(d => idsEntidades.has(String(d.id)))
-      .map(d => +d[key === "poblacion" ? "poblacion" : key])  // ojo: población sin acento
+      .map(d => +d[key === "poblacion" ? "poblacion" : key])  // población sin acento
       .filter(Number.isFinite);
   }
 
@@ -138,7 +138,7 @@ Promise.all([
   function paletteFor(metricKey) {
     const pal = METRICAS[metricKey].palette;
     return pal === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
-    }
+  }
 
   function recomputeAndPaint() {
     // 1) cuartiles
@@ -146,6 +146,7 @@ Promise.all([
 
     // 2) paleta por métrica
     const PALETTE = paletteFor(currentMetric);
+    const esPoblacion = currentMetric === "poblacion";
 
     // 3) escala continua
     colorScale = d3.scaleLinear()
@@ -162,7 +163,7 @@ Promise.all([
         if (!item) return COLOR_SIN;
         const v = +item[METRICAS[currentMetric].tasaKey];
         if (!Number.isFinite(v)) return COLOR_SIN; // s/d
-        if (v <= 0) return COLOR_CERO;            // 0.00
+        if (!esPoblacion && v <= 0) return COLOR_CERO; // 0.00 solo aplica a tasas
         return colorScale(v);
       });
 
@@ -173,20 +174,16 @@ Promise.all([
     const pasos = [];
     const seen = new Set();
     pasosCrudos.forEach(v => {
-      const k = (+v).toFixed(2);
-      if (!seen.has(k)) { seen.add(k); pasos.push(+k); }
+      const k = esPoblacion ? Math.round(v) : +(+v).toFixed(2);
+      if (!seen.has(k)) { seen.add(k); pasos.push(k); }
     });
 
     crearLeyenda(legendHost, {
       dominio: [min, max],
       pasos,
       colores: PALETTE,
-      // Si tu crearLeyenda imprime "Tasa" fijo, pásale un texto que funcione:
-      // para población queremos que se lea como "Tasa / población"? Si tu helper ya
-      // pone siempre "Tasa" arriba, con "población" abajo quedará bien visualmente.
-      // Si lo cambiaste para soportar un título simple, esto también funciona.
-      titulo: METRICAS[currentMetric].label,
-      chips: [
+      titulo: METRICAS[currentMetric].label,          // "Población" o la etiqueta de tasa
+      chips: esPoblacion ? null : [                   // sin chips en Población
         { color: COLOR_CERO, texto: "0.00" },
         { color: COLOR_SIN,  texto: "s/d"  }
       ]
