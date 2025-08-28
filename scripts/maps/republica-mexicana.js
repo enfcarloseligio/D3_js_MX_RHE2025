@@ -69,7 +69,7 @@ Promise.all([
       enfermeras_apoyo:   d.enfermeras_apoyo,   tasa_apoyo:   d.tasa_apoyo,
       enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas,
 
-      // ➕ Añadidos (antes faltaban)
+      // Extras
       enfermeras_no_aplica:   d.enfermeras_no_aplica,   tasa_no_aplica:   d.tasa_no_aplica,
       enfermeras_no_asignado: d.enfermeras_no_asignado, tasa_no_asignado: d.tasa_no_asignado
     };
@@ -80,6 +80,8 @@ Promise.all([
   // ==============================
   const COLORES    = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']; // paleta
   const COLOR_CERO = '#bfbfbf'; // gris para tasas = 0
+  const COLOR_SIN  = '#d9d9d9'; // gris claro para s/d (sin dato)
+
   const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
 
   const METRICAS = {
@@ -138,21 +140,21 @@ Promise.all([
       .range(COLORES)
       .interpolate(d3.interpolateRgb);
 
-    // 3) repintar mapa (gris cuando v <= 0)
+    // 3) repintar mapa (COLOR_CERO cuando v <= 0; COLOR_SIN cuando no hay dato)
     g.selectAll("path")
       .transition().duration(350)
       .attr("fill", d => {
         const nombre = d.properties.NOMBRE.trim();
         const item = dataByEstado[nombre];
-        if (!item) return "#ccc";
+        if (!item) return COLOR_SIN;
 
         const v = +item[METRICAS[currentMetric].tasaKey];
-        if (!Number.isFinite(v)) return "#ccc";
-        if (v <= 0) return COLOR_CERO;
+        if (!Number.isFinite(v)) return COLOR_SIN; // s/d
+        if (v <= 0) return COLOR_CERO;            // 0.00
         return colorScale(v);
       });
 
-    // 4) LEYENDA: limpiar host y redibujar (sin superponer)
+    // 4) LEYENDA: limpiar host y redibujar con título + chips
     legendHost.selectAll("*").remove();
 
     const pasosCrudos = [min, q1, q2, q3, max];
@@ -163,12 +165,15 @@ Promise.all([
       if (!seen.has(k)) { seen.add(k); pasos.push(+k); }
     });
 
-    // dibujar leyenda dentro del host
     crearLeyenda(legendHost, {
       dominio: [min, max],
       pasos,
       colores: COLORES,
-      // titulo: METRICAS[currentMetric].label // si tu helper lo soporta
+      titulo: METRICAS[currentMetric].label,
+      chips: [
+        { color: COLOR_CERO, texto: "0.00" },
+        { color: COLOR_SIN,  texto: "s/d"  }
+      ]
     });
   }
 
@@ -230,14 +235,12 @@ Promise.all([
       const nombre = d.properties.NOMBRE.trim();
       const item = dataByEstado[nombre];
 
-      const tasaSel = item ? +item[METRICAS[currentMetric].tasaKey] : NaN;
-      const cntSel  = item ? +item[METRICAS[currentMetric].countKey] : NaN;
-
       d3.select(this).attr("stroke-width", 1.5);
-      mostrarTooltip(tooltip, event, nombre, {
-        tasa: tasaSel,
-        población: item?.poblacion,
-        enfermeras: cntSel
+
+      // Tooltip con etiqueta del indicador actual
+      mostrarTooltip(tooltip, event, nombre, item, {
+        metricKey: METRICAS[currentMetric].tasaKey,
+        label: METRICAS[currentMetric].label
       });
     })
     .on("mousemove", event => {

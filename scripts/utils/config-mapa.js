@@ -97,18 +97,35 @@ export function crearLeyenda(host, {
     .attr("transform", `translate(${x + ancho}, 0)`)
     .call(eje);
 
-  // Título opcional arriba de la barra
+  // ==============================
+  // Título en dos líneas
+  // ==============================
   if (titulo) {
-    root.append("text")
+    // Quita la palabra "tasa" si viene incluida en el texto
+    const tituloLinea2 = String(titulo).replace(/^\s*tasa\s*/i, "").trim() || "total";
+
+    const t = root.append("text")
       .attr("x", x + ancho / 2)
-      .attr("y", y - 8)
+      .attr("y", y - 22) // un poco más arriba
       .attr("text-anchor", "middle")
       .attr("font-size", "12px")
-      .attr("font-family", "'Noto Sans', sans-serif")
-      .text(titulo);
+      .attr("font-family", "'Noto Sans', sans-serif");
+
+    // Línea fija: "Tasa"
+    t.append("tspan")
+      .attr("x", x + ancho / 2)
+      .attr("dy", 0)
+      .style("font-weight", "bold")
+      .text("Tasa");
+
+    // Línea dinámica: categoría (ej. total, primer nivel, no asignado)
+    t.append("tspan")
+      .attr("x", x + ancho / 2)
+      .attr("dy", 14)
+      .text(tituloLinea2);
   }
 
-  // Chips opcionales (por ejemplo "0.00" y "s/d")
+  // Chips opcionales (ej. "0.00" y "s/d")
   if (Array.isArray(chips) && chips.length) {
     const chipGrp = root.append("g").attr("transform", `translate(${x + ancho + 40}, ${y})`);
     chips.forEach((c, i) => {
