@@ -117,6 +117,7 @@ export function mostrarTooltipClinica(tooltip, event, campos) {
   const html = `
     <strong>Clínica de catéter</strong><br>
     <div style="margin-top:4px;">
+      <div><strong>Unidad:</strong> ${safe(campos.unidad)}</div>
       <div><strong>CLUES:</strong> ${safe(campos.clues)}</div>
       <div><strong>Institución:</strong> ${safe(campos.institucion)}</div>
       <div><strong>Entidad:</strong> ${safe(campos.entidad)}</div>
