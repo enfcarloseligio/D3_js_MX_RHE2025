@@ -13,14 +13,14 @@
   <link rel="stylesheet" href="../styles/mapas.css" />
 
   <!-- Librerías necesarias -->
-  <script src="https://d3js.org/d3.v7.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
 
   <!-- Layout general -->
-  <script src="../scripts/inyectar-layout.js"></script>
+  <script src="../scripts/inyectar-layout.js" defer></script>
 
-  <!-- Mapa de clínicas -->
+  <!-- Lógica del mapa de clínicas -->
   <script type="module" src="../scripts/maps/clinicas-cateteres.js"></script>
 </head>
 
@@ -35,37 +35,23 @@
     <!-- SECCIÓN DEL MAPA DE CLÍNICAS -->
     <section class="mapa-entidad">
       <h1>Clínicas de Catéter y Tasas de Enfermeras por Estado (2025)</h1>
+
       <p class="bienvenida">
         Explore la localización de clínicas de catéter superpuesta sobre el mapa coroplético de tasas de enfermeras por entidad federativa.
       </p>
 
       <!-- ==============================
-           CONTROL DE MÉTRICA
+           CONTROL DE MÉTRICA (componente reutilizable)
            ============================== -->
-      <div class="control-metrica" style="margin:8px 0; display:flex; gap:8px; align-items:center">
-        <label for="sel-metrica"><strong>Indicador:</strong></label>
-        <select id="sel-metrica">
-          <option value="tasa_total">Tasa total</option>
-          <option value="tasa_primer">Tasa 1er nivel</option>
-          <option value="tasa_segundo">Tasa 2º nivel</option>
-          <option value="tasa_tercer">Tasa 3er nivel</option>
-          <option value="tasa_apoyo">Tasa en establecimientos de apoyo</option>
-          <option value="tasa_escuelas">Tasa en escuelas</option>
-          <option value="tasa_no_aplica">Tasa no aplica</option>
-          <option value="tasa_no_asignado">Tasa no asignado</option>
-        </select>
-      </div>
+      <div id="control-indicador"></div>
+      <script type="module">
+        import { renderIndicadorControl } from "../scripts/componentes/indicador-control.js";
+        renderIndicadorControl("#control-indicador", { defaultValue: "tasa_total" });
+        // El mapa escucha #sel-metrica, no necesitas nada más aquí
+      </script>
 
-      <!-- CONTENEDOR DEL MAPA -->
-      <div id="mapa-clinicas" class="mapa-wrapper">
-        <!-- SVG insertado dinámicamente -->
-        <div class="zoom-controles">
-          <button id="zoom-in" class="boton" aria-label="Acercar">+</button>
-          <button id="zoom-out" class="boton" aria-label="Alejar">–</button>
-          <button id="zoom-reset" class="boton" aria-label="Reiniciar zoom">⟳</button>
-          <button id="zoom-home" class="boton" aria-label="Volver al mapa nacional">🏠</button>
-        </div>
-      </div>
+      <!-- CONTENEDOR DEL MAPA (los botones se inyectan por JS) -->
+      <div id="mapa-clinicas" class="mapa-wrapper"></div>
 
       <!-- NOTA METODOLÓGICA -->
       <p id="nota">
@@ -81,7 +67,7 @@
         document.getElementById("fecha-consulta").textContent = new Date().toISOString().split("T")[0];
       </script>
 
-      <!-- BOTONES DE DESCARGA DEL MAPA (opcional si quieres permitir exportar) -->
+      <!-- BOTONES DE DESCARGA DEL MAPA -->
       <div class="descarga-container">
         <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
         <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
@@ -89,7 +75,6 @@
     </section>
 
     <!-- (Opcional) SECCIÓN DE TABLA RESUMEN -->
-    <!-- Puedes eliminar esta sección si no deseas tabla aquí -->
     <section class="tabla-republica" style="display:none;">
       <h2>Resumen por entidad</h2>
       <p>

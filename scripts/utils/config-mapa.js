@@ -224,7 +224,7 @@ export function activarZoomConBotones(svg, g, {
   escalaMax = 8,
   paso = 0.5
 } = {}) {
-  let currentTransform = d3.zoomIdentity; // definir antes por seguridad
+  let currentTransform = d3.zoomIdentity;
 
   const zoom = d3.zoom()
     .scaleExtent([escalaMin, escalaMax])
