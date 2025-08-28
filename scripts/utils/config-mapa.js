@@ -34,7 +34,7 @@ export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribu
  * Dibuja una leyenda de colores gradiente.
  * - host: selección D3 (svg o <g>) donde se dibujará la leyenda.
  * - Limpia cualquier leyenda previa dentro del host (clase .leyenda-gradiente).
- * - Crea un id de gradiente único si no se pasa 'id'.
+ * - Admite `tituloSimple` para usar solo una línea (ej. Población).
  */
 let __legendCounter = 0;
 export function crearLeyenda(host, {
@@ -44,7 +44,9 @@ export function crearLeyenda(host, {
   posicion = { x: 30, y: 50, ancho: 20, alto: 200 },
   id = null,
   titulo = null,
-  chips = null // ej: [{ color:'#bfbfbf', texto:'0.00' }, { color:'#d9d9d9', texto:'s/d' }]
+  tituloSimple = false,
+  tickFormat = d3.format(".2f"),
+  chips = null
 }) {
   const { x, y, ancho, alto } = posicion;
 
@@ -54,13 +56,13 @@ export function crearLeyenda(host, {
   // Limpia leyendas previas dentro del host
   sel.selectAll(".leyenda-gradiente").remove();
 
-  // Contenedor de esta leyenda (así solo eliminamos lo que corresponde)
+  // Contenedor de esta leyenda
   const root = sel.append("g").attr("class", "leyenda-gradiente");
 
-  // ID único para el gradiente si no viene dado
+  // ID único para el gradiente
   const gradId = id || `legend-gradient-${++__legendCounter}`;
 
-  // defs (puede vivir dentro de <g> sin problema)
+  // Definición del gradiente
   const defs = root.append("defs");
   const linearGradient = defs.append("linearGradient")
     .attr("id", gradId)
@@ -84,48 +86,57 @@ export function crearLeyenda(host, {
     .attr("height", alto)
     .style("fill", `url(#${gradId})`);
 
-  // Eje con ticks en los "pasos"
+  // Eje con ticks
   const escala = d3.scaleLinear()
     .domain([dominio[0], dominio[1]])
     .range([y + alto, y]);
 
   const eje = d3.axisRight(escala)
     .tickValues(pasos)
-    .tickFormat(d3.format(".2f"));
+    .tickFormat(tickFormat);
 
   root.append("g")
     .attr("transform", `translate(${x + ancho}, 0)`)
     .call(eje);
 
   // ==============================
-  // Título en dos líneas
+  // Título
   // ==============================
   if (titulo) {
-    // Quita la palabra "tasa" si viene incluida en el texto
-    const tituloLinea2 = String(titulo).replace(/^\s*tasa\s*/i, "").trim() || "total";
+    if (tituloSimple) {
+      // Una sola línea (ej. "Población")
+      root.append("text")
+        .attr("x", x + ancho / 2)
+        .attr("y", y - 10)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "12px")
+        .attr("font-family", "'Noto Sans', sans-serif")
+        .style("font-weight", "bold")
+        .text(titulo);
+    } else {
+      // Dos líneas: fija "Tasa" y debajo la categoría
+      const tituloLinea2 = String(titulo).replace(/^\s*tasa\s*/i, "").trim() || "total";
+      const t = root.append("text")
+        .attr("x", x + ancho / 2)
+        .attr("y", y - 22)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "12px")
+        .attr("font-family", "'Noto Sans', sans-serif");
 
-    const t = root.append("text")
-      .attr("x", x + ancho / 2)
-      .attr("y", y - 22) // un poco más arriba
-      .attr("text-anchor", "middle")
-      .attr("font-size", "12px")
-      .attr("font-family", "'Noto Sans', sans-serif");
+      t.append("tspan")
+        .attr("x", x + ancho / 2)
+        .attr("dy", 0)
+        .style("font-weight", "bold")
+        .text("Tasa");
 
-    // Línea fija: "Tasa"
-    t.append("tspan")
-      .attr("x", x + ancho / 2)
-      .attr("dy", 0)
-      .style("font-weight", "bold")
-      .text("Tasa");
-
-    // Línea dinámica: categoría (ej. total, primer nivel, no asignado)
-    t.append("tspan")
-      .attr("x", x + ancho / 2)
-      .attr("dy", 14)
-      .text(tituloLinea2);
+      t.append("tspan")
+        .attr("x", x + ancho / 2)
+        .attr("dy", 14)
+        .text(tituloLinea2);
+    }
   }
 
-  // Chips opcionales (ej. "0.00" y "s/d")
+  // Chips opcionales
   if (Array.isArray(chips) && chips.length) {
     const chipGrp = root.append("g").attr("transform", `translate(${x + ancho + 40}, ${y})`);
     chips.forEach((c, i) => {
@@ -139,15 +150,12 @@ export function crearLeyenda(host, {
     });
   }
 
-  return root; // por si quieres mover/ocultar desde fuera
+  return root;
 }
 
 // ==============================
 // CREAR ETIQUETA DE MUNICIPIO
 // ==============================
-/**
- * Crea una etiqueta de texto para un municipio o entidad en el mapa.
- */
 export function crearEtiquetaMunicipio(grupo, nombre, x, y, opciones = {}) {
   const {
     fontSize = "10px",
@@ -171,9 +179,6 @@ export function crearEtiquetaMunicipio(grupo, nombre, x, y, opciones = {}) {
 // ==============================
 // INYECTAR CONTROLES DE ZOOM
 // ==============================
-/**
- * Inyecta botones de zoom y botón de casa automáticamente.
- */
 export function inyectarControlesBasicos(svg, g, urlCasa = "../entidades/republica-mexicana.html") {
   let contenedor = document.querySelector(".zoom-controles");
 
@@ -184,11 +189,11 @@ export function inyectarControlesBasicos(svg, g, urlCasa = "../entidades/republi
   }
 
   const botones = [
-  { id: "zoom-in",    label: "+",  title: "Acercar" },
-  { id: "zoom-out",   label: "–",  title: "Alejar" },
-  { id: "zoom-reset", label: "⟳",  title: "Restablecer" },
-  { id: "zoom-home",  label: "🏠", title: "Volver al mapa nacional" }
-];
+    { id: "zoom-in",    label: "+",  title: "Acercar" },
+    { id: "zoom-out",   label: "–",  title: "Alejar" },
+    { id: "zoom-reset", label: "⟳",  title: "Restablecer" },
+    { id: "zoom-home",  label: "🏠", title: "Volver al mapa nacional" }
+  ];
 
   botones.forEach(({ id, label, title }) => {
     let btn = document.getElementById(id);
@@ -217,9 +222,6 @@ export function inyectarControlesBasicos(svg, g, urlCasa = "../entidades/republi
 // ==============================
 // FUNCIONALIDAD DE ZOOM CON BOTONES
 // ==============================
-/**
- * Habilita controles de zoom con botones personalizados.
- */
 export function activarZoomConBotones(svg, g, {
   selectorZoomIn = "#zoom-in",
   selectorZoomOut = "#zoom-out",
@@ -264,13 +266,13 @@ export function descargarComoPNG(
 ) {
   const svgElement = document.querySelector(svgSelector);
 
-  // === Extensiones del área de visualización ===
+  // Extensión de viewBox
   const extraTop = 50;
   const extraBottom = 40;
   const newHeight = height + extraTop + extraBottom;
   svgElement.setAttribute("viewBox", `0 ${-extraTop} ${width} ${newHeight}`);
 
-  // === Fondo semitransparente del título ===
+  // Fondo del título
   const fondoTitulo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondoTitulo.setAttribute("x", -100);
   fondoTitulo.setAttribute("y", -extraTop);
@@ -281,7 +283,7 @@ export function descargarComoPNG(
   fondoTitulo.setAttribute("id", "fondo-titulo");
   svgElement.appendChild(fondoTitulo);
 
-  // === Título centrado en la parte superior ===
+  // Texto título
   const titulo = document.createElementNS("http://www.w3.org/2000/svg", "text");
   titulo.setAttribute("x", width / 2);
   titulo.setAttribute("y", -extraTop + 30);
@@ -296,7 +298,7 @@ export function descargarComoPNG(
     : `Tasa de enfermeras por cada mil habitantes (2025)`;
   svgElement.appendChild(titulo);
 
-  // === Fondo semitransparente de la fuente/cita ===
+  // Fondo de la cita
   const fondo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondo.setAttribute("x", -100);
   fondo.setAttribute("y", height);
@@ -307,10 +309,10 @@ export function descargarComoPNG(
   fondo.setAttribute("id", "fondo-cita");
   svgElement.appendChild(fondo);
 
-  // === Cita inferior con fecha dinámica ===
+  // Texto cita
   const cita = document.createElementNS("http://www.w3.org/2000/svg", "text");
   cita.setAttribute("x", width / 2);
-  cita.setAttribute("y", height + 20); // verticalmente ajustado
+  cita.setAttribute("y", height + 20);
   cita.setAttribute("text-anchor", "middle");
   cita.setAttribute("dominant-baseline", "middle");
   cita.setAttribute("font-size", "14px");
@@ -324,7 +326,7 @@ export function descargarComoPNG(
     `Consultado el ${fecha}`;
   svgElement.appendChild(cita);
 
-  // === Serialización del SVG y creación del canvas ===
+  // Serialización y exportación
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgElement);
   const canvas = document.createElement("canvas");
@@ -332,7 +334,6 @@ export function descargarComoPNG(
   canvas.height = height;
   const context = canvas.getContext("2d");
 
-  // === Conversión a imagen y descarga como PNG ===
   const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(svgBlob);
   const image = new Image();
@@ -352,7 +353,7 @@ export function descargarComoPNG(
 
   image.src = url;
 
-  // === Limpieza de elementos auxiliares del SVG (título y cita) ===
+  // Limpieza
   setTimeout(() => {
     svgElement.querySelector("#titulo-descarga")?.remove();
     svgElement.querySelector("#fondo-titulo")?.remove();

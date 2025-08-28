@@ -1,7 +1,6 @@
 // ==============================
 // IMPORTACIONES
 // ==============================
-
 import { crearTooltip, mostrarTooltip, ocultarTooltip } from '../utils/tooltip.js';
 import {
   crearSVGBase, MAP_WIDTH, MAP_HEIGHT,
@@ -12,25 +11,33 @@ import {
 // ==============================
 // CREACIÓN DEL MAPA
 // ==============================
-
 const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución nacional de enfermeras");
 const tooltip = crearTooltip();
 
-// Host fijo para la leyenda (así evitamos superposiciones)
+// Host fijo para la leyenda (evita superposiciones)
 const legendHost = svg.append("g").attr("id", "legend-host");
 
+// ==============================
+// CARGA DE DATOS
+// ==============================
 Promise.all([
   d3.json("../data/maps/republica-mexicana.geojson"),
   d3.csv("../data/rate/republica-mexicana.csv")
 ]).then(([geoData, tasas]) => {
+
   // ==============================
   // Normalización de columnas
   // ==============================
   tasas.forEach(d => {
-    d.población = +(("población" in d && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
+    // Población con alias sin/ con acento (ambas disponibles)
+    d["población"] = +(("población" in d && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
+    d.poblacion = d["población"];  // alias consistente
+
+    // Totales (nuevo esquema / legado)
     d.enfermeras_total = +((d.enfermeras_total ?? d.enfermeras) || 0);
     d.tasa_total       = +((d.tasa_total ?? d.tasa) || 0);
 
+    // Niveles / ámbitos
     d.enfermeras_primer   = +(d.enfermeras_primer   || 0);
     d.tasa_primer         = +(d.tasa_primer         || 0);
     d.enfermeras_segundo  = +(d.enfermeras_segundo  || 0);
@@ -48,28 +55,23 @@ Promise.all([
   });
 
   // ==============================
-  // Diccionario por estado
+  // Diccionario por estado (ancho)
   // ==============================
   const dataByEstado = {};
   tasas.forEach(d => {
     const estado = (d.estado || "").trim();
     if (!estado) return;
     dataByEstado[estado] = {
-      poblacion: d.población,
+      poblacion: d.poblacion, // clave sin acento para JS
 
-      // Totales
       enfermeras_total:   d.enfermeras_total,   tasa_total:   d.tasa_total,
-
-      // Niveles
       enfermeras_primer:  d.enfermeras_primer,  tasa_primer:  d.tasa_primer,
       enfermeras_segundo: d.enfermeras_segundo, tasa_segundo: d.tasa_segundo,
       enfermeras_tercer:  d.enfermeras_tercer,  tasa_tercer:  d.tasa_tercer,
 
-      // Otros ámbitos
       enfermeras_apoyo:   d.enfermeras_apoyo,   tasa_apoyo:   d.tasa_apoyo,
       enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas,
 
-      // Extras
       enfermeras_no_aplica:   d.enfermeras_no_aplica,   tasa_no_aplica:   d.tasa_no_aplica,
       enfermeras_no_asignado: d.enfermeras_no_asignado, tasa_no_asignado: d.tasa_no_asignado
     };
@@ -78,24 +80,28 @@ Promise.all([
   // ==============================
   // Configuración de métricas
   // ==============================
-  const COLORES    = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']; // paleta
-  const COLOR_CERO = '#bfbfbf'; // gris para tasas = 0
-  const COLOR_SIN  = '#d9d9d9'; // gris claro para s/d (sin dato)
+  const COLOR_CERO = '#bfbfbf'; // gris para 0.00
+  const COLOR_SIN  = '#d9d9d9'; // gris claro s/d
 
+  const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen']; // institucional (tasas)
+  const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c']; // verdes (población)
+
+  // ids 1..32
   const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
 
   const METRICAS = {
-    tasa_total:    { label: "Tasa total",           tasaKey: "tasa_total",    countKey: "enfermeras_total" },
-    tasa_primer:   { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",   countKey: "enfermeras_primer" },
-    tasa_segundo:  { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",  countKey: "enfermeras_segundo" },
-    tasa_tercer:   { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",   countKey: "enfermeras_tercer" },
-    tasa_apoyo:    { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",    countKey: "enfermeras_apoyo" },
-    tasa_escuelas: { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas", countKey: "enfermeras_escuelas" },
-    tasa_no_aplica:   { label: "Tasa no aplica",    tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica" },
-    tasa_no_asignado: { label: "Tasa no asignado",  tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado" }
+    tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",    countKey: "enfermeras_total", palette: "tasas" },
+    tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",   countKey: "enfermeras_primer", palette: "tasas" },
+    tasa_segundo:     { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",  countKey: "enfermeras_segundo", palette: "tasas" },
+    tasa_tercer:      { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",   countKey: "enfermeras_tercer", palette: "tasas" },
+    tasa_apoyo:       { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",    countKey: "enfermeras_apoyo", palette: "tasas" },
+    tasa_escuelas:    { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas", countKey: "enfermeras_escuelas", palette: "tasas" },
+    tasa_no_aplica:   { label: "Tasa no aplica",       tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica", palette: "tasas" },
+    tasa_no_asignado: { label: "Tasa no asignado",     tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado", palette: "tasas" },
+    poblacion:        { label: "Población",            tasaKey: "poblacion",     countKey: "poblacion", palette: "poblacion" }
   };
 
-  let currentMetric = "tasa_total"; // inicial
+  let currentMetric = "tasa_total";
 
   // ==============================
   // Utilidades de cuartiles
@@ -109,8 +115,7 @@ Promise.all([
     let q2  = d3.quantileSorted(vals, 0.50);
     let q3  = d3.quantileSorted(vals, 0.75);
 
-    // evita cortes iguales por empates
-    const eps = 1e-6;
+    const eps = 1e-6; // evita cortes iguales
     if (!(q1 > min)) q1 = min + eps;
     if (!(q2 > q1)) q2 = q1 + eps;
     if (!(q3 > q2)) q3 = q2 + eps;
@@ -120,41 +125,48 @@ Promise.all([
   }
 
   function valoresDeMetrica(metricKey) {
-    const key = METRICAS[metricKey].tasaKey;
+    const key = METRICAS[metricKey].tasaKey; // 'tasa_*' o 'poblacion'
     return tasas
       .filter(d => idsEntidades.has(String(d.id)))
-      .map(d => +d[key])
+      .map(d => +d[key === "poblacion" ? "poblacion" : key])  // ojo: población sin acento
       .filter(Number.isFinite);
   }
 
   let min, q1, q2, q3, max;
   let colorScale;
 
+  function paletteFor(metricKey) {
+    const pal = METRICAS[metricKey].palette;
+    return pal === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
+    }
+
   function recomputeAndPaint() {
-    // 1) cuartiles para la métrica
+    // 1) cuartiles
     ({ min, q1, q2, q3, max } = computeQuartiles(valoresDeMetrica(currentMetric)));
 
-    // 2) escala continua (gradiente)
+    // 2) paleta por métrica
+    const PALETTE = paletteFor(currentMetric);
+
+    // 3) escala continua
     colorScale = d3.scaleLinear()
       .domain([min, q1, q2, q3, max])
-      .range(COLORES)
+      .range(PALETTE)
       .interpolate(d3.interpolateRgb);
 
-    // 3) repintar mapa (COLOR_CERO cuando v <= 0; COLOR_SIN cuando no hay dato)
+    // 4) repintar mapa
     g.selectAll("path")
       .transition().duration(350)
       .attr("fill", d => {
         const nombre = d.properties.NOMBRE.trim();
         const item = dataByEstado[nombre];
         if (!item) return COLOR_SIN;
-
         const v = +item[METRICAS[currentMetric].tasaKey];
         if (!Number.isFinite(v)) return COLOR_SIN; // s/d
         if (v <= 0) return COLOR_CERO;            // 0.00
         return colorScale(v);
       });
 
-    // 4) LEYENDA: limpiar host y redibujar con título + chips
+    // 5) leyenda (limpiar y redibujar)
     legendHost.selectAll("*").remove();
 
     const pasosCrudos = [min, q1, q2, q3, max];
@@ -168,7 +180,11 @@ Promise.all([
     crearLeyenda(legendHost, {
       dominio: [min, max],
       pasos,
-      colores: COLORES,
+      colores: PALETTE,
+      // Si tu crearLeyenda imprime "Tasa" fijo, pásale un texto que funcione:
+      // para población queremos que se lea como "Tasa / población"? Si tu helper ya
+      // pone siempre "Tasa" arriba, con "población" abajo quedará bien visualmente.
+      // Si lo cambiaste para soportar un título simple, esto también funciona.
       titulo: METRICAS[currentMetric].label,
       chips: [
         { color: COLOR_CERO, texto: "0.00" },
@@ -178,7 +194,7 @@ Promise.all([
   }
 
   // ==============================
-  // Proyección y paths
+  // Proyección y paths base
   // ==============================
   const projection = d3.geoMercator()
     .scale(2000)
@@ -237,10 +253,12 @@ Promise.all([
 
       d3.select(this).attr("stroke-width", 1.5);
 
-      // Tooltip con etiqueta del indicador actual
+      // Tooltip: si es población, sólo población (onlyPopulation:true)
+      const isPob = currentMetric === "poblacion";
       mostrarTooltip(tooltip, event, nombre, item, {
-        metricKey: METRICAS[currentMetric].tasaKey,
-        label: METRICAS[currentMetric].label
+        metricKey: METRICAS[currentMetric].tasaKey, // 'tasa_*' o 'poblacion'
+        label: METRICAS[currentMetric].label,
+        onlyPopulation: isPob
       });
     })
     .on("mousemove", event => {
@@ -285,9 +303,8 @@ Promise.all([
   });
 
   // ==============================
-  // TABLA NACIONAL (dinámica y sincronizada)
+  // TABLA NACIONAL (dinámica)
   // ==============================
-
   let _tablaCache = null;
   let _tbodyElem  = null;
 
@@ -295,7 +312,9 @@ Promise.all([
     d3.csv(rutaCSV).then(data => {
       // normaliza igual que arriba
       data.forEach(d => {
-        d.población = +(("población" in d && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
+        d["población"] = +(("población" in d && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
+        d.poblacion = d["población"];
+
         d.enfermeras_total = +((d.enfermeras_total ?? d.enfermeras) || 0);
         d.tasa_total       = +((d.tasa_total ?? d.tasa) || 0);
 
@@ -309,6 +328,10 @@ Promise.all([
         d.tasa_apoyo          = +(d.tasa_apoyo          || 0);
         d.enfermeras_escuelas = +(d.enfermeras_escuelas || 0);
         d.tasa_escuelas       = +(d.tasa_escuelas       || 0);
+        d.enfermeras_no_aplica   = +(d.enfermeras_no_aplica   || 0);
+        d.tasa_no_aplica         = +(d.tasa_no_aplica         || 0);
+        d.enfermeras_no_asignado = +(d.enfermeras_no_asignado || 0);
+        d.tasa_no_asignado       = +(d.tasa_no_asignado       || 0);
       });
 
       _tablaCache = data;
@@ -341,7 +364,7 @@ Promise.all([
       envoltorio.appendChild(tabla);
       contenedor.appendChild(envoltorio);
 
-      updateTablaNacional(currentMetric); // primer pintado con la métrica actual
+      updateTablaNacional(currentMetric); // primer pintado
       activarOrdenamientoTabla(tabla);
     });
   }
@@ -351,11 +374,12 @@ Promise.all([
 
     const def = METRICAS[metricKey] || METRICAS["tasa_total"];
     const { tasaKey, countKey } = def;
+    const isPob = metricKey === "poblacion";
 
     // Copia para ordenar sin mutar cache
     const data = _tablaCache.slice();
 
-    // Deja 8888 y 9999 al final
+    // Fija 8888 y 9999 al final
     data.sort((a, b) => {
       if (a.id === "9999") return 1;
       if (b.id === "9999") return -1;
@@ -370,14 +394,17 @@ Promise.all([
       fila.dataset.id = d.id;
       if (d.id === "9999") fila.classList.add("fila-total");
 
-      const enfermerasSel = +(d[countKey] || 0);
-      const tasaSel       = +(d[tasaKey]  || 0);
+      const poblSel = +(d.poblacion || 0);
+
+      // Para población: mostramos solo población; enfermeras/tasa van “—”
+      const enfermerasSel = isPob ? null : +(d[countKey] || 0);
+      const tasaSel       = isPob ? null : +(d[tasaKey]  || 0);
 
       fila.innerHTML = `
         <td class="municipio">${d.estado}</td>
-        <td class="numero">${Number(enfermerasSel).toLocaleString('es-MX')}</td>
-        <td class="numero">${Number(d.población).toLocaleString('es-MX')}</td>
-        <td class="numero">${tasaSel.toFixed(2)}</td>
+        <td class="numero">${isPob ? "—" : Number(enfermerasSel).toLocaleString('es-MX')}</td>
+        <td class="numero">${Number(poblSel).toLocaleString('es-MX')}</td>
+        <td class="numero">${isPob ? "—" : (Number.isFinite(tasaSel) ? tasaSel.toFixed(2) : "—")}</td>
       `;
       _tbodyElem.appendChild(fila);
     });

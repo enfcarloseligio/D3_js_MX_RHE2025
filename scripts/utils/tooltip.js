@@ -20,7 +20,7 @@ export function crearTooltip() {
 // ==============================
 // Helpers internos
 // ==============================
-const labelPorMetrica = (metricKey) => ({
+const LABELS = {
   "tasa_total":       "Tasa total",
   "tasa_primer":      "Tasa 1er nivel",
   "tasa_segundo":     "Tasa 2º nivel",
@@ -28,21 +28,24 @@ const labelPorMetrica = (metricKey) => ({
   "tasa_apoyo":       "Tasa en apoyo",
   "tasa_escuelas":    "Tasa en escuelas",
   "tasa_no_aplica":   "Tasa no aplica",
-  "tasa_no_asignado": "Tasa no asignado"
-}[metricKey] || "Tasa");
+  "tasa_no_asignado": "Tasa no asignado",
+  "poblacion":        "Población"
+};
+const labelPorMetrica = key => LABELS[key] || "Tasa";
 
-const fmtRate = (n) => (Number.isFinite(n) ? n.toFixed(2) : "Sin datos");
-const fmtNum  = (n) => (Number.isFinite(n) ? Number(n).toLocaleString('es-MX') : "—");
+const fmtRate = n => (Number.isFinite(n) ? n.toFixed(2) : "Sin datos");
+const fmtNum  = n => (Number.isFinite(+n) ? Number(n).toLocaleString("es-MX") : "—");
 
 // Arma {tasa, enfermeras, poblacion, label} a partir de:
 // 1) objeto resumido {tasa, poblacion|población, enfermeras}, o
-// 2) registro “ancho” + metricKey (tasa_*/enfermeras_*)
+// 2) registro “ancho” + metricKey (tasa_*/enfermeras_* o 'población')
 function pickDatos(datos, metricKey, labelForced) {
+  // Normaliza población (admite 'poblacion' o 'población')
   const poblacion = Number.isFinite(+datos?.poblacion)
     ? +datos.poblacion
     : (Number.isFinite(+datos?.["población"]) ? +datos["población"] : NaN);
 
-  // Caso A: ya viene resumido (retro-compatible)
+  // Caso A: datos ya vienen resumidos
   if (datos && ("tasa" in datos || "enfermeras" in datos)) {
     return {
       tasa: Number.isFinite(+datos.tasa) ? +datos.tasa : NaN,
@@ -52,13 +55,30 @@ function pickDatos(datos, metricKey, labelForced) {
     };
   }
 
-  // Caso B: registro ancho + metricKey
+  // Caso especial: métrica de población (no es tasa)
+  if (metricKey === "poblacion") {
+    return {
+      tasa: NaN,
+      enfermeras: NaN,
+      poblacion,
+      label: "Población",
+      isPoblacion: true
+    };
+  }
+
+  // Caso B: registro ancho + metricKey (tasa_*)
   if (metricKey) {
-    const tasaKey = metricKey;                           // ej. 'tasa_primer'
-    const enfKey  = metricKey.replace(/^tasa_/, "enfermeras_"); // 'enfermeras_primer'
+    const tasaKey = metricKey; // ej. 'tasa_primer'
+    const enfKey  = metricKey.replace(/^tasa_/, "enfermeras_");
     const tasa = Number.isFinite(+datos?.[tasaKey]) ? +datos[tasaKey] : NaN;
     const enfermeras = Number.isFinite(+datos?.[enfKey]) ? +datos[enfKey] : NaN;
-    return { tasa, enfermeras, poblacion, label: labelForced || labelPorMetrica(metricKey) };
+    return {
+      tasa,
+      enfermeras,
+      poblacion,
+      label: labelForced || labelPorMetrica(metricKey),
+      isPoblacion: false
+    };
   }
 
   // Caso C: buscar la primera llave tasa_* disponible
@@ -68,20 +88,21 @@ function pickDatos(datos, metricKey, labelForced) {
       const tasa = +datos[key];
       const enfKey = key.replace(/^tasa_/, "enfermeras_");
       const enfermeras = Number.isFinite(+datos?.[enfKey]) ? +datos[enfKey] : NaN;
-      return { tasa, enfermeras, poblacion, label: labelPorMetrica(key) };
+      return { tasa, enfermeras, poblacion, label: labelPorMetrica(key), isPoblacion: false };
     }
   }
 
-  return { tasa: NaN, enfermeras: NaN, poblacion, label: labelForced || "Tasa" };
+  // Fallback sin datos
+  return { tasa: NaN, enfermeras: NaN, poblacion, label: labelForced || "Tasa", isPoblacion: false };
 }
 
 // ==============================
 // Mostrar / ocultar tooltip
 // ==============================
 //
-// Uso recomendado con tu estructura "ancha":
-// mostrarTooltip(tooltip, event, nombre, registroDelEstado, {
-//   metricKey: METRICAS[currentMetric].tasaKey,
+// Uso típico con estructura “ancha”:
+// mostrarTooltip(tooltip, event, nombre, registro, {
+//   metricKey: METRICAS[currentMetric].tasaKey || 'poblacion',
 //   label: METRICAS[currentMetric].label
 // });
 //
@@ -91,13 +112,24 @@ export function mostrarTooltip(tooltip, event, nombre, datos, opts = {}) {
 
   const picked = pickDatos(datos, metricKey, labelUser);
 
-  tooltip
-    .html(`
+  let html;
+  if (picked.isPoblacion) {
+    // Solo muestra la población (no tasa ni enfermeras)
+    html = `
+      <strong>${nombre}</strong><br>
+      ${picked.label}: ${fmtNum(picked.poblacion)}
+    `;
+  } else {
+    html = `
       <strong>${nombre}</strong><br>
       ${picked.label}: ${fmtRate(picked.tasa)}<br>
       Población: ${fmtNum(picked.poblacion)}<br>
       Enfermeras: ${fmtNum(picked.enfermeras)}
-    `)
+    `;
+  }
+
+  tooltip
+    .html(html)
     .style("left", (event.pageX + 10) + "px")
     .style("top", (event.pageY - 28) + "px")
     .style("display", "block");
@@ -112,7 +144,7 @@ export function ocultarTooltip(tooltip) {
 // ==============================
 export function mostrarTooltipClinica(tooltip, event, campos) {
   const safe = v => (v != null && String(v).trim() !== "" ? String(v).trim() : "N/D");
-  const fmt6 = n => (Number.isFinite(n) ? Number(n).toFixed(6) : "N/D");
+  const fmt6  = n => (Number.isFinite(n) ? Number(n).toFixed(6) : "N/D");
 
   const html = `
     <strong>Clínica de catéter</strong><br>
