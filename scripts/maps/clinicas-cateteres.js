@@ -17,6 +17,15 @@ import {
 import { renderZoomControles } from '../componentes/zoom-controles.js';
 
 // ==============================
+// COLORES DE CLÍNICAS
+// ==============================
+
+// Catéter
+const COLOR_CLINICA_CATETER        = "#1e5b4f"; // verde base
+const COLOR_CLINICA_CATETER_HOVER  = "#004d40"; // verde oscuro hover
+const COLOR_CLINICA_CATETER_BORDER = "#ffffff"; // borde blanco
+
+// ==============================
 // CREAR SVG + TOOLTIP + HOST LEYENDA
 // ==============================
 const { svg, g } = crearSVGBase(
@@ -261,40 +270,36 @@ Promise.all([
   const radioEscalado = el => (RADIO_BASE  * (el.classList.contains("is-hover") ? HOVER_FACTOR : 1)) / currentK;
   const bordeEscalado = el => (STROKE_BASE * (el.classList.contains("is-hover") ? HOVER_FACTOR : 1)) / currentK;
 
-  gMarcadores.selectAll("circle")
-    .data(puntos)
-    .enter()
-    .append("circle")
-    .attr("cx", d => projection([d.lon, d.lat])[0])
-    .attr("cy", d => projection([d.lon, d.lat])[1])
-    .attr("r", function() { return radioEscalado(this); })
-    .attr("fill", "#002f2a")
-    .attr("stroke", "#fff")
-    .attr("stroke-width", function() { return bordeEscalado(this); })
-    .style("cursor", "pointer")
-    .on("mouseover", function (event, d) {
-      event.stopPropagation();
-      d3.select(this)
-        .classed("is-hover", true)
-        .attr("fill", "#002f2a")
-        .attr("r",            () => radioEscalado(this))
-        .attr("stroke-width", () => bordeEscalado(this));
-      mostrarTooltipClinica(tooltip, event, d);
-    })
-    .on("mousemove", function (event) {
-      event.stopPropagation();
-      tooltip.style("left", (event.pageX + 10) + "px")
-             .style("top",  (event.pageY - 28) + "px");
-    })
-    .on("mouseout", function (event) {
-      event.stopPropagation();
-      d3.select(this)
-        .classed("is-hover", false)
-        .attr("fill", "#1e5b4f")
-        .attr("r",            () => radioEscalado(this))
-        .attr("stroke-width", () => bordeEscalado(this));
-      ocultarTooltip(tooltip);
-    });
+gMarcadores.selectAll("circle")
+  .data(puntos)
+  .enter()
+  .append("circle")
+  .attr("cx", d => projection([d.lon, d.lat])[0])
+  .attr("cy", d => projection([d.lon, d.lat])[1])
+  .attr("r", function() { return radioEscalado(this); })
+  .attr("fill", COLOR_CLINICA_CATETER)               // normal
+  .attr("stroke", COLOR_CLINICA_CATETER_BORDER)      // borde
+  .attr("stroke-width", function() { return bordeEscalado(this); })
+  .style("cursor", "pointer")
+  .on("mouseover", function (event, d) {
+    event.stopPropagation();
+    d3.select(this)
+      .classed("is-hover", true)
+      .attr("fill", COLOR_CLINICA_CATETER_HOVER)     // hover
+      .attr("r",            () => radioEscalado(this))
+      .attr("stroke-width", () => bordeEscalado(this));
+    mostrarTooltipClinica(tooltip, event, d);
+  })
+  .on("mouseout", function (event) {
+    event.stopPropagation();
+    d3.select(this)
+      .classed("is-hover", false)
+      .attr("fill", COLOR_CLINICA_CATETER)           // normal
+      .attr("r",            () => radioEscalado(this))
+      .attr("stroke-width", () => bordeEscalado(this));
+    ocultarTooltip(tooltip);
+  });
+
 
 // ==============================
 // ZOOM + Botones (componente lo cablea a TU zoom)
