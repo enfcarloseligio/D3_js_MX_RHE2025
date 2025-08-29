@@ -1,3 +1,4 @@
+// scripts/maps/republica-mexicana.js
 // ==============================
 // IMPORTACIONES
 // ==============================
@@ -9,7 +10,7 @@ import {
 } from '../utils/config-mapa.js';
 import { renderZoomControles } from '../componentes/zoom-controles.js';
 import { renderTablaNacional, attachExcelButton } from '../utils/tablas.js';
-
+import { normalizarDataset } from '../utils/normalizacion.js';
 
 // ==============================
 // CREACIÓN DEL MAPA
@@ -24,34 +25,12 @@ const legendHost = svg.append("g").attr("id", "legend-host");
 Promise.all([
   d3.json("../data/maps/republica-mexicana.geojson"),
   d3.csv("../data/rate/republica-mexicana.csv")
-]).then(([geoData, tasas]) => {
+]).then(([geoData, tasasRaw]) => {
 
   // ==============================
-  // Normalización de columnas
+  // Normalización de columnas (GLOBAL)
   // ==============================
-  tasas.forEach(d => {
-    d["población"] = +(("población" in d && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
-    d.poblacion = d["población"];
-
-    d.enfermeras_total = +((d.enfermeras_total ?? d.enfermeras) || 0);
-    d.tasa_total       = +((d.tasa_total ?? d.tasa) || 0);
-
-    d.enfermeras_primer   = +(d.enfermeras_primer   || 0);
-    d.tasa_primer         = +(d.tasa_primer         || 0);
-    d.enfermeras_segundo  = +(d.enfermeras_segundo  || 0);
-    d.tasa_segundo        = +(d.tasa_segundo        || 0);
-    d.enfermeras_tercer   = +(d.enfermeras_tercer   || 0);
-    d.tasa_tercer         = +(d.tasa_tercer         || 0);
-    d.enfermeras_apoyo    = +(d.enfermeras_apoyo    || 0);
-    d.tasa_apoyo          = +(d.tasa_apoyo          || 0);
-    d.enfermeras_escuelas = +(d.enfermeras_escuelas || 0);
-    d.tasa_escuelas       = +(d.tasa_escuelas       || 0);
-
-    d.enfermeras_no_aplica   = +(d.enfermeras_no_aplica   || 0);
-    d.tasa_no_aplica         = +(d.tasa_no_aplica         || 0);
-    d.enfermeras_no_asignado = +(d.enfermeras_no_asignado || 0);
-    d.tasa_no_asignado       = +(d.tasa_no_asignado       || 0);
-  });
+  let tasas = normalizarDataset(tasasRaw, { scope: "nacional", extras: [] });
 
   // ==============================
   // Diccionario por estado
@@ -249,34 +228,31 @@ Promise.all([
     paso: 0.5
   });
 
-// ==============================
-// TABLA NACIONAL (usa utils/tablas.js)
-// ==============================
-
-// 1) Crear la tabla una vez con la métrica actual
-const tablaNac = renderTablaNacional({
-  data: tasas,              // CSV ya normalizado arriba
-  METRICAS,                 // objeto de métricas del mapa
-  metricKey: currentMetric, // ej. 'tasa_total'
-  hostSelector: "#tabla-contenido"
-});
-
-// 2) Botón Excel (lee la tabla actual del DOM)
-attachExcelButton({
-  buttonSelector: "#descargar-excel",
-  filenameBase: "enfermeras-nacional.xlsx",
-  sheetName: "Resumen" // (opcional; si quieres que cambie por métrica, también sirve fijo)
-});
-
-// 3) Sincronizar selector de métrica: mapa + tabla
-const sel = document.getElementById("sel-metrica");
-if (sel) {
-  sel.addEventListener("change", () => {
-    currentMetric = sel.value;
-    recomputeAndPaint();           // repinta el mapa
-    tablaNac.update(currentMetric); // repinta la tabla
+  // ==============================
+  // TABLA NACIONAL (usa utils/tablas.js)
+  // ==============================
+  const tablaNac = renderTablaNacional({
+    data: tasas,              // CSV normalizado
+    METRICAS,                 // objeto de métricas del mapa
+    metricKey: currentMetric, // ej. 'tasa_total'
+    hostSelector: "#tabla-contenido"
   });
-}
+
+  attachExcelButton({
+    buttonSelector: "#descargar-excel",
+    filenameBase: "enfermeras-nacional.xlsx",
+    sheetName: "Resumen"
+  });
+
+  // Sincronizar selector: mapa + tabla
+  const sel = document.getElementById("sel-metrica");
+  if (sel) {
+    sel.addEventListener("change", () => {
+      currentMetric = sel.value;
+      recomputeAndPaint();           // mapa
+      tablaNac.update(currentMetric); // tabla
+    });
+  }
 
   // ==============================
   // DESCARGA PNG
@@ -286,9 +262,13 @@ if (sel) {
     const etiquetas = document.getElementById("etiquetas-municipios");
     if (etiquetas) etiquetas.style.display = "none";
     setTimeout(() => {
-      descargarComoPNG("#mapa-nacional svg", "mapa-enfermeras-mexico-sin-nombres.png", MAP_WIDTH, MAP_HEIGHT, {
-        titulo
-      });
+      descargarComoPNG(
+        "#mapa-nacional svg",
+        "mapa-enfermeras-mexico-sin-nombres.png",
+        MAP_WIDTH,
+        MAP_HEIGHT,
+        { titulo }
+      );
     }, 100);
   });
 
@@ -297,9 +277,13 @@ if (sel) {
     const etiquetas = document.getElementById("etiquetas-municipios");
     if (etiquetas) etiquetas.style.display = "block";
     setTimeout(() => {
-      descargarComoPNG("#mapa-nacional svg", "mapa-enfermeras-mexico-con-nombres.png", MAP_WIDTH, MAP_HEIGHT, {
-        titulo
-      });
+      descargarComoPNG(
+        "#mapa-nacional svg",
+        "mapa-enfermeras-mexico-con-nombres.png",
+        MAP_WIDTH,
+        MAP_HEIGHT,
+        { titulo }
+      );
       etiquetas.style.display = "none";
     }, 100);
   });
