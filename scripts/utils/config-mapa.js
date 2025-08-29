@@ -251,23 +251,48 @@ export function activarZoomConBotones(svg, g, {
 // ==============================
 // DESCARGAR SVG COMO PNG
 // ==============================
+// ============ NUEVO helper: título según métrica ============
+export function construirTitulo(metricKey, { entidad = null, year = 2025 } = {}) {
+  const lugar = entidad ? `en ${entidad}` : "en México";
+  const sufijo = `(${year})`;
+
+  const map = {
+    // Tasas
+    "tasa_total":       `Tasa de enfermeras por cada mil habitantes ${lugar} ${sufijo}`,
+    "tasa_primer":      `Tasa de enfermeras por cada mil habitantes en 1er nivel de atención ${lugar} ${sufijo}`,
+    "tasa_segundo":     `Tasa de enfermeras por cada mil habitantes en 2º nivel de atención ${lugar} ${sufijo}`,
+    "tasa_tercer":      `Tasa de enfermeras por cada mil habitantes en 3er nivel de atención ${lugar} ${sufijo}`,
+    "tasa_apoyo":       `Tasa de enfermeras por cada mil habitantes en establecimientos de apoyo ${lugar} ${sufijo}`,
+    "tasa_escuelas":    `Tasa de enfermeras por cada mil habitantes en escuelas ${lugar} ${sufijo}`,
+    "tasa_no_aplica":   `Registros “No aplica” de enfermería ${lugar} ${sufijo}`,
+    "tasa_no_asignado": `Registros “No asignado” de enfermería ${lugar} ${sufijo}`,
+
+    // Población (no dice “tasa”)
+    "poblacion":        `Población ${lugar} ${sufijo}`,
+  };
+
+  return map[metricKey] || `Distribución de enfermería ${lugar} ${sufijo}`;
+}
+
+// ============ ACTUALIZA descargarComoPNG para aceptar título/cita ============
 export function descargarComoPNG(
   svgSelector,
   nombreArchivo = "mapa.png",
   width = MAP_WIDTH,
   height = MAP_HEIGHT,
-  nombreEntidad = ""
+  opts = {}
 ) {
+  const { titulo, cita } = opts;  // <- NUEVO: podemos pasar título/cita personalizados
+
   const svgElement = document.querySelector(svgSelector);
   if (!svgElement) return;
 
-  // Extiende el viewBox para título y cita
   const extraTop = 50;
   const extraBottom = 40;
   const newHeight = height + extraTop + extraBottom;
   svgElement.setAttribute("viewBox", `0 ${-extraTop} ${width} ${newHeight}`);
 
-  // Fondo y título
+  // Fondo superior
   const fondoTitulo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondoTitulo.setAttribute("x", -100);
   fondoTitulo.setAttribute("y", -extraTop);
@@ -278,21 +303,21 @@ export function descargarComoPNG(
   fondoTitulo.setAttribute("id", "fondo-titulo");
   svgElement.appendChild(fondoTitulo);
 
-  const titulo = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  titulo.setAttribute("x", width / 2);
-  titulo.setAttribute("y", -extraTop + 30);
-  titulo.setAttribute("text-anchor", "middle");
-  titulo.setAttribute("font-size", "20px");
-  titulo.setAttribute("font-family", "'Noto Sans', sans-serif");
-  titulo.setAttribute("font-weight", "bold");
-  titulo.setAttribute("fill", "#111");
-  titulo.setAttribute("id", "titulo-descarga");
-  titulo.textContent = nombreEntidad
-    ? `Tasa de enfermeras por cada mil habitantes en ${nombreEntidad} (2025)`
-    : `Tasa de enfermeras por cada mil habitantes (2025)`;
-  svgElement.appendChild(titulo);
+  // Título (dinámico si lo envían)
+  const tituloNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  tituloNode.setAttribute("x", width / 2);
+  tituloNode.setAttribute("y", -extraTop + 30);
+  tituloNode.setAttribute("text-anchor", "middle");
+  tituloNode.setAttribute("font-size", "20px");
+  tituloNode.setAttribute("font-family", "'Noto Sans', sans-serif");
+  tituloNode.setAttribute("font-weight", "bold");
+  tituloNode.setAttribute("fill", "#111");
+  tituloNode.setAttribute("id", "titulo-descarga");
+  tituloNode.textContent =
+    titulo || `Tasa de enfermeras por cada mil habitantes (2025)`; // ← fallback previo
+  svgElement.appendChild(tituloNode);
 
-  // Cita
+  // Fondo inferior
   const fondo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondo.setAttribute("x", -100);
   fondo.setAttribute("y", height);
@@ -303,21 +328,21 @@ export function descargarComoPNG(
   fondo.setAttribute("id", "fondo-cita");
   svgElement.appendChild(fondo);
 
-  const cita = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  cita.setAttribute("x", width / 2);
-  cita.setAttribute("y", height + 20);
-  cita.setAttribute("text-anchor", "middle");
-  cita.setAttribute("dominant-baseline", "middle");
-  cita.setAttribute("font-size", "14px");
-  cita.setAttribute("fill", "#333");
-  cita.setAttribute("font-family", "'Noto Sans', sans-serif");
-  cita.setAttribute("id", "marca-descarga");
+  // Cita (dinámica si la envían)
+  const citaNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  citaNode.setAttribute("x", width / 2);
+  citaNode.setAttribute("y", height + 20);
+  citaNode.setAttribute("text-anchor", "middle");
+  citaNode.setAttribute("dominant-baseline", "middle");
+  citaNode.setAttribute("font-size", "14px");
+  citaNode.setAttribute("fill", "#333");
+  citaNode.setAttribute("font-family", "'Noto Sans', sans-serif");
+  citaNode.setAttribute("id", "marca-descarga");
   const fecha = new Date().toISOString().split("T")[0];
-  cita.textContent =
-    `Fuente: Secretaría de Salud. (enero, 2025). ` +
-    `Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. ` +
-    `Consultado el ${fecha}`;
-  svgElement.appendChild(cita);
+  citaNode.textContent =
+    cita ||
+    `Fuente: Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. Consultado el ${fecha}`;
+  svgElement.appendChild(citaNode);
 
   // Serializar y descargar
   const serializer = new XMLSerializer();
