@@ -10,6 +10,16 @@ export const MARCADORES_TIPOS = {
   // Agrega más aquí… p. ej. ONCOLOGIA, PEDIATRIA, etc.
 };
 
+// Nombre legible por tipo de marcador (para títulos/leyendas)
+export const MARCADOR_NOMBRES = {
+  [MARCADORES_TIPOS.CATETER]: "clínicas de catéter",
+  [MARCADORES_TIPOS.HERIDAS]: "clínicas de heridas",
+};
+
+export function nombreTipoMarcador(tipo) {
+  return MARCADOR_NOMBRES[tipo] || "clínicas";
+}
+
 // Paletas por tipo de marcador
 export const MARCADOR_ESTILOS = {
   [MARCADORES_TIPOS.CATETER]: {

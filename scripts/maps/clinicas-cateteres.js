@@ -1,62 +1,57 @@
 // scripts/maps/clinicas-cateteres.js
+
 // ==============================
 // IMPORTACIONES
 // ==============================
 import {
   crearTooltip,
-  mostrarTooltip,       // tooltip para ESTADOS (tasas / población)
-  ocultarTooltip,
-  mostrarTooltipClinica // tooltip para CLÍNICAS (CLUES, institución, etc.)
+  mostrarTooltip,
+  ocultarTooltip
 } from '../utils/tooltip.js';
 
 import {
   crearSVGBase, MAP_WIDTH, MAP_HEIGHT,
-  crearLeyenda, descargarComoPNG
+  crearLeyenda, descargarComoPNG, crearEtiquetaMunicipio,
+  construirTituloClinicas
 } from '../utils/config-mapa.js';
 
 import { renderZoomControles } from '../componentes/zoom-controles.js';
+import { renderTablaNacional, attachExcelButton } from '../utils/tablas.js';
+import { normalizarDataset } from '../utils/normalizacion.js';
 
-// 🎨 Catálogo de tipos + helper para estilos de marcadores
-import { MARCADORES_TIPOS, getEstiloMarcador } from '../utils/marcadores.js';
+import {
+  pintarMarcadores,
+  MARCADORES_TIPOS
+} from '../utils/marcadores.js';
 
-// Fallback por si el import/clave falla
-const DEFAULT_CLINICA = { fill: '#1e5b4f', hover: '#004d40', stroke: '#ffffff' };
-const ESTILO_CLINICA = (() => {
-  try {
-    const st = getEstiloMarcador(MARCADORES_TIPOS.CATETER);
-    return st || DEFAULT_CLINICA;
-  } catch (_) {
-    console.warn('[clinicas-cateteres] No se pudieron leer colores desde marcadores.js. Uso defaults.');
-    return DEFAULT_CLINICA;
-  }
-})();
+// ==============================
+// HOST DEL MAPA (fallback si #mapa-clinicas no existe)
+// ==============================
+const HOST_SEL = document.querySelector("#mapa-clinicas") ? "#mapa-clinicas" : "#mapa-nacional";
 
 // ==============================
 // CREAR SVG + TOOLTIP + HOST LEYENDA
 // ==============================
 const { svg, g } = crearSVGBase(
-  "#mapa-clinicas",
-  "Mapa nacional de tasas de enfermeras con clínicas de catéter"
+  HOST_SEL,
+  "Mapa nacional de tasas de enfermeras con clínicas"
 );
 const tooltip = crearTooltip();
 const legendHost = svg.append("g").attr("id", "legend-host");
 
-// Paletas y colores
+// ==============================
+// CONSTANTES DE COLOR (relleno de estados)
+// ==============================
+const COLOR_CERO = '#bfbfbf';   // 0.00 para tasas
+const COLOR_SIN  = '#d9d9d9';   // s/d
+
 const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen'];
 const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'];
-const COLOR_CERO = '#bfbfbf';  // para 0.00 (solo en tasas)
-const COLOR_SIN  = '#d9d9d9';  // s/d
 
-// Parser números (soporta coma decimal)
-const toNum = v => {
-  if (v == null) return NaN;
-  const n = +String(v).trim().replace(",", ".");
-  return Number.isFinite(n) ? n : NaN;
-};
+// Solo ids 1..32 para cálculos del mapa nacional
+const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
 
-// ==============================
-// CONFIG DE MÉTRICAS
-// ==============================
+// Métricas disponibles
 const METRICAS = {
   tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",       countKey: "enfermeras_total",     palette: "tasas" },
   tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",      countKey: "enfermeras_primer",    palette: "tasas" },
@@ -70,16 +65,21 @@ const METRICAS = {
 };
 let currentMetric = "tasa_total";
 
-// Solo ids 1..32 para cortes (excluye 8888/9999)
-const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
+// ==============================
+// RUTAS DE DATOS (ajusta si cambian)
+// ==============================
+const RUTA_GEO      = "../data/maps/republica-mexicana.geojson";
+const RUTA_TASAS    = "../data/rate/republica-mexicana.csv";
+const RUTA_CLINICAS = "../data/clinicas/clinicas-cateteres.csv"; // Asegúrate que exista este archivo
 
 // ==============================
 // CARGA DE DATOS
 // ==============================
 Promise.all([
-  d3.json("../data/maps/republica-mexicana.geojson"),
-  d3.csv("../data/rate/republica-mexicana.csv"),
-  d3.csv("../data/clinicas/clinicas-cateteres.csv", d => ({
+  d3.json(RUTA_GEO),
+  d3.csv(RUTA_TASAS),
+  d3.csv(RUTA_CLINICAS, d => ({
+    // Limpieza básica del catálogo de clínicas
     clues: (d.CLUES || "").trim().toUpperCase(),
     inst_cod: (d.Clave_Institucion || "").trim().toUpperCase(),
     institucion: (d.Institucion || "").trim(),
@@ -90,59 +90,43 @@ Promise.all([
     loc_cod: String(d.CLAVE_LOCALIDAD || "").padStart(4, "0"),
     localidad: (d.LOCALIDAD || "").trim(),
     unidad: (d.NOMBRE_UNIDAD || "").trim(),
-    lat: toNum(d.LATITUD),
-    lon: toNum(d.LONGITUD),
-    observaciones: (d.Observaciones || "").trim()
+    lat: +String(d.LATITUD || "").replace(",", "."),
+    lon: +String(d.LONGITUD || "").replace(",", "."),
+    observaciones: (d.Observaciones || "").trim(),
+    tipo: MARCADORES_TIPOS.CATETER // tipifica para estilos
   }))
-]).then(([geoData, tasas, clinicas]) => {
+]).then(([geoData, tasasRaw, clinicasRaw]) => {
 
   // ==============================
-  // Normalización “ancha”
+  // Normalización global del CSV de tasas
   // ==============================
-  tasas.forEach(d => {
-    d.población            = +((("población" in d) && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
-    d.poblacion            = d["población"]; // alias sin acento
-    d.enfermeras_total     = +((d.enfermeras_total ?? d.enfermeras) || 0);
-    d.tasa_total           = +((d.tasa_total       ?? d.tasa)       || 0);
-
-    d.enfermeras_primer      = +(d.enfermeras_primer      || 0);
-    d.tasa_primer            = +(d.tasa_primer            || 0);
-    d.enfermeras_segundo     = +(d.enfermeras_segundo     || 0);
-    d.tasa_segundo           = +(d.tasa_segundo           || 0);
-    d.enfermeras_tercer      = +(d.enfermeras_tercer      || 0);
-    d.tasa_tercer            = +(d.tasa_tercer            || 0);
-    d.enfermeras_apoyo       = +(d.enfermeras_apoyo       || 0);
-    d.tasa_apoyo             = +(d.tasa_apoyo             || 0);
-    d.enfermeras_escuelas    = +(d.enfermeras_escuelas    || 0);
-    d.tasa_escuelas          = +(d.tasa_escuelas          || 0);
-    d.enfermeras_no_aplica   = +(d.enfermeras_no_aplica   || 0);
-    d.tasa_no_aplica         = +(d.tasa_no_aplica         || 0);
-    d.enfermeras_no_asignado = +(d.enfermeras_no_asignado || 0);
-    d.tasa_no_asignado       = +(d.tasa_no_asignado       || 0);
-  });
+  const tasas = normalizarDataset(tasasRaw, { scope: "nacional", extras: [] });
 
   // ==============================
-  // Diccionario por estado
+  // Diccionario por estado (para polígonos/tooltip)
   // ==============================
   const dataByEstado = {};
   tasas.forEach(d => {
-    const estado = (d.estado || d.Estado || "").trim();
+    const estado = (d.estado || "").trim();
     if (!estado) return;
     dataByEstado[estado] = {
       poblacion: d.poblacion,
-      enfermeras_total:       d.enfermeras_total,       tasa_total:       d.tasa_total,
-      enfermeras_primer:      d.enfermeras_primer,      tasa_primer:      d.tasa_primer,
-      enfermeras_segundo:     d.enfermeras_segundo,     tasa_segundo:     d.tasa_segundo,
-      enfermeras_tercer:      d.enfermeras_tercer,      tasa_tercer:      d.tasa_tercer,
-      enfermeras_apoyo:       d.enfermeras_apoyo,       tasa_apoyo:       d.tasa_apoyo,
-      enfermeras_escuelas:    d.enfermeras_escuelas,    tasa_escuelas:    d.tasa_escuelas,
+
+      enfermeras_total:   d.enfermeras_total,   tasa_total:   d.tasa_total,
+      enfermeras_primer:  d.enfermeras_primer,  tasa_primer:  d.tasa_primer,
+      enfermeras_segundo: d.enfermeras_segundo, tasa_segundo: d.tasa_segundo,
+      enfermeras_tercer:  d.enfermeras_tercer,  tasa_tercer:  d.tasa_tercer,
+
+      enfermeras_apoyo:   d.enfermeras_apoyo,   tasa_apoyo:   d.tasa_apoyo,
+      enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas,
+
       enfermeras_no_aplica:   d.enfermeras_no_aplica,   tasa_no_aplica:   d.tasa_no_aplica,
       enfermeras_no_asignado: d.enfermeras_no_asignado, tasa_no_asignado: d.tasa_no_asignado
     };
   });
 
   // ==============================
-  // Cuartiles + valores
+  // Utilidades de cuartiles
   // ==============================
   function computeQuartiles(vals) {
     vals = vals.filter(Number.isFinite).sort((a, b) => a - b);
@@ -163,12 +147,12 @@ Promise.all([
     const key = METRICAS[metricKey].tasaKey; // 'tasa_*' o 'poblacion'
     return tasas
       .filter(d => idsEntidades.has(String(d.id)))
-      .map(d => +d[key === "poblacion" ? "poblacion" : key])
+      .map(d => +d[key])
       .filter(Number.isFinite);
   }
 
   // ==============================
-  // Proyección y paths
+  // Proyección y paths de estados
   // ==============================
   const projection = d3.geoMercator()
     .scale(2000)
@@ -177,9 +161,6 @@ Promise.all([
 
   const path = d3.geoPath().projection(projection);
 
-  // ==============================
-  // Estados base
-  // ==============================
   const estados = g.selectAll("path")
     .data(geoData.features)
     .join("path")
@@ -187,7 +168,7 @@ Promise.all([
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.5)
     .attr("vector-effect", "non-scaling-stroke")
-    .style("cursor", "default");
+    .attr("fill", COLOR_SIN);
 
   // ==============================
   // Pintado + leyenda
@@ -195,11 +176,16 @@ Promise.all([
   let min, q1, q2, q3, max;
   let colorScale;
 
+  function paletteFor(metricKey) {
+    const pal = METRICAS[metricKey].palette;
+    return pal === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
+  }
+
   function recomputeAndPaint() {
     ({ min, q1, q2, q3, max } = computeQuartiles(valoresDeMetrica(currentMetric)));
 
+    const PALETTE = paletteFor(currentMetric);
     const esPoblacion = currentMetric === "poblacion";
-    const PALETTE = esPoblacion ? COLORES_POBLACION : COLORES_TASAS;
 
     colorScale = d3.scaleLinear()
       .domain([min, q1, q2, q3, max])
@@ -213,11 +199,13 @@ Promise.all([
         if (!item) return COLOR_SIN;
         const v = +item[METRICAS[currentMetric].tasaKey];
         if (!Number.isFinite(v)) return COLOR_SIN;
-        if (!esPoblacion && v <= 0) return COLOR_CERO; // CERO solo para tasas
+        if (!esPoblacion && v <= 0) return COLOR_CERO; // '0.00' solo aplica a tasas
         return colorScale(v);
       });
 
-    // Leyenda
+    legendHost.selectAll("*").remove();
+
+    // Pasos únicos (redondeo distinto para población vs. tasas)
     const pasosCrudos = [min, q1, q2, q3, max];
     const pasos = [];
     const seen = new Set();
@@ -262,73 +250,66 @@ Promise.all([
     });
 
   // ==============================
-  // Capa de marcadores de clínicas
+  // CAPA DE MARCADORES (clínicas)
   // ==============================
-  const puntos = clinicas.filter(d => Number.isFinite(d.lat) && Number.isFinite(d.lon));
-  const gMarcadores = g.append("g").attr("class", "capa-clinicas");
-  gMarcadores.raise();
+  const puntos = clinicasRaw.filter(d =>
+    Number.isFinite(d.lat) && Number.isFinite(d.lon)
+  );
 
-  const RADIO_BASE   = 5;
-  const STROKE_BASE  = 1.1;
-  const HOVER_FACTOR = 1.35;
-  let currentK = 1;
+  const marcadoresCtl = pintarMarcadores(g, puntos, projection, {
+    tipo: MARCADORES_TIPOS.CATETER,
+    radioBase: 5,
+    strokeBase: 1.1,
+  });
 
-  const radioEscalado = el => (RADIO_BASE  * (el.classList.contains("is-hover") ? HOVER_FACTOR : 1)) / currentK;
-  const bordeEscalado = el => (STROKE_BASE * (el.classList.contains("is-hover") ? HOVER_FACTOR : 1)) / currentK;
+  // Tooltip simple para clínicas (local, sin depender de otro export)
+  function mostrarTooltipClinicaLocal(tooltipSel, event, d) {
+    const titulo = d.unidad || d.clinica || "Clínica";
+    const cuerpo = `
+      <div><strong>${titulo}</strong></div>
+      <div>${d.municipio || ""}${d.municipio && d.entidad ? ", " : ""}${d.entidad || ""}</div>
+      <div>${d.institucion || ""}${d.inst_cod ? " (" + d.inst_cod + ")" : ""}</div>
+      <div>Lat: ${Number(d.lat).toFixed(4)}, Lon: ${Number(d.lon).toFixed(4)}</div>
+      ${d.observaciones ? `<div style="margin-top:4px;">${d.observaciones}</div>` : "" }
+    `;
+    tooltipSel.html(cuerpo)
+      .style("opacity", 1)
+      .style("left", (event.pageX + 10) + "px")
+      .style("top",  (event.pageY - 28) + "px");
+  }
 
-  gMarcadores.selectAll("circle")
-    .data(puntos)
-    .enter()
-    .append("circle")
-    .attr("cx", d => projection([d.lon, d.lat])[0])
-    .attr("cy", d => projection([d.lon, d.lat])[1])
-    .attr("r", function() { return radioEscalado(this); })
-    .attr("fill", ESTILO_CLINICA.fill)          // ← colores desde marcadores.js
-    .attr("stroke", ESTILO_CLINICA.stroke)
-    .attr("stroke-width", function() { return bordeEscalado(this); })
-    .style("cursor", "pointer")
+  marcadoresCtl.selection
     .on("mouseover", function (event, d) {
       event.stopPropagation();
-      d3.select(this)
-        .classed("is-hover", true)
-        .attr("fill", ESTILO_CLINICA.hover)
-        .attr("r",            () => radioEscalado(this))
-        .attr("stroke-width", () => bordeEscalado(this));
-      mostrarTooltipClinica(tooltip, event, d);
+      mostrarTooltipClinicaLocal(tooltip, event, d);
     })
     .on("mousemove", function (event) {
       event.stopPropagation();
       tooltip.style("left", (event.pageX + 10) + "px")
              .style("top",  (event.pageY - 28) + "px");
     })
-    .on("mouseout", function () {
-      d3.select(this)
-        .classed("is-hover", false)
-        .attr("fill", ESTILO_CLINICA.fill)
-        .attr("r",            () => radioEscalado(this))
-        .attr("stroke-width", () => bordeEscalado(this));
+    .on("mouseout", function (event) {
+      event.stopPropagation();
       ocultarTooltip(tooltip);
     });
 
   // ==============================
-  // ZOOM + Botones (componente cableado a TU zoom)
+  // ZOOM (y tamaño visual estable de marcadores)
   // ==============================
   const zoom = d3.zoom()
     .scaleExtent([1, 20])
     .on("zoom", (event) => {
-      currentK = event.transform.k;
       g.attr("transform", event.transform);
-      gMarcadores.selectAll("circle")
-        .attr("r",            function () { return radioEscalado(this); })
-        .attr("stroke-width", function () { return bordeEscalado(this); });
+      marcadoresCtl.updateZoom(event.transform.k);
     });
 
   svg.call(zoom);
 
-  renderZoomControles("#mapa-clinicas", {
+  // Botones conectados (si tu componente los usa)
+  renderZoomControles(HOST_SEL, {
     svg,
     g,
-    zoom,                  // el componente conecta +/−/⟳ a ESTA instancia
+    zoom,
     showHome: true,
     homeHref: "../entidades/republica-mexicana.html",
     idsPrefix: "clin",
@@ -338,33 +319,86 @@ Promise.all([
   });
 
   // ==============================
-  // Render inicial + selector
+  // Etiquetas (apagadas por default)
+  // ==============================
+  const labelsGroup = g.append("g")
+    .attr("id", "etiquetas-municipios")
+    .style("display", "none");
+
+  const nombresUnicos = new Set();
+  geoData.features.forEach(d => {
+    const nombre = (d.properties.NOMBRE || "").trim();
+    if (!nombre || nombresUnicos.has(nombre)) return;
+    const [x, y] = path.centroid(d);
+    crearEtiquetaMunicipio(labelsGroup, nombre, x, y, { fontSize: "6px" });
+    nombresUnicos.add(nombre);
+  });
+
+  // ==============================
+  // Primera renderización y selector de métrica
   // ==============================
   const sel = document.getElementById("sel-metrica");
   if (sel) currentMetric = sel.value || currentMetric;
-
   recomputeAndPaint();
 
   if (sel) {
     sel.addEventListener("change", () => {
       currentMetric = sel.value;
       recomputeAndPaint();
+      tablaNac.update(currentMetric);
     });
   }
 
   // ==============================
-  // DESCARGA PNG
+  // TABLA NACIONAL (usa utils/tablas.js)
   // ==============================
+  const tablaNac = renderTablaNacional({
+    data: tasas,
+    METRICAS,
+    metricKey: currentMetric,
+    hostSelector: "#tabla-contenido"
+  });
+
+  attachExcelButton({
+    buttonSelector: "#descargar-excel",
+    filenameBase: "enfermeras-nacional.xlsx",
+    sheetName: "Resumen"
+  });
+
+  // ==============================
+  // DESCARGA PNG (título para clínicas)
+  // ==============================
+  const nombreTipo = "clínicas de catéter";
+  const year = 2025;
+
   document.getElementById("descargar-sin-etiquetas")?.addEventListener("click", () => {
-    descargarComoPNG("#mapa-clinicas svg", "mapa-clinicas-sin-nombres.png", MAP_WIDTH, MAP_HEIGHT, "México");
+    const titulo = construirTituloClinicas(currentMetric, { nombreTipo, entidad: null, year });
+    const etiquetas = document.getElementById("etiquetas-municipios");
+    if (etiquetas) etiquetas.style.display = "none";
+    setTimeout(() => {
+      descargarComoPNG(
+        `${HOST_SEL} svg`,
+        "clinicas-cateteres-sin-nombres.png",
+        MAP_WIDTH,
+        MAP_HEIGHT,
+        { titulo }
+      );
+    }, 100);
   });
 
   document.getElementById("descargar-con-etiquetas")?.addEventListener("click", () => {
+    const titulo = construirTituloClinicas(currentMetric, { nombreTipo, entidad: null, year });
     const etiquetas = document.getElementById("etiquetas-municipios");
     if (etiquetas) etiquetas.style.display = "block";
     setTimeout(() => {
-      descargarComoPNG("#mapa-clinicas svg", "mapa-clinicas-con-nombres.png", MAP_WIDTH, MAP_HEIGHT, "México");
-      if (etiquetas) etiquetas.style.display = "none";
+      descargarComoPNG(
+        `${HOST_SEL} svg`,
+        "clinicas-cateteres-con-nombres.png",
+        MAP_WIDTH,
+        MAP_HEIGHT,
+        { titulo }
+      );
+      etiquetas.style.display = "none";
     }, 100);
   });
 

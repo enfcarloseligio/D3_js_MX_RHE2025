@@ -301,7 +301,6 @@ export function descargarComoPNG(
     for (const w of words) {
       const test = line ? `${line} ${w}` : w;
       if (test.length > maxChars && lines.length < 1) {
-        // si ya es largo, guarda la primera línea
         lines.push(line);
         line = w;
       } else {
@@ -310,7 +309,6 @@ export function descargarComoPNG(
     }
     if (line) lines.push(line);
 
-    // si salen más de 2 líneas, junta lo que sobre en la segunda
     if (lines.length > 2) {
       lines[1] = lines.slice(1).join(" ");
       return lines.slice(0, 2);
@@ -418,4 +416,35 @@ export function descargarComoPNG(
     svgElement.querySelector("#marca-descarga")?.remove();
     svgElement.querySelector("#fondo-cita")?.remove();
   }, 200);
+}
+
+// Título para mapas con clínicas (combina clínicas + métrica seleccionada)
+export function construirTituloClinicas(
+  metricKey,
+  {
+    nombreTipo = "clínicas",             // p. ej. "clínicas de catéter"
+    entidad = null,                      // p. ej. "Tamaulipas"
+    year = new Date().getFullYear(),     // 2025 por defecto actual
+  } = {}
+) {
+  const lugar = entidad ? `en ${entidad}` : "en México";
+  const sufijo = `(${year})`;
+
+  const baseTasa = `Distribución de ${nombreTipo} y tasa de enfermeras por cada mil habitantes`;
+  const map = {
+    // Tasas
+    "tasa_total":       `${baseTasa} ${lugar} ${sufijo}`,
+    "tasa_primer":      `${baseTasa} en 1er nivel de atención ${lugar} ${sufijo}`,
+    "tasa_segundo":     `${baseTasa} en 2º nivel de atención ${lugar} ${sufijo}`,
+    "tasa_tercer":      `${baseTasa} en 3er nivel de atención ${lugar} ${sufijo}`,
+    "tasa_apoyo":       `${baseTasa} en establecimientos de apoyo ${lugar} ${sufijo}`,
+    "tasa_escuelas":    `${baseTasa} en escuelas ${lugar} ${sufijo}`,
+    "tasa_no_aplica":   `Distribución de ${nombreTipo} y registros “No aplica” de enfermería ${lugar} ${sufijo}`,
+    "tasa_no_asignado": `Distribución de ${nombreTipo} y registros “No asignado” de enfermería ${lugar} ${sufijo}`,
+
+    // Población
+    "poblacion":        `Distribución de ${nombreTipo} y población ${lugar} ${sufijo}`,
+  };
+
+  return map[metricKey] || `Distribución de ${nombreTipo} y enfermería ${lugar} ${sufijo}`;
 }
