@@ -274,7 +274,7 @@ export function construirTitulo(metricKey, { entidad = null, year = 2025 } = {})
   return map[metricKey] || `Distribución de enfermería ${lugar} ${sufijo}`;
 }
 
-// ============ ACTUALIZA descargarComoPNG para aceptar título/cita ============
+// ============ ACTUALIZA descargarComoPNG con wrap en 2 líneas ============
 export function descargarComoPNG(
   svgSelector,
   nombreArchivo = "mapa.png",
@@ -282,17 +282,45 @@ export function descargarComoPNG(
   height = MAP_HEIGHT,
   opts = {}
 ) {
-  const { titulo, cita } = opts;  // <- NUEVO: podemos pasar título/cita personalizados
+  const { titulo, cita } = opts;
 
   const svgElement = document.querySelector(svgSelector);
   if (!svgElement) return;
 
+  // --- Parámetros visuales ---
   const extraTop = 50;
-  const extraBottom = 40;
-  const newHeight = height + extraTop + extraBottom;
-  svgElement.setAttribute("viewBox", `0 ${-extraTop} ${width} ${newHeight}`);
+  const citaFontSize = 13;
+  const citaLineHeight = 18;
 
-  // Fondo superior
+  // Helper: wrap en máximo 2 líneas
+  function wrapDosLineas(str, maxChars = 130) {
+    const words = String(str).split(/\s+/);
+    const lines = [];
+    let line = "";
+
+    for (const w of words) {
+      const test = line ? `${line} ${w}` : w;
+      if (test.length > maxChars && lines.length < 1) {
+        // si ya es largo, guarda la primera línea
+        lines.push(line);
+        line = w;
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+
+    // si salen más de 2 líneas, junta lo que sobre en la segunda
+    if (lines.length > 2) {
+      lines[1] = lines.slice(1).join(" ");
+      return lines.slice(0, 2);
+    }
+    return lines;
+  }
+
+  // ---------- TÍTULO ----------
+  svgElement.setAttribute("viewBox", `0 ${-extraTop} ${width} ${height + extraTop + 80}`);
+
   const fondoTitulo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
   fondoTitulo.setAttribute("x", -100);
   fondoTitulo.setAttribute("y", -extraTop);
@@ -303,7 +331,6 @@ export function descargarComoPNG(
   fondoTitulo.setAttribute("id", "fondo-titulo");
   svgElement.appendChild(fondoTitulo);
 
-  // Título (dinámico si lo envían)
   const tituloNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
   tituloNode.setAttribute("x", width / 2);
   tituloNode.setAttribute("y", -extraTop + 30);
@@ -314,39 +341,53 @@ export function descargarComoPNG(
   tituloNode.setAttribute("fill", "#111");
   tituloNode.setAttribute("id", "titulo-descarga");
   tituloNode.textContent =
-    titulo || `Tasa de enfermeras por cada mil habitantes (2025)`; // ← fallback previo
+    titulo || `Tasa de enfermeras por cada mil habitantes (2025)`;
   svgElement.appendChild(tituloNode);
 
-  // Fondo inferior
-  const fondo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  fondo.setAttribute("x", -100);
-  fondo.setAttribute("y", height);
-  fondo.setAttribute("width", width + 200);
-  fondo.setAttribute("height", extraBottom);
-  fondo.setAttribute("fill", "white");
-  fondo.setAttribute("fill-opacity", "0.7");
-  fondo.setAttribute("id", "fondo-cita");
-  svgElement.appendChild(fondo);
+  // ---------- CITA ----------
+  const fecha = new Date().toISOString().split("T")[0];
+  const citaTexto =
+    cita ||
+    `Dirección de Enfermería & Dirección General de Calidad y Educación en Salud. (2025). ` +
+    `Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. ` +
+    `Secretaría de Salud. Consultado el ${fecha}`;
 
-  // Cita (dinámica si la envían)
+  const lineas = wrapDosLineas(citaTexto, 130);
+  const extraBottom = lineas.length * citaLineHeight + 16;
+  svgElement.setAttribute("viewBox", `0 ${-extraTop} ${width} ${height + extraTop + extraBottom}`);
+
+  const fondoCita = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  fondoCita.setAttribute("x", -100);
+  fondoCita.setAttribute("y", height);
+  fondoCita.setAttribute("width", width + 200);
+  fondoCita.setAttribute("height", extraBottom);
+  fondoCita.setAttribute("fill", "white");
+  fondoCita.setAttribute("fill-opacity", "0.7");
+  fondoCita.setAttribute("id", "fondo-cita");
+  svgElement.appendChild(fondoCita);
+
   const citaNode = document.createElementNS("http://www.w3.org/2000/svg", "text");
   citaNode.setAttribute("x", width / 2);
-  citaNode.setAttribute("y", height + 20);
+  citaNode.setAttribute("y", height + 12);
   citaNode.setAttribute("text-anchor", "middle");
-  citaNode.setAttribute("dominant-baseline", "middle");
-  citaNode.setAttribute("font-size", "14px");
+  citaNode.setAttribute("font-size", citaFontSize + "px");
   citaNode.setAttribute("fill", "#333");
   citaNode.setAttribute("font-family", "'Noto Sans', sans-serif");
   citaNode.setAttribute("id", "marca-descarga");
-  const fecha = new Date().toISOString().split("T")[0];
-  citaNode.textContent =
-    cita ||
-    `Fuente: Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema informático]. Consultado el ${fecha}`;
   svgElement.appendChild(citaNode);
 
-  // Serializar y descargar
+  lineas.forEach((ln, i) => {
+    const tspan = document.createElementNS("http://www.w3.org/2000/svg", "tspan");
+    tspan.setAttribute("x", width / 2);
+    tspan.setAttribute("dy", i === 0 ? "0" : String(citaLineHeight));
+    tspan.textContent = ln;
+    citaNode.appendChild(tspan);
+  });
+
+  // ---------- Serializar y descargar ----------
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgElement);
+
   const canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
@@ -368,7 +409,6 @@ export function descargarComoPNG(
     a.click();
     document.body.removeChild(a);
   };
-
   image.src = url;
 
   // Limpieza

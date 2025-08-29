@@ -234,7 +234,7 @@ Promise.all([
     nombresUnicos.add(nombre);
   });
 
-  // Primera renderización
+  // Primera renderización (mapa)
   recomputeAndPaint();
 
   // Inyecta y conecta los controles de zoom
@@ -247,14 +247,173 @@ Promise.all([
     paso: 0.5
   });
 
-  // Selector de métricas
-  const sel = document.getElementById("sel-metrica");
-  if (sel) {
-    sel.addEventListener("change", () => {
-      currentMetric = sel.value;
-      recomputeAndPaint();
-    });
+// ==============================
+// TABLA NACIONAL (dinámica por entidad)
+// ==============================
+let _tbodyRef = null;
+
+// Crea la estructura de la tabla una sola vez
+function initTablaNacional() {
+  const host = document.getElementById("tabla-contenido");
+  if (!host) return;
+
+  host.innerHTML = "";
+  const tabla = document.createElement("table");
+  tabla.className = "tabla-datos";
+
+  const thead = document.createElement("thead");
+  thead.innerHTML = `
+    <tr>
+      <th><span class="flecha-orden"></span>Estado</th>
+      <th><span class="flecha-orden"></span>Enfermeras</th>
+      <th><span class="flecha-orden"></span>Población</th>
+      <th><span class="flecha-orden"></span>Tasa por cada mil habitantes</th>
+    </tr>
+  `;
+
+  const tbody = document.createElement("tbody");
+  _tbodyRef = tbody;
+
+  tabla.appendChild(thead);
+  tabla.appendChild(tbody);
+  const wrap = document.createElement("div");
+  wrap.className = "tabla-scroll";
+  wrap.appendChild(tabla);
+  host.appendChild(wrap);
+
+  activarOrdenamientoTabla(tabla);
+}
+
+// Rellena/actualiza la tabla con la métrica seleccionada
+function updateTablaNacional(metricKey = "tasa_total") {
+  if (!_tbodyRef) return;
+
+  const def = METRICAS[metricKey] || METRICAS["tasa_total"];
+  const { tasaKey, countKey } = def;
+  const esPob = metricKey === "poblacion";
+
+  // Incluye TODAS las filas del CSV (1..32 + 34 + 8888 + 9999)
+  const filas = tasas.map(d => {
+    const id     = String(d.id || d.ID || "").trim();
+    const estado = (d.estado || d.Estado || "").trim();
+    const pobl   = +d.poblacion || 0;
+    const enf    = esPob ? null : (+d[countKey] || 0);
+    const tasa   = esPob ? null : (+d[tasaKey]  || 0);
+    return { id, estado, pobl, enf, tasa };
+  });
+
+  // Prioridad: 1..32 por nombre; después 34, 8888, 9999 (en ese orden)
+  function prioridad(id) {
+    const n = Number(id);
+    if (Number.isFinite(n) && n >= 1 && n <= 32) return 0; // estados
+    if (id === "34")   return 1; // laborando en el extranjero
+    if (id === "8888") return 2; // no disponible
+    if (id === "9999") return 3; // total república
+    return 4; // otros (por si aparecen)
   }
+
+  filas.sort((a, b) => {
+    const pa = prioridad(a.id);
+    const pb = prioridad(b.id);
+    if (pa !== pb) return pa - pb;
+    // Dentro de 1..32: orden alfabético
+    if (pa === 0) return a.estado.localeCompare(b.estado, 'es', { sensitivity: 'base' });
+    // Especiales ya tienen orden por prioridad
+    return 0;
+  });
+
+  _tbodyRef.innerHTML = "";
+  filas.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.dataset.id = row.id;
+    if (row.id === "9999") tr.classList.add("fila-total"); // opcional: estiliza en CSS
+
+    tr.innerHTML = `
+      <td class="municipio">${row.estado || "—"}</td>
+      <td class="numero">${esPob ? "—" : (Number.isFinite(row.enf) ? Number(row.enf).toLocaleString("es-MX") : "—")}</td>
+      <td class="numero">${Number.isFinite(row.pobl) ? Number(row.pobl).toLocaleString("es-MX") : "—"}</td>
+      <td class="numero">${esPob ? "—" : (Number.isFinite(row.tasa) ? row.tasa.toFixed(2) : "—")}</td>
+    `;
+    _tbodyRef.appendChild(tr);
+  });
+}
+
+// Ordenamiento por encabezados (texto o número)
+function activarOrdenamientoTabla(tabla) {
+  const ths = tabla.querySelectorAll("thead th");
+  ths.forEach((th, idx) => {
+    th.style.cursor = "pointer";
+    th.setAttribute("data-orden", "asc");
+    th.addEventListener("click", () => {
+      const ordenActual = th.getAttribute("data-orden");
+      const nuevoOrden = ordenActual === "asc" ? "desc" : "asc";
+
+      tabla.querySelectorAll(".flecha-orden").forEach(span => span.textContent = "");
+      const flecha = th.querySelector(".flecha-orden");
+      if (flecha) flecha.textContent = nuevoOrden === "asc" ? "▲" : "▼";
+
+      const filas = Array.from(tabla.querySelectorAll("tbody tr"));
+
+      // Separamos especiales para mantenerlos al final tras ordenar
+      const especiales = filas.filter(f => ["34", "8888", "9999"].includes(f.dataset.id));
+      const normales   = filas.filter(f => !["34", "8888", "9999"].includes(f.dataset.id));
+
+      normales.sort((a, b) => {
+        const ta = a.children[idx].textContent.trim();
+        const tb = b.children[idx].textContent.trim();
+        const na = ta.replace(/[^\d.-]/g, "");
+        const nb = tb.replace(/[^\d.-]/g, "");
+        const isNum = v => /^-?\d+(\.\d+)?$/.test(v);
+
+        if (isNum(na) && isNum(nb)) {
+          const va = parseFloat(na), vb = parseFloat(nb);
+          return (va - vb) * (nuevoOrden === "asc" ? 1 : -1);
+        }
+        return ta.localeCompare(tb, 'es', { sensitivity: 'base' }) * (nuevoOrden === "asc" ? 1 : -1);
+      });
+
+      const tbody = tabla.querySelector("tbody");
+      // Pegamos primero normales (ya ordenados) y luego especiales en orden fijo 34, 8888, 9999
+      normales.forEach(f => tbody.appendChild(f));
+      ["34", "8888", "9999"].forEach(id => {
+        especiales.filter(f => f.dataset.id === id).forEach(f => tbody.appendChild(f));
+      });
+
+      th.setAttribute("data-orden", nuevoOrden);
+    });
+  });
+}
+
+// Descarga Excel de la tabla
+function habilitarDescargaExcel(nombreArchivo = "enfermeras-nacional.xlsx") {
+  const boton = document.getElementById("descargar-excel");
+  if (!boton) return;
+  boton.addEventListener("click", () => {
+    const tabla = document.querySelector("#tabla-contenido table");
+    if (!tabla) return;
+
+    const metricKey = (document.getElementById("sel-metrica")?.value) || "tasa_total";
+    const nombreBonito = (METRICAS[metricKey]?.label || "Total").replace(/\s+/g, " ");
+    const wb = XLSX.utils.table_to_book(tabla, { sheet: `Resumen ${nombreBonito}` });
+    const nombre = nombreArchivo.replace(".xlsx", ` - ${nombreBonito}.xlsx`);
+    XLSX.writeFile(wb, nombre);
+  });
+}
+
+// Inicializa y pinta la tabla una vez
+initTablaNacional();
+updateTablaNacional(currentMetric);
+habilitarDescargaExcel();
+
+// Selector de métricas (sincroniza mapa + tabla)
+const sel = document.getElementById("sel-metrica");
+if (sel) {
+  sel.addEventListener("change", () => {
+    currentMetric = sel.value;
+    recomputeAndPaint();               // mapa
+    updateTablaNacional(currentMetric); // tabla
+  });
+}
 
   // ==============================
   // DESCARGA PNG
@@ -281,6 +440,7 @@ Promise.all([
       etiquetas.style.display = "none";
     }, 100);
   });
+
 }).catch(error => {
   console.error("Error al cargar los datos del mapa nacional:", error);
 });
