@@ -162,71 +162,123 @@ Promise.all([
     });
   }
 
-  // ==============================
-  // Proyección y paths
-  // ==============================
-  const projection = d3.geoMercator()
-    .scale(2000)
-    .center([-102, 24])
-    .translate([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
+// ==============================
+// Proyección y paths (con doble clic a entidad)
+// ==============================
+const projection = d3.geoMercator()
+  .scale(2000)
+  .center([-102, 24])
+  .translate([MAP_WIDTH / 2, MAP_HEIGHT / 2]);
 
-  const path = d3.geoPath().projection(projection);
+const path = d3.geoPath().projection(projection);
 
-  g.selectAll("path")
-    .data(geoData.features)
-    .join("path")
-    .attr("d", path)
-    .attr("stroke", "#fff")
-    .attr("stroke-width", 0.5)
-    .attr("vector-effect", "non-scaling-stroke")
-    .on("mouseover", function (event, d) {
-      const nombre = d.properties.NOMBRE.trim();
-      const item = dataByEstado[nombre];
+// Enlaces por entidad (ajusta rutas si cambiaste nombres de archivos)
+const enlacesEntidad = {
+  "Aguascalientes": "../entidades/aguascalientes.html",
+  "Baja California": "../entidades/baja-california.html",
+  "Baja California Sur": "../entidades/baja-california-sur.html",
+  "Campeche": "../entidades/campeche.html",
+  "Chiapas": "../entidades/chiapas.html",
+  "Chihuahua": "../entidades/chihuahua.html",
+  "Ciudad de México": "../entidades/ciudad-de-mexico.html",
+  "Coahuila": "../entidades/coahuila.html",
+  "Colima": "../entidades/colima.html",
+  "Durango": "../entidades/durango.html",
+  "Estado de México": "../entidades/estado-de-mexico.html",
+  "Guanajuato": "../entidades/guanajuato.html",
+  "Guerrero": "../entidades/guerrero.html",
+  "Hidalgo": "../entidades/hidalgo.html",
+  "Jalisco": "../entidades/jalisco.html",
+  "Michoacán": "../entidades/michoacan.html",
+  "Morelos": "../entidades/morelos.html",
+  "Nayarit": "../entidades/nayarit.html",
+  "Nuevo León": "../entidades/nuevo-leon.html",
+  "Oaxaca": "../entidades/oaxaca.html",
+  "Puebla": "../entidades/puebla.html",
+  "Querétaro": "../entidades/queretaro.html",
+  "Quintana Roo": "../entidades/quintana-roo.html",
+  "San Luis Potosí": "../entidades/san-luis-potosi.html",
+  "Sinaloa": "../entidades/sinaloa.html",
+  "Sonora": "../entidades/sonora.html",
+  "Tabasco": "../entidades/tabasco.html",
+  "Tamaulipas": "../entidades/tamaulipas.html",
+  "Tlaxcala": "../entidades/tlaxcala.html",
+  "Veracruz de Ignacio de la Llave": "../entidades/veracruz.html",
+  "Yucatán": "../entidades/yucatan.html",
+  "Zacatecas": "../entidades/zacatecas.html"
+};
 
-      d3.select(this).attr("stroke-width", 1.5);
+let ultimoClick = 0;
 
-      const isPob = currentMetric === "poblacion";
-      mostrarTooltip(tooltip, event, nombre, item, {
-        metricKey: METRICAS[currentMetric].tasaKey,
-        label: METRICAS[currentMetric].label,
-        onlyPopulation: isPob
-      });
-    })
-    .on("mousemove", event => {
-      tooltip.style("left", (event.pageX + 10) + "px")
-             .style("top", (event.pageY - 28) + "px");
-    })
-    .on("mouseout", function () {
-      ocultarTooltip(tooltip);
-      d3.select(this).attr("stroke-width", 0.5);
+// Dibujo de los estados
+g.selectAll("path")
+  .data(geoData.features)
+  .join("path")
+  .attr("d", path)
+  .attr("stroke", "#fff")
+  .attr("stroke-width", 0.5)
+  .attr("vector-effect", "non-scaling-stroke")
+  .attr("fill", COLOR_SIN) // ⟵ fill inicial por si la primera pintura se demora/falla
+  .on("mouseover", function (event, d) {
+    const nombre = (d.properties.NOMBRE || "").trim();
+    const item = dataByEstado[nombre];
+
+    d3.select(this).attr("stroke-width", 1.5);
+
+    mostrarTooltip(tooltip, event, nombre, item, {
+      metricKey: METRICAS[currentMetric].tasaKey,
+      label: METRICAS[currentMetric].label,
+      onlyPopulation: currentMetric === "poblacion"
     });
-
-  // Etiquetas (apagadas por default)
-  const labelsGroup = g.append("g")
-    .attr("id", "etiquetas-municipios")
-    .style("display", "none");
-
-  const nombresUnicos = new Set();
-  geoData.features.forEach(d => {
-    const nombre = d.properties.NOMBRE.trim();
-    if (nombresUnicos.has(nombre)) return;
-    const [x, y] = path.centroid(d);
-    crearEtiquetaMunicipio(labelsGroup, nombre, x, y, { fontSize: "6px" });
-    nombresUnicos.add(nombre);
+  })
+  .on("mousemove", event => {
+    tooltip.style("left", (event.pageX + 10) + "px")
+           .style("top",  (event.pageY - 28) + "px");
+  })
+  .on("mouseout", function () {
+    ocultarTooltip(tooltip);
+    d3.select(this).attr("stroke-width", 0.5);
+  })
+  .on("click", function (event, d) {
+    // Doble clic para abrir la página de la entidad
+    const ahora = Date.now();
+    const nombre = (d.properties.NOMBRE || "").trim();
+    const enlace = enlacesEntidad[nombre];
+    if (ahora - ultimoClick < 350 && enlace) {
+      window.location.href = enlace;
+    }
+    ultimoClick = ahora;
   });
 
-  // Primera renderización (mapa)
-  recomputeAndPaint();
+// ==============================
+// Etiquetas (apagadas por default)
+// ==============================
+const labelsGroup = g.append("g")
+  .attr("id", "etiquetas-municipios")
+  .style("display", "none");
 
-  // Inyecta y conecta los controles de zoom
-  renderZoomControles("#mapa-nacional", {
-    svg,
-    g,
-    showHome: false,
-    escalaMin: 1,
-    escalaMax: 8,
-    paso: 0.5
-  });
+const nombresUnicos = new Set();
+geoData.features.forEach(d => {
+  const nombre = (d.properties.NOMBRE || "").trim();
+  if (!nombre || nombresUnicos.has(nombre)) return;
+  const [x, y] = path.centroid(d);
+  crearEtiquetaMunicipio(labelsGroup, nombre, x, y, { fontSize: "6px" });
+  nombresUnicos.add(nombre);
+});
+
+// Primera renderización (aplica colores según métrica)
+recomputeAndPaint();
+
+// Controles de zoom
+renderZoomControles("#mapa-nacional", {
+  svg,
+  g,
+  showHome: false,
+  escalaMin: 1,
+  escalaMax: 8,
+  paso: 0.5
+});
+
 
   // ==============================
   // TABLA NACIONAL (usa utils/tablas.js)
