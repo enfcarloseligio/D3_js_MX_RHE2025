@@ -6,7 +6,8 @@
 import {
   crearTooltip,
   mostrarTooltip,
-  ocultarTooltip
+  ocultarTooltip,
+  mostrarTooltipClinica
 } from '../utils/tooltip.js';
 
 import {
@@ -21,8 +22,7 @@ import { normalizarDataset } from '../utils/normalizacion.js';
 
 import {
   pintarMarcadores,
-  MARCADORES_TIPOS,
-  crearLeyendaMarcadores   // ⟵ NUEVO IMPORT
+  MARCADORES_TIPOS
 } from '../utils/marcadores.js';
 
 // ==============================
@@ -71,7 +71,7 @@ let currentMetric = "tasa_total";
 // ==============================
 const RUTA_GEO      = "../data/maps/republica-mexicana.geojson";
 const RUTA_TASAS    = "../data/rate/republica-mexicana.csv";
-const RUTA_CLINICAS = "../data/clinicas/clinicas-cateteres.csv"; // Asegúrate que exista este archivo
+const RUTA_CLINICAS = "../data/clinicas/clinicas-cateteres.csv";
 
 // ==============================
 // CARGA DE DATOS
@@ -250,62 +250,73 @@ Promise.all([
       d3.select(this).attr("stroke-width", 0.5);
     });
 
-// ==============================
-// CAPA DE MARCADORES (clínicas)
-// ==============================
-const puntos = clinicasRaw.filter(d =>
-  Number.isFinite(d.lat) && Number.isFinite(d.lon)
-);
+  // ==============================
+  // CAPA DE MARCADORES (clínicas)
+  // ==============================
+  const puntos = clinicasRaw.filter(d =>
+    Number.isFinite(d.lat) && Number.isFinite(d.lon)
+  );
 
-const marcadoresCtl = pintarMarcadores(g, puntos, projection, {
-  tipo: MARCADORES_TIPOS.CATETER,
-  radioBase: 5,
-  strokeBase: 1.1,
-});
-
-// Tooltip simple para clínicas (local, sin depender de otro export)
-function mostrarTooltipClinicaLocal(tooltipSel, event, d) {
-  const titulo = d.unidad || d.clinica || "Clínica";
-  const cuerpo = `
-    <div><strong>${titulo}</strong></div>
-    <div>${d.municipio || ""}${d.municipio && d.entidad ? ", " : ""}${d.entidad || ""}</div>
-    <div>${d.institucion || ""}${d.inst_cod ? " (" + d.inst_cod + ")" : ""}</div>
-    <div>Lat: ${Number(d.lat).toFixed(4)}, Lon: ${Number(d.lon).toFixed(4)}</div>
-    ${d.observaciones ? `<div style="margin-top:4px;">${d.observaciones}</div>` : "" }
-  `;
-  tooltipSel.html(cuerpo)
-    .style("opacity", 1)
-    .style("left", (event.pageX + 10) + "px")
-    .style("top",  (event.pageY - 28) + "px");
-}
-
-marcadoresCtl.selection
-  .on("mouseover", function (event, d) {
-    event.stopPropagation();
-    mostrarTooltipClinicaLocal(tooltip, event, d);
-  })
-  .on("mousemove", function (event) {
-    event.stopPropagation();
-    tooltip.style("left", (event.pageX + 10) + "px")
-           .style("top",  (event.pageY - 28) + "px");
-  })
-  .on("mouseout", function (event) {
-    event.stopPropagation();
-    ocultarTooltip(tooltip);
+  const marcadoresCtl = pintarMarcadores(g, puntos, projection, {
+    tipo: MARCADORES_TIPOS.CATETER,
+    radioBase: 5,
+    strokeBase: 1.1,
   });
 
-// ---- LEYENDA DE MARCADORES (abajo-izquierda) ----
-const tiposPresentes = Array.from(new Set(puntos.map(p => p.tipo))).filter(Boolean);
-if (tiposPresentes.length) {
-  crearLeyendaMarcadores(svg, tiposPresentes, {
-    x: 24,                    // margen izquierdo
-    y: MAP_HEIGHT - 96,       // posición vertical (pegada abajo)
-    title: "Marcadores",        // título de la leyenda
-    dx: 0,                    // offset horizontal interno
-    dyStep: 20,               // separación entre filas
-  });
-}
+  // Tooltip de clínicas
+  marcadoresCtl.selection
+    .on("mouseover", function (event, d) {
+      event.stopPropagation();
+      mostrarTooltipClinica(tooltip, event, d);
+    })
+    .on("mousemove", function (event) {
+      event.stopPropagation();
+      tooltip.style("left", (event.pageX + 10) + "px")
+             .style("top",  (event.pageY - 28) + "px");
+    })
+    .on("mouseout", function (event) {
+      event.stopPropagation();
+      ocultarTooltip(tooltip);
+    });
 
+  // ======= LEYENDA DE MARCADORES (chip dinámico) =======
+  function dibujarLeyendaMarcadores() {
+    svg.selectAll(".leyenda-marcadores").remove();
+
+    // Toma los estilos reales del primer marcador para garantizar coincidencia
+    const sampleNode = marcadoresCtl.selection.node();
+    const fill   = sampleNode ? sampleNode.getAttribute("fill")   : "#0a7a56";
+    const stroke = sampleNode ? sampleNode.getAttribute("stroke") : "#0b2e2e";
+
+    const root = svg.append("g")
+      .attr("class", "leyenda-marcadores")
+      .attr("transform", `translate(${30}, ${MAP_HEIGHT - 110})`);
+
+    // Título
+    root.append("text")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("font-size", "13px")
+      .attr("font-weight", "700")
+      .style("font-family", "'Noto Sans', sans-serif")
+      .text("Marcadores");
+
+    // Ítem
+    const item = root.append("g").attr("transform", "translate(0, 16)");
+    item.append("circle")
+      .attr("cx", 8).attr("cy", 6).attr("r", 6)
+      .attr("fill", fill)
+      .attr("stroke", stroke)
+      .attr("stroke-width", 1.5);
+
+    item.append("text")
+      .attr("x", 22).attr("y", 10)
+      .attr("font-size", "12px")
+      .style("font-family", "'Noto Sans', sans-serif")
+      .text("Clínicas de catéteres");
+  }
+
+  dibujarLeyendaMarcadores();
 
   // ==============================
   // ZOOM (y tamaño visual estable de marcadores)
@@ -319,7 +330,7 @@ if (tiposPresentes.length) {
 
   svg.call(zoom);
 
-  // Botones conectados (si tu componente los usa)
+  // Botones conectados
   renderZoomControles(HOST_SEL, {
     svg,
     g,
@@ -364,7 +375,7 @@ if (tiposPresentes.length) {
   }
 
   // ==============================
-  // TABLA NACIONAL (usa utils/tablas.js)
+  // TABLA NACIONAL
   // ==============================
   const tablaNac = renderTablaNacional({
     data: tasas,
