@@ -3,18 +3,25 @@
 // ==============================
 // IMPORTACIONES
 // ==============================
-import { crearTooltip, mostrarTooltip, ocultarTooltip } from '../utils/tooltip.js';
+import {
+  crearTooltip,
+  mostrarTooltip,
+  ocultarTooltip,
+  mostrarTooltipClinica, // tooltip igual al de clínicas de catéteres
+} from '../utils/tooltip.js';
+
 import {
   crearSVGBase, MAP_WIDTH, MAP_HEIGHT,
   crearLeyenda, descargarComoPNG, crearEtiquetaMunicipio,
   construirTitulo
 } from '../utils/config-mapa.js';
+
 import { renderZoomControles } from '../componentes/zoom-controles.js';
 import { renderTablaNacional, attachExcelButton } from '../utils/tablas.js';
 import { normalizarDataset } from '../utils/normalizacion.js';
 import { urlEntidad } from '../utils/enlaces.js';
 
-// NUEVO: selector multi de marcadores + rutas/normalizador + estilos/leyenda
+// Selector multi de marcadores + rutas/normalizador + estilos/leyenda
 import { renderMarcadoresControl } from '../componentes/marcadores-control.js';
 import { RUTAS_MARCADORES, normalizarClinicaRow } from '../utils/marcadores.config.js';
 import {
@@ -25,6 +32,7 @@ import {
 } from '../utils/marcadores.js';
 
 // ==============================
+//
 // CREACIÓN DEL MAPA
 // ==============================
 const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución nacional de enfermeras");
@@ -43,7 +51,7 @@ const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'
 // ids válidos de entidad para el cálculo de cuartiles (1..32)
 const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
 
-// Definición de métricas (claves ya normalizadas por normalizacion.js)
+// Definición de métricas
 const METRICAS = {
   tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",       countKey: "enfermeras_total",     palette: "tasas" },
   tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",      countKey: "enfermeras_primer",    palette: "tasas" },
@@ -65,52 +73,40 @@ Promise.all([
   d3.csv("../data/rate/republica-mexicana.csv")
 ]).then(([geoData, tasasRaw]) => {
 
-  // ==============================
-  // Normalización (GLOBAL)
-  // ==============================
+  // Normalización
   const tasas = normalizarDataset(tasasRaw, { scope: "nacional", extras: [] });
 
-  // ==============================
   // Diccionario por estado
-  // ==============================
   const dataByEstado = {};
   tasas.forEach(d => {
     const estado = (d.estado || "").trim();
     if (!estado) return;
     dataByEstado[estado] = {
       poblacion: d.poblacion,
-
       enfermeras_total:   d.enfermeras_total,   tasa_total:   d.tasa_total,
       enfermeras_primer:  d.enfermeras_primer,  tasa_primer:  d.tasa_primer,
       enfermeras_segundo: d.enfermeras_segundo, tasa_segundo: d.tasa_segundo,
       enfermeras_tercer:  d.enfermeras_tercer,  tasa_tercer:  d.tasa_tercer,
-
       enfermeras_apoyo:   d.enfermeras_apoyo,   tasa_apoyo:   d.tasa_apoyo,
       enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas,
-
       enfermeras_no_aplica:   d.enfermeras_no_aplica,   tasa_no_aplica:   d.tasa_no_aplica,
       enfermeras_no_asignado: d.enfermeras_no_asignado, tasa_no_asignado: d.tasa_no_asignado
     };
   });
 
-  // ==============================
-  // Utilidades de cuartiles
-  // ==============================
+  // Cuartiles
   function computeQuartiles(vals) {
     vals = vals.filter(Number.isFinite).sort((a, b) => a - b);
     if (!vals.length) return { min: 0, q1: 1, q2: 2, q3: 3, max: 4 };
-
     let min = vals[0], max = vals[vals.length - 1];
     let q1  = d3.quantileSorted(vals, 0.25);
     let q2  = d3.quantileSorted(vals, 0.50);
     let q3  = d3.quantileSorted(vals, 0.75);
-
     const eps = 1e-6;
     if (!(q1 > min)) q1 = min + eps;
     if (!(q2 > q1)) q2 = q1 + eps;
     if (!(q3 > q2)) q3 = q2 + eps;
     if (!(max > q3)) max = q3 + eps;
-
     return { min, q1, q2, q3, max };
   }
 
@@ -175,9 +171,7 @@ Promise.all([
     });
   }
 
-  // ==============================
-  // Proyección y paths (doble clic -> entidad)
-  // ==============================
+  // Proyección y paths (doble click -> entidad)
   const projection = d3.geoMercator()
     .scale(2000)
     .center([-102, 24])
@@ -195,13 +189,11 @@ Promise.all([
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.5)
     .attr("vector-effect", "non-scaling-stroke")
-    .attr("fill", COLOR_SIN) // por si la primera pintura tarda
+    .attr("fill", COLOR_SIN)
     .on("mouseover", function (event, d) {
       const nombre = (d.properties.NOMBRE || "").trim();
       const item = dataByEstado[nombre];
-
       d3.select(this).attr("stroke-width", 1.5);
-
       mostrarTooltip(tooltip, event, nombre, item, {
         metricKey: METRICAS[currentMetric].tasaKey,
         label: METRICAS[currentMetric].label,
@@ -228,11 +220,10 @@ Promise.all([
 
   // ==============================
   // CAPA DE MARCADORES (multi-tipo)
-  // ==============================
+// ==============================
   const gMarcadores = g.append("g").attr("class", "capa-marcadores");
   let marcadoresCtlPorTipo = new Map(); // tipo -> controlador pintarMarcadores
 
-  // Carga un CSV por tipo, normaliza y pinta; devuelve controlador
   async function cargarYPintarTipo(tipo) {
     const ruta = RUTAS_MARCADORES[tipo];
     if (!ruta) return null;
@@ -243,22 +234,12 @@ Promise.all([
       .filter(d => Number.isFinite(d.lat) && Number.isFinite(d.lon));
 
     const ctl = pintarMarcadores(gMarcadores, puntos, projection, { tipo });
-    // tooltips de clínica
+
+    // Tooltips de clínica (misma vista que en “Clínicas de catéteres”)
     ctl.selection
       .on("mouseover", function (event, d) {
         event.stopPropagation();
-        const titulo = d.unidad || d.clinica || "Clínica";
-        const cuerpo = `
-          <div><strong>${titulo}</strong></div>
-          <div>${d.municipio || ""}${d.municipio && d.entidad ? ", " : ""}${d.entidad || ""}</div>
-          <div>${d.institucion || ""}${d.inst_cod ? " (" + d.inst_cod + ")" : ""}</div>
-          <div>Lat: ${Number(d.lat).toFixed(4)}, Lon: ${Number(d.lon).toFixed(4)}</div>
-          ${d.observaciones ? `<div style="margin-top:4px;">${d.observaciones}</div>` : "" }
-        `;
-        tooltip.html(cuerpo)
-          .style("opacity", 1)
-          .style("left", (event.pageX + 10) + "px")
-          .style("top",  (event.pageY - 28) + "px");
+        mostrarTooltipClinica(tooltip, event, d);
       })
       .on("mousemove", function (event) {
         event.stopPropagation();
@@ -273,7 +254,6 @@ Promise.all([
     return ctl;
   }
 
-  // Actualiza marcadores según selección (añade/quita y actualiza leyenda)
   async function updateMarcadores(tiposSeleccionados = []) {
     const setSel = new Set(tiposSeleccionados);
 
@@ -293,19 +273,17 @@ Promise.all([
       }
     }
 
-    // Leyenda de marcadores (usa los nombres/colores globales)
+    // Leyenda de marcadores (posición abajo-izquierda)
     const tiposPresentes = Array.from(marcadoresCtlPorTipo.keys());
+    svg.selectAll(".leyenda-marcadores").remove();
     if (tiposPresentes.length) {
       crearLeyendaMarcadores(svg, tiposPresentes, {
-        x: 120,                  // a la derecha de la leyenda de tasas
-        y: MAP_HEIGHT - 90,
+        x: 30,
+        y: MAP_HEIGHT - 110,
         title: "Marcadores",
         dx: 0,
         dyStep: 18
       });
-    } else {
-      // Sin marcadores: limpia la leyenda
-      svg.selectAll(".leyenda-marcadores").remove();
     }
   }
 
@@ -324,11 +302,13 @@ Promise.all([
 
   svg.call(zoom);
 
-  // Controles de zoom
+  // Controles de zoom (sin “home”)
   renderZoomControles("#mapa-nacional", {
     svg,
     g,
+    zoom,            // conecta botones al mismo zoom
     showHome: false,
+    idsPrefix: "rep",
     escalaMin: 1,
     escalaMax: 20,
     paso: 0.5
@@ -351,25 +331,50 @@ Promise.all([
   });
 
   // ==============================
-  // Primera renderización (mapa)
-  // ==============================
+  // --- SELECTOR + TABLA SINCRONIZADOS ---
+// ==============================
+  const selMetrica = document.getElementById("sel-metrica");
+  if (selMetrica) currentMetric = selMetrica.value || currentMetric;
+
+  // Primera pintura del mapa con la métrica actual
   recomputeAndPaint();
 
-  // ==============================
-  // Control de métrica (ya renderizado por indicador-control.js)
-  // ==============================
-  const selMetrica = document.getElementById("sel-metrica");
+  // TABLA NACIONAL (creación)
+  const tablaNac = renderTablaNacional({
+    data: tasas,
+    METRICAS,
+    metricKey: currentMetric,
+    hostSelector: "#tabla-contenido"
+  });
+
+  // Excel
+  attachExcelButton({
+    buttonSelector: "#descargar-excel",
+    filenameBase: "enfermeras-nacional.xlsx",
+    sheetName: "Resumen"
+  });
+
   if (selMetrica) {
-    currentMetric = selMetrica.value || currentMetric;
     selMetrica.addEventListener("change", () => {
       currentMetric = selMetrica.value;
       recomputeAndPaint();
+      tablaNac.update(currentMetric);   // sincroniza tabla con indicador
     });
   }
 
   // ==============================
-  // NUEVO: Control de marcadores (multi)
-  // ==============================
+  // SELECTOR DE MARCADORES (con fallback si no existe el host)
+// ==============================
+  let controlHostSel = "#control-marcadores";
+  if (!document.querySelector(controlHostSel)) {
+    // crea un contenedor al inicio del wrapper del mapa
+    const host = document.createElement("div");
+    host.id = "control-marcadores";
+    host.style.margin = "8px 0";
+    const mapaWrapper = document.querySelector("#mapa-nacional")?.parentElement || document.body;
+    mapaWrapper.insertBefore(host, mapaWrapper.firstChild);
+  }
+
   const itemsMarcadores = Object.values(MARCADORES_TIPOS).map(t => ({
     value: t,
     label: nombreTipoMarcador(t)
@@ -381,33 +386,16 @@ Promise.all([
     size: 4
   });
 
-  // Por defecto, sin marcadores
+  // Por defecto, sin marcadores seleccionados
   marcCtl.setSelected([]);
 
-  // Reaccionar a cambios
   marcCtl.onChange(async () => {
     const seleccion = marcCtl.getSelected();
     await updateMarcadores(seleccion);
   });
 
   // ==============================
-  // TABLA NACIONAL
-  // ==============================
-  const tablaNac = renderTablaNacional({
-    data: tasas,
-    METRICAS,
-    metricKey: currentMetric,
-    hostSelector: "#tabla-contenido"
-  });
-
-  attachExcelButton({
-    buttonSelector: "#descargar-excel",
-    filenameBase: "enfermeras-nacional.xlsx",
-    sheetName: "Resumen"
-  });
-
-  // ==============================
-  // DESCARGA PNG (título dinámico)
+  // DESCARGA PNG
   // ==============================
   document.getElementById("descargar-sin-etiquetas")?.addEventListener("click", () => {
     const titulo = construirTitulo(currentMetric, { entidad: null, year: 2025 });
