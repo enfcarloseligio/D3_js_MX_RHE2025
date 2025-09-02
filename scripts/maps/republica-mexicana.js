@@ -398,19 +398,37 @@ Promise.all([
     hostSelector: "#tabla-contenido"
   });
 
-  // Excel
-  attachExcelButton({
-    buttonSelector: "#descargar-excel",
-    filenameBase: "enfermeras-nacional.xlsx",
-    sheetName: "Resumen"
-  });
+  // === DESCARGA DE EXCEL DINÁMICA (según indicador actual, sin listeners duplicados) ===
+  function resetExcelButtonListener() {
+    const btn = document.querySelector("#descargar-excel");
+    if (!btn) return;
+    const clone = btn.cloneNode(true);          // sin listeners
+    btn.parentNode.replaceChild(clone, btn);    // reemplaza
+  }
 
-  // Cuando cambias el indicador: repinta y ACTUALIZA la tabla
+  function actualizarDescargaExcel() {
+    const metric = METRICAS[currentMetric] || { label: currentMetric };
+    const nombreArchivo = `enfermeras-${currentMetric}.xlsx`;
+    const nombreHoja = metric.label;
+
+    resetExcelButtonListener(); // limpia listeners previos
+    attachExcelButton({
+      buttonSelector: "#descargar-excel",
+      filenameBase: nombreArchivo,
+      sheetName: nombreHoja
+    });
+  }
+
+  // Inicializa con la métrica vigente
+  actualizarDescargaExcel();
+
+  // Cuando cambias el indicador: repinta, actualiza tabla y reconfigura Excel
   if (selMetrica) {
     selMetrica.addEventListener("change", () => {
       currentMetric = selMetrica.value;
       recomputeAndPaint();
-      tablaNac.update(currentMetric);   // sincroniza tabla con indicador
+      tablaNac.update(currentMetric);
+      actualizarDescargaExcel();
     });
   }
 
