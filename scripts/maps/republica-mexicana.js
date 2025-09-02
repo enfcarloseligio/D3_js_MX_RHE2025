@@ -365,15 +365,6 @@ Promise.all([
   // ==============================
   // SELECTOR DE MARCADORES (con fallback si no existe el host)
 // ==============================
-  let controlHostSel = "#control-marcadores";
-  if (!document.querySelector(controlHostSel)) {
-    // crea un contenedor al inicio del wrapper del mapa
-    const host = document.createElement("div");
-    host.id = "control-marcadores";
-    host.style.margin = "8px 0";
-    const mapaWrapper = document.querySelector("#mapa-nacional")?.parentElement || document.body;
-    mapaWrapper.insertBefore(host, mapaWrapper.firstChild);
-  }
 
   const itemsMarcadores = Object.values(MARCADORES_TIPOS).map(t => ({
     value: t,
