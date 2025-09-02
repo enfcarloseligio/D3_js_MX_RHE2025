@@ -1,265 +1,271 @@
+styles.css
+index.html
+LICENSE
+.gitignore
+README.md
+code.js
+estructura.bat
+README_COLABORADORES.md
+.gdignore
+estructura.txt
+desktop.ini
+
+================================
+ pages
+================================
 Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
-El n mero de serie del volumen es 1983-1116
-G:.
-    styles.css
-    index.html
-    estructura.txt
-    LICENSE
-    .gitignore
-    README.md
-    code.js
-    estructura.bat
-    README_COLABORADORES.md
+El número de serie del volumen es 1983-1116
+G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\PAGES
+¦   contactanos.html
+¦   publicaciones.html
+¦   acerca-de.html
+¦   normas.html
+¦   acceso.html
+¦   ayuda.html
+¦   clinicas-cateteres.html
+¦   
++---publicaciones
+¦       datos-abiertos.html
+¦       libros.html
+¦       documentos.html
+¦       
++---acerca-de
+¦       siarhe.html
+¦       antecedentes.html
+¦       atribuciones.html
+¦       mision.html
+¦       vision.html
+¦       directorio.html
+¦       
++---normas
+        normatividad.html
+        operacion.html
+        
+
+================================
+ styles
+================================
+Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
+El número de serie del volumen es 1983-1116
+G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\STYLES
+    mapas.css
+    index.css
+    contactanos.css
     
-+---pages
-        contactanos.html
-        publicaciones.html
-        acerca-de.html
-        normas.html
-        acceso.html
-        ayuda.html
-        clinica-cateter.html
-        
-    +---publicaciones
-            datos-abiertos.html
-            libros.html
-            documentos.html
-            
-    +---acerca-de
-            siarhe.html
-            antecedentes.html
-            atribuciones.html
-            mision.html
-            vision.html
-            directorio.html
-            
-    +---normas
-            normatividad.html
-            operacion.html
-            
-+---styles
-        mapas.css
-        index.css
-        contactanos.css
-        
-+---entidades
-        nayarit.html
-        republica-mexicana.html
-        aguascalientes.html
-        tamaulipas.html
-        zacatecas.html
-        yucatan.html
-        veracruz.html
-        tlaxcala.html
-        tabasco.html
-        sonora.html
-        sinaloa.html
-        san-luis-potosi.html
-        campeche.html
-        baja-california.html
-        chiapas.html
-        baja-california-sur.html
-        ciudad-de-mexico.html
-        chihuahua.html
-        quintana-roo.html
-        queretaro.html
-        puebla.html
-        oaxaca.html
-        nuevo-leon.html
-        morelos.html
-        michoacan.html
-        jalisco.html
-        hidalgo.html
-        guerrero.html
-        guanajuato.html
-        estado-de-mexico.html
-        durango.html
-        colima.html
-        coahuila.html
-        
-+---img
-        texture-r-2.png
-        texture-r-2.svg
-        
+No existe ninguna subcarpeta 
+
+
+================================
+ entidades
+================================
+Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
+El número de serie del volumen es 1983-1116
+G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\ENTIDADES
+    nayarit.html
+    republica-mexicana.html
+    aguascalientes.html
+    tamaulipas.html
+    zacatecas.html
+    yucatan.html
+    veracruz.html
+    tlaxcala.html
+    tabasco.html
+    sonora.html
+    sinaloa.html
+    san-luis-potosi.html
+    campeche.html
+    baja-california.html
+    chiapas.html
+    baja-california-sur.html
+    ciudad-de-mexico.html
+    chihuahua.html
+    quintana-roo.html
+    queretaro.html
+    puebla.html
+    oaxaca.html
+    nuevo-leon.html
+    morelos.html
+    michoacan.html
+    jalisco.html
+    hidalgo.html
+    guerrero.html
+    guanajuato.html
+    estado-de-mexico.html
+    durango.html
+    colima.html
+    coahuila.html
+    
+No existe ninguna subcarpeta 
+
+
+================================
+ img
+================================
+Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
+El número de serie del volumen es 1983-1116
+G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\IMG
+    texture-r-2.png
+    texture-r-2.svg
+    
+No existe ninguna subcarpeta 
+
+
+================================
+ componentes
+================================
+Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
+El número de serie del volumen es 1983-1116
+G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\COMPONENTES
+    header.html
+    banner.html
+    footer.html
+    layout-simple.html
+    layout-entidades.html
+    
+No existe ninguna subcarpeta 
+
+
+================================
+ scripts
+================================
+Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
+El número de serie del volumen es 1983-1116
+G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\SCRIPTS
+¦   inyectar-layout.js
+¦   
++---maps
+¦       republica-mexicana.js
+¦       nayarit.js
+¦       aguascalientes.js
+¦       chihuahua.js
+¦       nuevo-leon.js
+¦       queretaro.js
+¦       campeche.js
+¦       baja-california.js
+¦       ciudad-de-mexico.js
+¦       estado-de-mexico.js
+¦       colima.js
+¦       durango.js
+¦       tlaxcala.js
+¦       coahuila.js
+¦       morelos.js
+¦       oaxaca.js
+¦       puebla.js
+¦       zacatecas.js
+¦       hidalgo.js
+¦       guerrero.js
+¦       sonora.js
+¦       tamaulipas.js
+¦       guanajuato.js
+¦       veracruz.js
+¦       baja-california-sur.js
+¦       sinaloa.js
+¦       michoacan.js
+¦       tabasco.js
+¦       san-luis-potosi.js
+¦       chiapas.js
+¦       jalisco.js
+¦       quintana-roo.js
+¦       yucatan.js
+¦       clinicas-cateteres.js
+¦       
++---utils
+¦       tabla-municipios.js
+¦       config-mapa.js
+¦       tooltip.js
+¦       cargar-indicadores.js
+¦       window.indicadoresSIARHE.js
+¦       marcadores.js
+¦       tablas.js
+¦       normalizacion.js
+¦       enlaces.js
+¦       marcadores.config.js
+¦       
 +---componentes
-        header.html
-        banner.html
-        footer.html
-        layout-simple.html
-        layout-entidades.html
+        indicador-control.js
+        zoom-controles.js
+        marcadores-control.js
         
-+---scripts
-        inyectar-layout.js
+
+================================
+ data
+================================
+Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
+El número de serie del volumen es 1983-1116
+G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\DATA
++---rate
+¦       nayarit.csv
+¦       aguascalientes.csv
+¦       republica-mexicana.csv
+¦       coahuila.csv
+¦       baja-california-sur.csv
+¦       jalisco.csv
+¦       yucatan.csv
+¦       oaxaca.csv
+¦       queretaro.csv
+¦       campeche.csv
+¦       baja-california.csv
+¦       sinaloa.csv
+¦       quintana-roo.csv
+¦       chihuahua.csv
+¦       hidalgo.csv
+¦       colima.csv
+¦       tabasco.csv
+¦       veracruz.csv
+¦       zacatecas.csv
+¦       estado-de-mexico.csv
+¦       tlaxcala.csv
+¦       san-luis-potosi.csv
+¦       guanajuato.csv
+¦       nuevo-leon.csv
+¦       tamaulipas.csv
+¦       ciudad-de-mexico.csv
+¦       puebla.csv
+¦       morelos.csv
+¦       chiapas.csv
+¦       guerrero.csv
+¦       michoacan.csv
+¦       sonora.csv
+¦       durango.csv
+¦       
++---maps
+¦       nayarit.geojson
+¦       tabasco.geojson
+¦       baja-california-sur.geojson
+¦       tlaxcala.geojson
+¦       colima.geojson
+¦       sonora.geojson
+¦       san-luis-potosi.geojson
+¦       puebla.geojson
+¦       guanajuato.geojson
+¦       jalisco.geojson
+¦       sinaloa.geojson
+¦       zacatecas.geojson
+¦       chiapas.geojson
+¦       guerrero.geojson
+¦       estado-de-mexico.geojson
+¦       quintana-roo.geojson
+¦       tamaulipas.geojson
+¦       michoacan.geojson
+¦       oaxaca.geojson
+¦       baja-california.geojson
+¦       yucatan.geojson
+¦       coahuila.geojson
+¦       queretaro.geojson
+¦       nuevo-leon.geojson
+¦       durango.geojson
+¦       ciudad-de-mexico.geojson
+¦       campeche.geojson
+¦       morelos.geojson
+¦       veracruz.geojson
+¦       chihuahua.geojson
+¦       hidalgo.geojson
+¦       republica-mexicana.geojson
+¦       aguascalientes.geojson
+¦       
++---indicators
+¦       indicadores-clave.csv
+¦       
++---clinicas
+        clinicas-cateteres.csv
         
-    +---maps
-            republica-mexicana.js
-            nayarit.js
-            aguascalientes.js
-            chihuahua.js
-            nuevo-leon.js
-            queretaro.js
-            campeche.js
-            baja-california.js
-            ciudad-de-mexico.js
-            estado-de-mexico.js
-            colima.js
-            durango.js
-            tlaxcala.js
-            coahuila.js
-            morelos.js
-            oaxaca.js
-            puebla.js
-            zacatecas.js
-            hidalgo.js
-            guerrero.js
-            sonora.js
-            tamaulipas.js
-            guanajuato.js
-            veracruz.js
-            baja-california-sur.js
-            sinaloa.js
-            michoacan.js
-            tabasco.js
-            san-luis-potosi.js
-            chiapas.js
-            jalisco.js
-            quintana-roo.js
-            yucatan.js
-            
-    +---utils
-            tabla-municipios.js
-            config-mapa.js
-            tooltip.js
-            cargar-indicadores.js
-            window.indicadoresSIARHE.js
-            
-+---data
-    +---rate
-            nayarit.csv
-            aguascalientes.csv
-            republica-mexicana.csv
-            coahuila.csv
-            baja-california-sur.csv
-            jalisco.csv
-            yucatan.csv
-            oaxaca.csv
-            queretaro.csv
-            campeche.csv
-            baja-california.csv
-            sinaloa.csv
-            quintana-roo.csv
-            chihuahua.csv
-            hidalgo.csv
-            colima.csv
-            tabasco.csv
-            veracruz.csv
-            zacatecas.csv
-            estado-de-mexico.csv
-            tlaxcala.csv
-            san-luis-potosi.csv
-            guanajuato.csv
-            nuevo-leon.csv
-            tamaulipas.csv
-            ciudad-de-mexico.csv
-            puebla.csv
-            morelos.csv
-            chiapas.csv
-            guerrero.csv
-            michoacan.csv
-            sonora.csv
-            durango.csv
-            
-    +---maps
-            nayarit.geojson
-            tabasco.geojson
-            baja-california-sur.geojson
-            tlaxcala.geojson
-            colima.geojson
-            sonora.geojson
-            san-luis-potosi.geojson
-            puebla.geojson
-            guanajuato.geojson
-            jalisco.geojson
-            sinaloa.geojson
-            zacatecas.geojson
-            chiapas.geojson
-            guerrero.geojson
-            estado-de-mexico.geojson
-            quintana-roo.geojson
-            tamaulipas.geojson
-            michoacan.geojson
-            oaxaca.geojson
-            baja-california.geojson
-            yucatan.geojson
-            coahuila.geojson
-            queretaro.geojson
-            nuevo-leon.geojson
-            durango.geojson
-            ciudad-de-mexico.geojson
-            campeche.geojson
-            morelos.geojson
-            veracruz.geojson
-            chihuahua.geojson
-            hidalgo.geojson
-            republica-mexicana.geojson
-            aguascalientes.geojson
-            
-    +---indicators
-            indicadores-clave.csv
-            
-+---.git
-        ORIG_HEAD
-        FETCH_HEAD
-        COMMIT_EDITMSG
-        index
-        config
-        packed-refs
-        HEAD
-        description
-        
-    +---logs
-            HEAD
-            
-        +---refs
-            +---remotes
-                +---origin
-                        main
-                        HEAD
-                        SQuetzalliAC
-                        
-            +---heads
-                    main
-                    SQuetzalliAC
-                    
-    +---refs
-        +---remotes
-            +---origin
-                    main
-                    HEAD
-                    SQuetzalliAC
-                    
-        +---tags
-        +---heads
-                main
-                SQuetzalliAC
-                
-    +---info
-            exclude
-            
-    +---hooks
-            push-to-checkout.sample
-            prepare-commit-msg.sample
-            applypatch-msg.sample
-            fsmonitor-watchman.sample
-            commit-msg.sample
-            pre-rebase.sample
-            pre-merge-commit.sample
-            pre-push.sample
-            post-update.sample
-            sendemail-validate.sample
-            update.sample
-            pre-commit.sample
-            pre-applypatch.sample
-            pre-receive.sample
-            
-   
