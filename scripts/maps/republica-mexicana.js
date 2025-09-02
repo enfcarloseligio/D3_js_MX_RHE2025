@@ -7,7 +7,7 @@ import {
   crearTooltip,
   mostrarTooltip,
   ocultarTooltip,
-  mostrarTooltipClinica, // tooltip igual al de clínicas de catéteres
+  mostrarTooltipClinica, // tooltip estándar para clínicas (como en catéteres)
 } from '../utils/tooltip.js';
 
 import {
@@ -32,7 +32,6 @@ import {
 } from '../utils/marcadores.js';
 
 // ==============================
-//
 // CREACIÓN DEL MAPA
 // ==============================
 const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución nacional de enfermeras");
@@ -73,40 +72,86 @@ Promise.all([
   d3.csv("../data/rate/republica-mexicana.csv")
 ]).then(([geoData, tasasRaw]) => {
 
-  // Normalización
+  // === Año dinámico ===
+  const year = new Date().getFullYear();
+  document.querySelectorAll(".year").forEach(el => el.textContent = year);
+
+  // === Total nacional (fila id=9999 del CSV crudo) ===
+  const fila9999 = tasasRaw.find(d => String(d.id) === "9999");
+  const totalNacional = fila9999
+    ? (Number(fila9999.enfermeras_total ?? fila9999.enfermeras) || 0)
+    : 0;
+  const spanTotalNac = document.getElementById("total-enfermeras-nac");
+  if (spanTotalNac) spanTotalNac.textContent = totalNacional.toLocaleString("es-MX");
+
+  // === Número de entidades federativas: auto + respaldo manual (32) ===
+  const NUM_ENTIDADES_FED = 32;
+  function contarEntidadesFederativas(geo) {
+    try {
+      const nombresUnicos = new Set(
+        (geo?.features ?? [])
+          .map(f => (f.properties?.NOMBRE || f.properties?.nom_ent || "").trim())
+          .filter(Boolean)
+      );
+      const n = nombresUnicos.size;
+      // si luce razonable (20–40), usa ese valor; si no, fija 32
+      return n >= 20 && n <= 40 ? n : NUM_ENTIDADES_FED;
+    } catch {
+      return NUM_ENTIDADES_FED;
+    }
+  }
+  const numEntidades = contarEntidadesFederativas(geoData);
+  const spanEnt = document.getElementById("total-entidades");
+  if (spanEnt) spanEnt.textContent = numEntidades.toLocaleString("es-MX");
+
+  // (Opcional) Título SEO dinámico con año
+  document.title = `SIARHE | Distribución de Profesionales de Enfermería en México ${year}`;
+  // ==============================
+  // Normalización (GLOBAL)
+  // ==============================
   const tasas = normalizarDataset(tasasRaw, { scope: "nacional", extras: [] });
 
+  // ==============================
   // Diccionario por estado
+  // ==============================
   const dataByEstado = {};
   tasas.forEach(d => {
     const estado = (d.estado || "").trim();
     if (!estado) return;
     dataByEstado[estado] = {
       poblacion: d.poblacion,
+
       enfermeras_total:   d.enfermeras_total,   tasa_total:   d.tasa_total,
       enfermeras_primer:  d.enfermeras_primer,  tasa_primer:  d.tasa_primer,
       enfermeras_segundo: d.enfermeras_segundo, tasa_segundo: d.tasa_segundo,
       enfermeras_tercer:  d.enfermeras_tercer,  tasa_tercer:  d.tasa_tercer,
+
       enfermeras_apoyo:   d.enfermeras_apoyo,   tasa_apoyo:   d.tasa_apoyo,
       enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas,
+
       enfermeras_no_aplica:   d.enfermeras_no_aplica,   tasa_no_aplica:   d.tasa_no_aplica,
       enfermeras_no_asignado: d.enfermeras_no_asignado, tasa_no_asignado: d.tasa_no_asignado
     };
   });
 
-  // Cuartiles
+  // ==============================
+  // Utilidades de cuartiles
+  // ==============================
   function computeQuartiles(vals) {
     vals = vals.filter(Number.isFinite).sort((a, b) => a - b);
     if (!vals.length) return { min: 0, q1: 1, q2: 2, q3: 3, max: 4 };
+
     let min = vals[0], max = vals[vals.length - 1];
     let q1  = d3.quantileSorted(vals, 0.25);
     let q2  = d3.quantileSorted(vals, 0.50);
     let q3  = d3.quantileSorted(vals, 0.75);
+
     const eps = 1e-6;
     if (!(q1 > min)) q1 = min + eps;
     if (!(q2 > q1)) q2 = q1 + eps;
     if (!(q3 > q2)) q3 = q2 + eps;
     if (!(max > q3)) max = q3 + eps;
+
     return { min, q1, q2, q3, max };
   }
 
@@ -171,7 +216,9 @@ Promise.all([
     });
   }
 
-  // Proyección y paths (doble click -> entidad)
+  // ==============================
+  // Proyección y paths (doble clic -> entidad)
+  // ==============================
   const projection = d3.geoMercator()
     .scale(2000)
     .center([-102, 24])
@@ -189,11 +236,13 @@ Promise.all([
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.5)
     .attr("vector-effect", "non-scaling-stroke")
-    .attr("fill", COLOR_SIN)
+    .attr("fill", COLOR_SIN) // por si la primera pintura tarda
     .on("mouseover", function (event, d) {
       const nombre = (d.properties.NOMBRE || "").trim();
       const item = dataByEstado[nombre];
+
       d3.select(this).attr("stroke-width", 1.5);
+
       mostrarTooltip(tooltip, event, nombre, item, {
         metricKey: METRICAS[currentMetric].tasaKey,
         label: METRICAS[currentMetric].label,
@@ -220,10 +269,11 @@ Promise.all([
 
   // ==============================
   // CAPA DE MARCADORES (multi-tipo)
-// ==============================
+  // ==============================
   const gMarcadores = g.append("g").attr("class", "capa-marcadores");
   let marcadoresCtlPorTipo = new Map(); // tipo -> controlador pintarMarcadores
 
+  // Carga un CSV por tipo, normaliza y pinta; devuelve controlador
   async function cargarYPintarTipo(tipo) {
     const ruta = RUTAS_MARCADORES[tipo];
     if (!ruta) return null;
@@ -235,7 +285,7 @@ Promise.all([
 
     const ctl = pintarMarcadores(gMarcadores, puntos, projection, { tipo });
 
-    // Tooltips de clínica (misma vista que en “Clínicas de catéteres”)
+    // Tooltips de clínica: MISMA VISTA que “Clínicas de catéteres”
     ctl.selection
       .on("mouseover", function (event, d) {
         event.stopPropagation();
@@ -254,6 +304,7 @@ Promise.all([
     return ctl;
   }
 
+  // Actualiza marcadores según selección (añade/quita y actualiza leyenda)
   async function updateMarcadores(tiposSeleccionados = []) {
     const setSel = new Set(tiposSeleccionados);
 
@@ -302,12 +353,12 @@ Promise.all([
 
   svg.call(zoom);
 
-  // Controles de zoom (sin “home”)
+  // Controles de zoom (sin “home”, esta vista es el home)
   renderZoomControles("#mapa-nacional", {
     svg,
     g,
     zoom,            // conecta botones al mismo zoom
-    showHome: false,
+    showHome: false, // sin botón home
     idsPrefix: "rep",
     escalaMin: 1,
     escalaMax: 20,
@@ -332,7 +383,7 @@ Promise.all([
 
   // ==============================
   // --- SELECTOR + TABLA SINCRONIZADOS ---
-// ==============================
+  // ==============================
   const selMetrica = document.getElementById("sel-metrica");
   if (selMetrica) currentMetric = selMetrica.value || currentMetric;
 
@@ -354,6 +405,7 @@ Promise.all([
     sheetName: "Resumen"
   });
 
+  // Cuando cambias el indicador: repinta y ACTUALIZA la tabla
   if (selMetrica) {
     selMetrica.addEventListener("change", () => {
       currentMetric = selMetrica.value;
@@ -363,9 +415,8 @@ Promise.all([
   }
 
   // ==============================
-  // SELECTOR DE MARCADORES (con fallback si no existe el host)
-// ==============================
-
+  // SELECTOR DE MARCADORES
+  // ==============================
   const itemsMarcadores = Object.values(MARCADORES_TIPOS).map(t => ({
     value: t,
     label: nombreTipoMarcador(t)
@@ -389,7 +440,7 @@ Promise.all([
   // DESCARGA PNG
   // ==============================
   document.getElementById("descargar-sin-etiquetas")?.addEventListener("click", () => {
-    const titulo = construirTitulo(currentMetric, { entidad: null, year: 2025 });
+    const titulo = construirTitulo(currentMetric, { entidad: null, year });
     const etiquetas = document.getElementById("etiquetas-municipios");
     if (etiquetas) etiquetas.style.display = "none";
     setTimeout(() => {
@@ -404,7 +455,7 @@ Promise.all([
   });
 
   document.getElementById("descargar-con-etiquetas")?.addEventListener("click", () => {
-    const titulo = construirTitulo(currentMetric, { entidad: null, year: 2025 });
+    const titulo = construirTitulo(currentMetric, { entidad: null, year });
     const etiquetas = document.getElementById("etiquetas-municipios");
     if (etiquetas) etiquetas.style.display = "block";
     setTimeout(() => {
