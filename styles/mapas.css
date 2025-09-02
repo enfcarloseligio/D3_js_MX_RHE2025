@@ -184,28 +184,30 @@ main {
 /* ===================================================
 MARCADORES
 =================================================== */
-/* ----- Layout en línea como "Indicador" ----- */
+/* ----- Layout: etiqueta arriba, control abajo (por defecto) ----- */
 .mc-row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin:8px 0 4px 0;
+  display: grid;
+  grid-template-columns: 1fr;   /* una sola columna */
+  row-gap: 6px;                 /* espacio entre etiqueta y control */
+  margin: 8px 0 4px 0;
 }
 .mc-label{
+  display:block;
   font-weight:700;
-  min-width:110px;                    /* mismo ancho que Indicador */
   font-family:'Noto Sans', sans-serif;
+  /* sin min-width: apilado limpio */
 }
 
 /* ----- Caja que imita un <select> ----- */
 .mc-field{
   position:relative;
-  display:inline-block;               /* el menú iguala el ancho del trigger */
+  display:block;                /* ocupa todo el ancho de la fila */
+  width:100%;
 }
 .mc-trigger{
   width:100%;
-  min-height:28px;                    /* = .ic-select para congruencia */
-  padding:2px 28px 2px 8px;
+  min-height:44px;              /* tap target cómodo */
+  padding:6px 28px 6px 8px;
   border:1px solid #bdbdbd;
   border-radius:4px;
   background:#fff;
@@ -231,9 +233,10 @@ MARCADORES
   display:none;
   position:absolute;
   z-index:999;                        /* sobre mapa/leyenda */
-  top:calc(100% + 4px);               /* SIEMPRE debajo del trigger */
+  top:calc(100% + 4px);               /* siempre debajo del trigger */
   left:0;
   min-width:100%;                     /* mismo ancho que el trigger */
+  max-width:min(92vw,420px);          /* evita desbordes en móvil */
   max-height:260px;
   overflow:auto;
   border:1px solid #bdbdbd;
@@ -257,42 +260,83 @@ MARCADORES
 .mc-option:hover{ background:#f3f4f6; }
 .mc-check{ cursor:pointer; }
 
-/* que no se rompa en móviles */
-@media (max-width:640px){
-  .mc-row{ flex-wrap:wrap; }
-  .mc-label{ min-width:auto; }
-  .mc-field{ width:100% !important; }
-}
-
-/* Ajuste fino opcional que usabas */
+/* Ajuste fino opcional */
 .mc2-control{ height:20px; }
 
 /* ===================================================
 INDICADOR (mismos estilos que Marcadores)
 =================================================== */
+/* ----- Layout: etiqueta arriba, control abajo (por defecto) ----- */
 .ic-row{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  margin:8px 0 4px 0;
+  display: grid;
+  grid-template-columns: 1fr;   /* una sola columna */
+  row-gap: 6px;
+  margin: 8px 0 4px 0;
 }
 .ic-label{
+  display:block;
   font-weight:700;
-  min-width:110px;                    /* igual que .mc-label */
   font-family:'Noto Sans', sans-serif;
 }
+
 .ic-select{
-  min-height:28px;                    /* = .mc-trigger */
-  padding:2px 8px;
+  box-sizing:border-box;
+  width:100%;
+  min-height:44px;              /* tap target cómodo */
+  padding:6px 28px 6px 8px;
   border:1px solid #bdbdbd;
   border-radius:4px;
   background:#fff;
   font-family:'Noto Sans', sans-serif;
   font-size:14px;
   line-height:1.4;
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5 7l5 5 5-5' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  background-size:16px;
 }
 
-/* Opcional: ancho mínimo para que no quede muy corto en desktop */
-@media (min-width:640px){
-  .ic-select{ min-width:260px; }
+/* Foco accesible para ambos controles */
+.ic-select:focus,
+.mc-trigger:focus{
+  outline:3px solid rgba(0,112,243,.35);
+  outline-offset:2px;
+}
+
+/* ===================================================
+RESPONSIVE: PC junta Indicador y Marcadores en una fila
+=================================================== */
+@media (min-width: 992px){
+  /* La barra de controles: dos columnas (grupo Indicador | grupo Marcadores) */
+  #barra-controles{
+    display: grid;
+    grid-template-columns: 1fr 1fr;   /* dos grupos */
+    column-gap: 32px;
+    align-items: center;
+  }
+
+  /* Cada grupo es etiqueta + control en la misma línea */
+  .ic-row,
+  .mc-row{
+    display: grid !important;
+    grid-template-columns: 90px minmax(240px, 1fr); /* etiqueta más estrecha */
+    column-gap: 8px;
+    row-gap: 0;
+    margin: 0;
+    align-items: center;
+  }
+
+  .ic-label,
+  .mc-label{
+    justify-self: start;              /* etiqueta alineada a la izquierda */
+    text-align: left;
+    margin: 0;
+  }
+
+  .ic-select{ width:100%; }
+  .mc-field{ width:100%; }
+  .mc-trigger{ width:100%; }
 }
