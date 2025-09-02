@@ -12,8 +12,8 @@ export const MARCADORES_TIPOS = {
 
 // Nombre legible por tipo de marcador (para títulos/leyendas)
 export const MARCADOR_NOMBRES = {
-  [MARCADORES_TIPOS.CATETER]: "clínicas de catéter",
-  [MARCADORES_TIPOS.HERIDAS]: "clínicas de heridas",
+  [MARCADORES_TIPOS.CATETER]: "Clínicas de catéteres",
+  [MARCADORES_TIPOS.HERIDAS]: "Clínicas de heridas",
 };
 
 export function nombreTipoMarcador(tipo) {
@@ -102,4 +102,73 @@ export function pintarMarcadores(g, puntos, projection, {
   }
 
   return { selection: sel, updateZoom, recolor };
+}
+
+// ==============================
+// LEYENDA DE MARCADORES
+// ==============================
+/**
+ * Renderiza una leyenda con círculos de colores para cada tipo de marcador.
+ *
+ * @param {d3.Selection|SVGElement|string} host  svg | g | selector donde insertar
+ * @param {string[]} tiposPresentes              array de tipos presentes (ej. ["CATETER"])
+ * @param {object} opciones
+ *   - x, y: posición inicial
+ *   - title: título de la leyenda
+ */
+export function crearLeyendaMarcadores(host, tiposPresentes, {
+  x = 20,
+  y =  MAP_HEIGHT - 100,
+  title = "Marcadores",
+  dx = 0,
+  dyStep = 20
+} = {}) {
+  const sel = (host && typeof host.select === "function")
+    ? host
+    : d3.select(host);
+
+  // Elimina leyendas previas de marcadores
+  sel.selectAll(".leyenda-marcadores").remove();
+
+  const g = sel.append("g")
+    .attr("class", "leyenda-marcadores")
+    .attr("transform", `translate(${x},${y})`);
+
+  // Título
+  if (title) {
+    g.append("text")
+      .attr("x", dx)
+      .attr("y", 0)
+      .attr("font-size", "12px")
+      .attr("font-family", "'Noto Sans', sans-serif")
+      .style("font-weight", "bold")
+      .text(title);
+  }
+
+  tiposPresentes.forEach((tipo, i) => {
+    const est = getEstiloMarcador(tipo);
+    const nombre = nombreTipoMarcador(tipo);
+
+    const gy = g.append("g")
+      .attr("transform", `translate(${dx},${(i+1) * dyStep})`);
+
+    // círculo
+    gy.append("circle")
+      .attr("r", 5)
+      .attr("cx", 0)
+      .attr("cy", -4)
+      .attr("fill", est.fill)
+      .attr("stroke", est.stroke)
+      .attr("stroke-width", 1);
+
+    // texto
+    gy.append("text")
+      .attr("x", 12)
+      .attr("y", 0)
+      .attr("font-size", "12px")
+      .attr("font-family", "'Noto Sans', sans-serif")
+      .text(nombre);
+  });
+
+  return g;
 }
