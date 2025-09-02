@@ -39,12 +39,19 @@
         Visualice la distribución de enfermeras por cada mil habitantes en cada entidad federativa, con base en datos oficiales actualizados.
       </p>
 
-      <!-- Control de métrica (componente reutilizable) -->
-      <div id="control-indicador"></div>
+      <!-- Barra de controles (Indicador + Marcadores) -->
+      <div id="barra-controles" class="controles-grid">
+        <!-- Control de métrica -->
+        <div id="control-indicador"></div>
+        <!-- NUEVO: Control de marcadores (el JS del mapa lo llenará automáticamente) -->
+        <div id="control-marcadores"></div>
+      </div>
+
+      <!-- Render del control de Indicador -->
       <script type="module">
         import { renderIndicadorControl } from "../scripts/componentes/indicador-control.js";
         renderIndicadorControl("#control-indicador", { defaultValue: "tasa_total" });
-        // El mapa escucha #sel-metrica, no hay que tocar nada más aquí.
+        // El control de marcadores lo renderiza republica-mexicana.js en #control-marcadores
       </script>
 
       <!-- Contenedor del mapa (los botones de zoom se inyectan por JS) -->

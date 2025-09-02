@@ -21,7 +21,8 @@ import { normalizarDataset } from '../utils/normalizacion.js';
 
 import {
   pintarMarcadores,
-  MARCADORES_TIPOS
+  MARCADORES_TIPOS,
+  crearLeyendaMarcadores   // ⟵ NUEVO IMPORT
 } from '../utils/marcadores.js';
 
 // ==============================
@@ -249,49 +250,62 @@ Promise.all([
       d3.select(this).attr("stroke-width", 0.5);
     });
 
-  // ==============================
-  // CAPA DE MARCADORES (clínicas)
-  // ==============================
-  const puntos = clinicasRaw.filter(d =>
-    Number.isFinite(d.lat) && Number.isFinite(d.lon)
-  );
+// ==============================
+// CAPA DE MARCADORES (clínicas)
+// ==============================
+const puntos = clinicasRaw.filter(d =>
+  Number.isFinite(d.lat) && Number.isFinite(d.lon)
+);
 
-  const marcadoresCtl = pintarMarcadores(g, puntos, projection, {
-    tipo: MARCADORES_TIPOS.CATETER,
-    radioBase: 5,
-    strokeBase: 1.1,
+const marcadoresCtl = pintarMarcadores(g, puntos, projection, {
+  tipo: MARCADORES_TIPOS.CATETER,
+  radioBase: 5,
+  strokeBase: 1.1,
+});
+
+// Tooltip simple para clínicas (local, sin depender de otro export)
+function mostrarTooltipClinicaLocal(tooltipSel, event, d) {
+  const titulo = d.unidad || d.clinica || "Clínica";
+  const cuerpo = `
+    <div><strong>${titulo}</strong></div>
+    <div>${d.municipio || ""}${d.municipio && d.entidad ? ", " : ""}${d.entidad || ""}</div>
+    <div>${d.institucion || ""}${d.inst_cod ? " (" + d.inst_cod + ")" : ""}</div>
+    <div>Lat: ${Number(d.lat).toFixed(4)}, Lon: ${Number(d.lon).toFixed(4)}</div>
+    ${d.observaciones ? `<div style="margin-top:4px;">${d.observaciones}</div>` : "" }
+  `;
+  tooltipSel.html(cuerpo)
+    .style("opacity", 1)
+    .style("left", (event.pageX + 10) + "px")
+    .style("top",  (event.pageY - 28) + "px");
+}
+
+marcadoresCtl.selection
+  .on("mouseover", function (event, d) {
+    event.stopPropagation();
+    mostrarTooltipClinicaLocal(tooltip, event, d);
+  })
+  .on("mousemove", function (event) {
+    event.stopPropagation();
+    tooltip.style("left", (event.pageX + 10) + "px")
+           .style("top",  (event.pageY - 28) + "px");
+  })
+  .on("mouseout", function (event) {
+    event.stopPropagation();
+    ocultarTooltip(tooltip);
   });
 
-  // Tooltip simple para clínicas (local, sin depender de otro export)
-  function mostrarTooltipClinicaLocal(tooltipSel, event, d) {
-    const titulo = d.unidad || d.clinica || "Clínica";
-    const cuerpo = `
-      <div><strong>${titulo}</strong></div>
-      <div>${d.municipio || ""}${d.municipio && d.entidad ? ", " : ""}${d.entidad || ""}</div>
-      <div>${d.institucion || ""}${d.inst_cod ? " (" + d.inst_cod + ")" : ""}</div>
-      <div>Lat: ${Number(d.lat).toFixed(4)}, Lon: ${Number(d.lon).toFixed(4)}</div>
-      ${d.observaciones ? `<div style="margin-top:4px;">${d.observaciones}</div>` : "" }
-    `;
-    tooltipSel.html(cuerpo)
-      .style("opacity", 1)
-      .style("left", (event.pageX + 10) + "px")
-      .style("top",  (event.pageY - 28) + "px");
-  }
+// ---- LEYENDA DE MARCADORES (abajo-izquierda) ----
+const tiposPresentes = Array.from(new Set(puntos.map(p => p.tipo))).filter(Boolean);
+if (tiposPresentes.length) {
+  crearLeyendaMarcadores(svg, tiposPresentes, {
+    x: 24,                    // margen izquierdo
+    y: MAP_HEIGHT - 96,       // posición vertical (pegada abajo)
+    title: "Marcadores",        // título de la leyenda
+    dx: 0,                    // offset horizontal interno
+    dyStep: 20,               // separación entre filas
+  });
+}
 
-  marcadoresCtl.selection
-    .on("mouseover", function (event, d) {
-      event.stopPropagation();
-      mostrarTooltipClinicaLocal(tooltip, event, d);
-    })
-    .on("mousemove", function (event) {
-      event.stopPropagation();
-      tooltip.style("left", (event.pageX + 10) + "px")
-             .style("top",  (event.pageY - 28) + "px");
-    })
-    .on("mouseout", function (event) {
-      event.stopPropagation();
-      ocultarTooltip(tooltip);
-    });
 
   // ==============================
   // ZOOM (y tamaño visual estable de marcadores)

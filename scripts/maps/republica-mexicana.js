@@ -14,12 +14,48 @@ import { renderTablaNacional, attachExcelButton } from '../utils/tablas.js';
 import { normalizarDataset } from '../utils/normalizacion.js';
 import { urlEntidad } from '../utils/enlaces.js';
 
+// NUEVO: selector multi de marcadores + rutas/normalizador + estilos/leyenda
+import { renderMarcadoresControl } from '../componentes/marcadores-control.js';
+import { RUTAS_MARCADORES, normalizarClinicaRow } from '../utils/marcadores.config.js';
+import {
+  MARCADORES_TIPOS,
+  pintarMarcadores,
+  crearLeyendaMarcadores,
+  nombreTipoMarcador
+} from '../utils/marcadores.js';
+
 // ==============================
 // CREACIÓN DEL MAPA
 // ==============================
 const { svg, g } = crearSVGBase("#mapa-nacional", "Mapa de distribución nacional de enfermeras");
 const tooltip = crearTooltip();
 const legendHost = svg.append("g").attr("id", "legend-host");
+
+// ==============================
+// CONSTANTES / CONFIG
+// ==============================
+const COLOR_CERO = '#bfbfbf';   // 0.00 (solo para tasas)
+const COLOR_SIN  = '#d9d9d9';   // s/d
+
+const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen'];
+const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'];
+
+// ids válidos de entidad para el cálculo de cuartiles (1..32)
+const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
+
+// Definición de métricas (claves ya normalizadas por normalizacion.js)
+const METRICAS = {
+  tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",       countKey: "enfermeras_total",     palette: "tasas" },
+  tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",      countKey: "enfermeras_primer",    palette: "tasas" },
+  tasa_segundo:     { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",     countKey: "enfermeras_segundo",   palette: "tasas" },
+  tasa_tercer:      { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",      countKey: "enfermeras_tercer",    palette: "tasas" },
+  tasa_apoyo:       { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",       countKey: "enfermeras_apoyo",     palette: "tasas" },
+  tasa_escuelas:    { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas",    countKey: "enfermeras_escuelas",  palette: "tasas" },
+  tasa_no_aplica:   { label: "Tasa no aplica",       tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica", palette: "tasas" },
+  tasa_no_asignado: { label: "Tasa no asignado",     tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado", palette: "tasas" },
+  poblacion:        { label: "Población",            tasaKey: "poblacion",        countKey: "poblacion",            palette: "poblacion" }
+};
+let currentMetric = "tasa_total";
 
 // ==============================
 // CARGA DE DATOS
@@ -30,7 +66,7 @@ Promise.all([
 ]).then(([geoData, tasasRaw]) => {
 
   // ==============================
-  // Normalización de columnas (GLOBAL)
+  // Normalización (GLOBAL)
   // ==============================
   const tasas = normalizarDataset(tasasRaw, { scope: "nacional", extras: [] });
 
@@ -56,31 +92,6 @@ Promise.all([
       enfermeras_no_asignado: d.enfermeras_no_asignado, tasa_no_asignado: d.tasa_no_asignado
     };
   });
-
-  // ==============================
-  // Configuración de métricas
-  // ==============================
-  const COLOR_CERO = '#bfbfbf';
-  const COLOR_SIN  = '#d9d9d9';
-
-  const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen'];
-  const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'];
-
-  const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
-
-  const METRICAS = {
-    tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",    countKey: "enfermeras_total",   palette: "tasas" },
-    tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",   countKey: "enfermeras_primer",  palette: "tasas" },
-    tasa_segundo:     { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",  countKey: "enfermeras_segundo", palette: "tasas" },
-    tasa_tercer:      { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",   countKey: "enfermeras_tercer",  palette: "tasas" },
-    tasa_apoyo:       { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",    countKey: "enfermeras_apoyo",   palette: "tasas" },
-    tasa_escuelas:    { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas", countKey: "enfermeras_escuelas",palette: "tasas" },
-    tasa_no_aplica:   { label: "Tasa no aplica",       tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica", palette: "tasas" },
-    tasa_no_asignado: { label: "Tasa no asignado",     tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado", palette: "tasas" },
-    poblacion:        { label: "Población",            tasaKey: "poblacion",     countKey: "poblacion",          palette: "poblacion" }
-  };
-
-  let currentMetric = "tasa_total";
 
   // ==============================
   // Utilidades de cuartiles
@@ -130,7 +141,7 @@ Promise.all([
       .range(PALETTE)
       .interpolate(d3.interpolateRgb);
 
-    g.selectAll("path")
+    g.selectAll("path.estado")
       .transition().duration(350)
       .attr("fill", d => {
         const nombre = (d.properties.NOMBRE || "").trim();
@@ -165,7 +176,7 @@ Promise.all([
   }
 
   // ==============================
-  // Proyección y paths (con doble clic a entidad)
+  // Proyección y paths (doble clic -> entidad)
   // ==============================
   const projection = d3.geoMercator()
     .scale(2000)
@@ -176,14 +187,15 @@ Promise.all([
 
   let ultimoClick = 0;
 
-  g.selectAll("path")
+  g.selectAll("path.estado")
     .data(geoData.features)
     .join("path")
+    .attr("class", "estado")
     .attr("d", path)
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.5)
     .attr("vector-effect", "non-scaling-stroke")
-    .attr("fill", COLOR_SIN) // fill inicial por si la primera pintura se demora
+    .attr("fill", COLOR_SIN) // por si la primera pintura tarda
     .on("mouseover", function (event, d) {
       const nombre = (d.properties.NOMBRE || "").trim();
       const item = dataByEstado[nombre];
@@ -205,7 +217,6 @@ Promise.all([
       d3.select(this).attr("stroke-width", 0.5);
     })
     .on("click", function (event, d) {
-      // Doble clic: navega a la página de la entidad
       const ahora = Date.now();
       if (ahora - ultimoClick < 350) {
         const nombre = (d.properties.NOMBRE || "").trim();
@@ -214,6 +225,114 @@ Promise.all([
       }
       ultimoClick = ahora;
     });
+
+  // ==============================
+  // CAPA DE MARCADORES (multi-tipo)
+  // ==============================
+  const gMarcadores = g.append("g").attr("class", "capa-marcadores");
+  let marcadoresCtlPorTipo = new Map(); // tipo -> controlador pintarMarcadores
+
+  // Carga un CSV por tipo, normaliza y pinta; devuelve controlador
+  async function cargarYPintarTipo(tipo) {
+    const ruta = RUTAS_MARCADORES[tipo];
+    if (!ruta) return null;
+
+    const raw = await d3.csv(ruta);
+    const puntos = raw
+      .map(d => normalizarClinicaRow(d, tipo))
+      .filter(d => Number.isFinite(d.lat) && Number.isFinite(d.lon));
+
+    const ctl = pintarMarcadores(gMarcadores, puntos, projection, { tipo });
+    // tooltips de clínica
+    ctl.selection
+      .on("mouseover", function (event, d) {
+        event.stopPropagation();
+        const titulo = d.unidad || d.clinica || "Clínica";
+        const cuerpo = `
+          <div><strong>${titulo}</strong></div>
+          <div>${d.municipio || ""}${d.municipio && d.entidad ? ", " : ""}${d.entidad || ""}</div>
+          <div>${d.institucion || ""}${d.inst_cod ? " (" + d.inst_cod + ")" : ""}</div>
+          <div>Lat: ${Number(d.lat).toFixed(4)}, Lon: ${Number(d.lon).toFixed(4)}</div>
+          ${d.observaciones ? `<div style="margin-top:4px;">${d.observaciones}</div>` : "" }
+        `;
+        tooltip.html(cuerpo)
+          .style("opacity", 1)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top",  (event.pageY - 28) + "px");
+      })
+      .on("mousemove", function (event) {
+        event.stopPropagation();
+        tooltip.style("left", (event.pageX + 10) + "px")
+               .style("top",  (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function (event) {
+        event.stopPropagation();
+        ocultarTooltip(tooltip);
+      });
+
+    return ctl;
+  }
+
+  // Actualiza marcadores según selección (añade/quita y actualiza leyenda)
+  async function updateMarcadores(tiposSeleccionados = []) {
+    const setSel = new Set(tiposSeleccionados);
+
+    // Remover tipos que ya no están seleccionados
+    for (const [tipo, ctl] of marcadoresCtlPorTipo.entries()) {
+      if (!setSel.has(tipo)) {
+        ctl.selection.remove();
+        marcadoresCtlPorTipo.delete(tipo);
+      }
+    }
+
+    // Cargar/pintar los nuevos tipos seleccionados
+    for (const tipo of setSel) {
+      if (!marcadoresCtlPorTipo.has(tipo)) {
+        const ctl = await cargarYPintarTipo(tipo);
+        if (ctl) marcadoresCtlPorTipo.set(tipo, ctl);
+      }
+    }
+
+    // Leyenda de marcadores (usa los nombres/colores globales)
+    const tiposPresentes = Array.from(marcadoresCtlPorTipo.keys());
+    if (tiposPresentes.length) {
+      crearLeyendaMarcadores(svg, tiposPresentes, {
+        x: 120,                  // a la derecha de la leyenda de tasas
+        y: MAP_HEIGHT - 90,
+        title: "Marcadores",
+        dx: 0,
+        dyStep: 18
+      });
+    } else {
+      // Sin marcadores: limpia la leyenda
+      svg.selectAll(".leyenda-marcadores").remove();
+    }
+  }
+
+  // ==============================
+  // ZOOM (y tamaño visual estable de marcadores)
+  // ==============================
+  const zoom = d3.zoom()
+    .scaleExtent([1, 20])
+    .on("zoom", (event) => {
+      g.attr("transform", event.transform);
+      // reescala cada capa de marcadores activa
+      for (const ctl of marcadoresCtlPorTipo.values()) {
+        ctl.updateZoom(event.transform.k);
+      }
+    });
+
+  svg.call(zoom);
+
+  // Controles de zoom
+  renderZoomControles("#mapa-nacional", {
+    svg,
+    g,
+    showHome: false,
+    escalaMin: 1,
+    escalaMax: 20,
+    paso: 0.5
+  });
 
   // ==============================
   // Etiquetas (apagadas por default)
@@ -231,26 +350,53 @@ Promise.all([
     nombresUnicos.add(nombre);
   });
 
-  // Primera renderización (aplica colores según métrica)
+  // ==============================
+  // Primera renderización (mapa)
+  // ==============================
   recomputeAndPaint();
 
-  // Controles de zoom
-  renderZoomControles("#mapa-nacional", {
-    svg,
-    g,
-    showHome: false,
-    escalaMin: 1,
-    escalaMax: 8,
-    paso: 0.5
+  // ==============================
+  // Control de métrica (ya renderizado por indicador-control.js)
+  // ==============================
+  const selMetrica = document.getElementById("sel-metrica");
+  if (selMetrica) {
+    currentMetric = selMetrica.value || currentMetric;
+    selMetrica.addEventListener("change", () => {
+      currentMetric = selMetrica.value;
+      recomputeAndPaint();
+    });
+  }
+
+  // ==============================
+  // NUEVO: Control de marcadores (multi)
+  // ==============================
+  const itemsMarcadores = Object.values(MARCADORES_TIPOS).map(t => ({
+    value: t,
+    label: nombreTipoMarcador(t)
+  }));
+
+  const marcCtl = renderMarcadoresControl("#control-marcadores", {
+    items: itemsMarcadores,
+    label: "Marcadores",
+    size: 4
+  });
+
+  // Por defecto, sin marcadores
+  marcCtl.setSelected([]);
+
+  // Reaccionar a cambios
+  marcCtl.onChange(async () => {
+    const seleccion = marcCtl.getSelected();
+    await updateMarcadores(seleccion);
   });
 
   // ==============================
-  // TABLA NACIONAL (usa utils/tablas.js)
+  // TABLA NACIONAL
   // ==============================
   const tablaNac = renderTablaNacional({
-    data: tasas,              // CSV normalizado
-    METRICAS,                 // objeto de métricas del mapa
-    metricKey: currentMetric, // ej. 'tasa_total'
+    data: tasas,
+    METRICAS,
+    metricKey: currentMetric,
     hostSelector: "#tabla-contenido"
   });
 
@@ -260,20 +406,10 @@ Promise.all([
     sheetName: "Resumen"
   });
 
-  // Sincronizar selector: mapa + tabla
-  const sel = document.getElementById("sel-metrica");
-  if (sel) {
-    sel.addEventListener("change", () => {
-      currentMetric = sel.value;
-      recomputeAndPaint();            // mapa
-      tablaNac.update(currentMetric); // tabla
-    });
-  }
-
   // ==============================
-  // DESCARGA PNG
+  // DESCARGA PNG (título dinámico)
   // ==============================
-  document.getElementById("descargar-sin-etiquetas").addEventListener("click", () => {
+  document.getElementById("descargar-sin-etiquetas")?.addEventListener("click", () => {
     const titulo = construirTitulo(currentMetric, { entidad: null, year: 2025 });
     const etiquetas = document.getElementById("etiquetas-municipios");
     if (etiquetas) etiquetas.style.display = "none";
@@ -288,7 +424,7 @@ Promise.all([
     }, 100);
   });
 
-  document.getElementById("descargar-con-etiquetas").addEventListener("click", () => {
+  document.getElementById("descargar-con-etiquetas")?.addEventListener("click", () => {
     const titulo = construirTitulo(currentMetric, { entidad: null, year: 2025 });
     const etiquetas = document.getElementById("etiquetas-municipios");
     if (etiquetas) etiquetas.style.display = "block";

@@ -181,3 +181,118 @@ main {
 }
 
 
+/* ===================================================
+MARCADORES
+=================================================== */
+/* ----- Layout en línea como "Indicador" ----- */
+.mc-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:8px 0 4px 0;
+}
+.mc-label{
+  font-weight:700;
+  min-width:110px;                    /* mismo ancho que Indicador */
+  font-family:'Noto Sans', sans-serif;
+}
+
+/* ----- Caja que imita un <select> ----- */
+.mc-field{
+  position:relative;
+  display:inline-block;               /* el menú iguala el ancho del trigger */
+}
+.mc-trigger{
+  width:100%;
+  min-height:28px;                    /* = .ic-select para congruencia */
+  padding:2px 28px 2px 8px;
+  border:1px solid #bdbdbd;
+  border-radius:4px;
+  background:#fff;
+  font-family:'Noto Sans', sans-serif;
+  font-size:14px;
+  text-align:left;
+  cursor:pointer;
+  position:relative;
+}
+.mc-trigger::after{
+  content:"▾";
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  opacity:.6;
+}
+.mc-trigger.is-placeholder{ color:#666; }
+
+/* ----- Dropdown ----- */
+.mc-menu{
+  display:none;
+  position:absolute;
+  z-index:999;                        /* sobre mapa/leyenda */
+  top:calc(100% + 4px);               /* SIEMPRE debajo del trigger */
+  left:0;
+  min-width:100%;                     /* mismo ancho que el trigger */
+  max-height:260px;
+  overflow:auto;
+  border:1px solid #bdbdbd;
+  border-radius:6px;
+  background:#fff;
+  box-shadow:0 8px 18px rgba(0,0,0,.08);
+  padding:6px;
+}
+.mc-menu.open{ display:block; }
+
+.mc-option{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:6px 8px;
+  border-radius:4px;
+  cursor:pointer;
+  font-family:'Noto Sans', sans-serif;
+  font-size:14px;
+}
+.mc-option:hover{ background:#f3f4f6; }
+.mc-check{ cursor:pointer; }
+
+/* que no se rompa en móviles */
+@media (max-width:640px){
+  .mc-row{ flex-wrap:wrap; }
+  .mc-label{ min-width:auto; }
+  .mc-field{ width:100% !important; }
+}
+
+/* Ajuste fino opcional que usabas */
+.mc2-control{ height:20px; }
+
+/* ===================================================
+INDICADOR (mismos estilos que Marcadores)
+=================================================== */
+.ic-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:8px 0 4px 0;
+}
+.ic-label{
+  font-weight:700;
+  min-width:110px;                    /* igual que .mc-label */
+  font-family:'Noto Sans', sans-serif;
+}
+.ic-select{
+  min-height:28px;                    /* = .mc-trigger */
+  padding:2px 8px;
+  border:1px solid #bdbdbd;
+  border-radius:4px;
+  background:#fff;
+  font-family:'Noto Sans', sans-serif;
+  font-size:14px;
+  line-height:1.4;
+}
+
+/* Opcional: ancho mínimo para que no quede muy corto en desktop */
+@media (min-width:640px){
+  .ic-select{ min-width:260px; }
+}

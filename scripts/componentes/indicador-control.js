@@ -1,5 +1,6 @@
 // ==============================
 // Componente: Control de Métrica
+// (mismo layout que Marcadores)
 // ==============================
 
 export function renderIndicadorControl(selector, { defaultValue = "tasa_total" } = {}) {
@@ -7,9 +8,9 @@ export function renderIndicadorControl(selector, { defaultValue = "tasa_total" }
   if (!container) return;
 
   container.innerHTML = `
-    <div class="control-metrica" style="margin:8px">
-      <label for="sel-metrica"><strong>Indicador:</strong></label>
-      <select id="sel-metrica">
+    <div class="ic-row">
+      <label for="sel-metrica" class="ic-label">Indicador:</label>
+      <select id="sel-metrica" class="ic-select">
         <option value="tasa_total">Tasa total</option>
         <option value="poblacion">Población</option>
         <option value="tasa_primer">Tasa 1er nivel</option>
@@ -23,9 +24,6 @@ export function renderIndicadorControl(selector, { defaultValue = "tasa_total" }
     </div>
   `;
 
-  // Seleccionar valor inicial
   const sel = container.querySelector("#sel-metrica");
-  if (sel && defaultValue) {
-    sel.value = defaultValue;
-  }
+  if (sel && defaultValue) sel.value = defaultValue;
 }
