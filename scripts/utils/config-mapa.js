@@ -1,9 +1,14 @@
+// scripts/utils/config-mapa.js
 // ==============================
 // CONFIGURACIÓN GLOBAL PARA MAPAS
 // ==============================
 export const MAP_WIDTH = 1280;
 export const MAP_HEIGHT = 720;
 export const MAP_BACKGROUND = "#e6f0f8";
+
+// Colores globales de control (un solo origen de verdad)
+export const COLOR_CERO = '#bfbfbf';   // tasa = 0.00 (solo para métricas de tasa)
+export const COLOR_SIN  = '#d9d9d9';   // sin dato (s/d)
 
 // ==============================
 // CREAR SVG BASE
@@ -30,12 +35,12 @@ export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribu
 /**
  * Dibuja una leyenda vertical con gradiente + eje + título y chips opcionales.
  * host: svg o <g> (o selector)
- * dominio: [min, max]
+ * dominio: [min, max] numérico global de la escala
  * pasos: array con cortes (min, q1, q2, q3, max)
  * colores: array de colores (mismo largo que pasos)
  * titulo: texto. Si contiene “población”, se muestra 1 línea "Población".
- *         En otro caso, se muestra en 2 líneas: "Tasa" y debajo la categoría.
  * chips: [{color, texto}] (opcional). Para población normalmente null.
+ * equalSpacing: si true, coloca los ticks equiespaciados (útil para población).
  */
 let __legendCounter = 0;
 export function crearLeyenda(host, {
@@ -45,7 +50,8 @@ export function crearLeyenda(host, {
   posicion = { x: 30, y: 50, ancho: 20, alto: 200 },
   id = null,
   titulo = null,
-  chips = null
+  chips = null,
+  equalSpacing = false
 }) {
   const { x, y, ancho, alto } = posicion;
   const sel = host && typeof host.select === "function" ? host : d3.select(host);
@@ -55,7 +61,7 @@ export function crearLeyenda(host, {
 
   const root = sel.append("g").attr("class", "leyenda-gradiente");
 
-  // Gradiente
+  // Gradiente (paradas SIEMPRE equiespaciadas visualmente)
   const gradId = id || `legend-gradient-${++__legendCounter}`;
   const defs = root.append("defs");
   const linearGradient = defs.append("linearGradient")
@@ -72,7 +78,7 @@ export function crearLeyenda(host, {
     .attr("offset", d => d.offset)
     .attr("stop-color", d => d.color);
 
-  // Barra
+  // Barra del gradiente
   root.append("rect")
     .attr("x", x)
     .attr("y", y)
@@ -80,26 +86,46 @@ export function crearLeyenda(host, {
     .attr("height", alto)
     .style("fill", `url(#${gradId})`);
 
-  // Escala y eje
-  const escala = d3.scaleLinear()
-    .domain([dominio[0], dominio[1]])
-    .range([y + alto, y]);
+  // --- Eje: proporcional vs equiespaciado ---
+  const esPoblacionPorTitulo = titulo && /poblaci/i.test(String(titulo));
+  const fmtTick = esPoblacionPorTitulo ? d3.format(",.0f") : d3.format(".2f");
 
-  // Formato de ticks: población -> miles sin decimales; tasas -> 2 decimales
-  const esPoblacion = titulo && /poblaci/i.test(String(titulo));
-  const fmtTick = esPoblacion ? d3.format(",.0f") : d3.format(".2f");
+  // Si equalSpacing=false -> ticks según valor numérico (proporcional)
+  // Si equalSpacing=true  -> ticks en posiciones equiespaciadas (índice)
+  let eje;
 
-  const eje = d3.axisRight(escala)
-    .tickValues(pasos)
-    .tickFormat(fmtTick);
+  if (!equalSpacing) {
+    const escala = d3.scaleLinear()
+      .domain([dominio[0], dominio[1]])
+      .range([y + alto, y]);
 
-  root.append("g")
-    .attr("transform", `translate(${x + ancho}, 0)`)
-    .call(eje);
+    eje = d3.axisRight(escala)
+      .tickValues(pasos)
+      .tickFormat(fmtTick);
+
+    root.append("g")
+      .attr("transform", `translate(${x + ancho}, 0)`)
+      .call(eje);
+  } else {
+    // Escala visual 0..N-1 -> equiespaciado
+    const n = pasos.length;
+    const escalaIdx = d3.scaleLinear()
+      .domain([0, n - 1])
+      .range([y + alto, y]);
+
+    // Ticks en índices 0..n-1, con formato usando los valores reales en "pasos"
+    eje = d3.axisRight(escalaIdx)
+      .tickValues(d3.range(n))
+      .tickFormat(i => fmtTick(pasos[i]));
+
+    root.append("g")
+      .attr("transform", `translate(${x + ancho}, 0)`)
+      .call(eje);
+  }
 
   // Título
   if (titulo) {
-    if (esPoblacion) {
+    if (esPoblacionPorTitulo) {
       // Una sola línea: "Población"
       root.append("text")
         .attr("x", x + ancho / 2)
@@ -447,4 +473,157 @@ export function construirTituloClinicas(
   };
 
   return map[metricKey] || `Distribución de ${nombreTipo} y enfermería ${lugar} ${sufijo}`;
+}
+
+// ===============================================
+// UTILIDADES GLOBALES PARA ESCALAS Y LEYENDAS
+// ===============================================
+
+/**
+ * Devuelve sólo los valores válidos para una métrica.
+ * - Para población: mantiene 0s, pero excluye filas especiales (8888, 9999).
+ * - Para tasas: excluye <= 0 (esos van al chip "0.00").
+ */
+export function valuesForMetric(
+  rows,
+  METRICAS,
+  metricKey,
+  { excludeIds = ["8888", "9999"], idKey = "id", extraFilter = null } = {}
+) {
+  const key = METRICAS[metricKey].tasaKey;
+  const esPoblacion = (metricKey === "poblacion");
+
+  const excl = new Set(excludeIds.map(String));
+
+  const arr = rows
+    .filter(r => !excl.has(String(r?.[idKey])))
+    .filter(r => (typeof extraFilter === "function" ? extraFilter(r) : true))
+    .map(r => +r[key])
+    .filter(Number.isFinite);
+
+  // En tasas removemos 0 y negativos (se pintan como chip 0.00)
+  return esPoblacion ? arr : arr.filter(v => v > 0);
+}
+
+/**
+ * Cuartiles robustos con pequeños epsilons para evitar dominios iguales.
+ */
+export function computeQuartiles(vals) {
+  const v = vals.slice().filter(Number.isFinite).sort((a, b) => a - b);
+  if (!v.length) return { min: 0, q1: 1, q2: 2, q3: 3, max: 4 };
+
+  let min = v[0], max = v[v.length - 1];
+  let q1  = d3.quantileSorted(v, 0.25);
+  let q2  = d3.quantileSorted(v, 0.50);
+  let q3  = d3.quantileSorted(v, 0.75);
+
+  const eps = 1e-6;
+  if (!(q1 > min)) q1 = min + eps;
+  if (!(q2 > q1)) q2 = q1 + eps;
+  if (!(q3 > q2)) q3 = q2 + eps;
+  if (!(max > q3)) max = q3 + eps;
+
+  return { min, q1, q2, q3, max };
+}
+
+/**
+ * Construye escala lineal de 5 nodos (min, q1, q2, q3, max).
+ */
+export function buildColorScale(stats, palette) {
+  const { min, q1, q2, q3, max } = stats;
+  return d3.scaleLinear()
+    .domain([min, q1, q2, q3, max])
+    .range(palette)
+    .interpolate(d3.interpolateRgb);
+}
+
+/**
+ * Pasos “bonitos” para la leyenda (evita repetidos y redondea).
+ * - Para población redondea enteros.
+ * - Para tasas mantiene dos decimales.
+ */
+export function legendSteps(stats, { isPopulation = false } = {}) {
+  const { min, q1, q2, q3, max } = stats;
+  const raw = [min, q1, q2, q3, max];
+  const seen = new Set();
+  const pasos = [];
+  for (const v of raw) {
+    const k = isPopulation ? Math.round(v) : +v.toFixed(2);
+    if (!seen.has(k)) { seen.add(k); pasos.push(k); }
+  }
+  return pasos;
+}
+
+/**
+ * Helper completo: valores -> dominio (fijo o dinámico) -> escala y leyenda.
+ * - fixedDomain (opcional): usa un dominio fijo [min, q1, q2, q3, max] (ideal para población).
+ * - capAtPercentile (opcional): recorta el max a un percentil (ej. 0.95) para mitigar outliers.
+ * Devuelve { stats, scale, legendCfg } listos para usar.
+ */
+export function prepararEscalaYLeyenda(
+  rows,
+  METRICAS,
+  metricKey,
+  {
+    palette,
+    titulo,
+    excludeIds = ["8888", "9999"],
+    idKey = "id",
+    extraFilter = null,
+    fixedDomain = null,     // [min, q1, q2, q3, max]
+    clamp = true,           // saturar fuera de rango
+    capAtPercentile = null  // ej. 0.95 (solo útil si no hay fixedDomain)
+  } = {}
+) {
+  const esPoblacion = (metricKey === "poblacion");
+
+  // 1) Valores válidos
+  const vals = valuesForMetric(rows, METRICAS, metricKey, { excludeIds, idKey, extraFilter });
+
+  // 2) Dominio para la escala (fijo o dinámico)
+  let domainValues;
+  if (esPoblacion && Array.isArray(fixedDomain) && fixedDomain.length === 5) {
+    domainValues = fixedDomain.slice().sort((a, b) => a - b);
+  } else {
+    const stats = computeQuartiles(vals);
+    let { min, q1, q2, q3, max } = stats;
+
+    if (esPoblacion && typeof capAtPercentile === "number" && capAtPercentile > 0 && capAtPercentile < 1) {
+      const sorted = vals.slice().sort((a, b) => a - b);
+      const pMax = d3.quantileSorted(sorted, capAtPercentile);
+      if (Number.isFinite(pMax) && pMax < max) max = pMax;
+    }
+    domainValues = [min, q1, q2, q3, max];
+  }
+
+  // 3) Escala para pintar el mapa (proporcional al valor real)
+  const scale = d3.scaleLinear()
+    .domain(domainValues)
+    .range(palette)
+    .interpolate(d3.interpolateRgb)
+    .clamp(!!clamp);
+
+  // 4) Pasos de la leyenda (texto)
+  const pasos = legendSteps(
+    { min: domainValues[0], q1: domainValues[1], q2: domainValues[2], q3: domainValues[3], max: domainValues[4] },
+    { isPopulation: esPoblacion }
+  );
+
+  const legendCfg = {
+    dominio: [domainValues[0], domainValues[4]],
+    pasos,
+    colores: palette,
+    titulo,
+    equalSpacing: esPoblacion,   // <- ticks equiespaciados en población
+    chips: esPoblacion ? null : [
+      { color: COLOR_CERO, texto: '0.00' },
+      { color: COLOR_SIN,  texto: 's/d'  }
+    ]
+  };
+
+  return {
+    stats: { min: domainValues[0], q1: domainValues[1], q2: domainValues[2], q3: domainValues[3], max: domainValues[4] },
+    scale,
+    legendCfg
+  };
 }

@@ -9,7 +9,9 @@ import {
 import {
   crearSVGBase, MAP_WIDTH, MAP_HEIGHT,
   crearLeyenda, descargarComoPNG, crearEtiquetaMunicipio,
-  construirTitulo
+  construirTitulo,
+  prepararEscalaYLeyenda,   // <<< nuevo: helper global
+  COLOR_CERO, COLOR_SIN     // <<< nuevo: colores globales
 } from '../utils/config-mapa.js';
 
 import { renderZoomControles } from '../componentes/zoom-controles.js';
@@ -32,9 +34,6 @@ const legendHost = svg.append("g").attr("id", "legend-host");
 // ==============================
 // CONSTANTES / CONFIG
 // ==============================
-const COLOR_CERO = '#bfbfbf';   // valor 0.00 (solo tasas)
-const COLOR_SIN  = '#d9d9d9';   // sin dato
-
 const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen'];
 const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'];
 
@@ -57,7 +56,7 @@ let currentMetric = "tasa_total";
 // ==============================
 Promise.all([
   d3.json("../data/maps/tamaulipas.geojson"),
-  d3.csv("../data/rate/tamaulipas.csv")
+  d3.csv("../data/rate/tamaulipas.csv") // agrega ?v=Date.now() si quieres cache-buster
 ]).then(([geoData, tasasRaw]) => {
 
   // Año dinámico en título y etiquetas
@@ -65,8 +64,11 @@ Promise.all([
   document.title = `SIARHE | Enfermería en Tamaulipas ${year}`;
   document.querySelectorAll(".year").forEach(el => el.textContent = year);
 
-  // --- Usamos el CSV tal cual y forzamos números (sin normalizar por scope) ---
-  function toNumber(v){ const n = +v; return Number.isFinite(n) ? n : NaN; }
+  // --- Parseo robusto (sin normalización por scope) ---
+  const toNumber = v => {
+    const n = +v;
+    return Number.isFinite(n) ? n : NaN;
+  };
 
   const tasas = tasasRaw.map(d => ({
     ...d,
@@ -107,80 +109,9 @@ Promise.all([
     byMun[mun] = d;
   });
 
-  // ==============================
-  // UTILIDADES DE CUARTILES
-  // ==============================
-  function computeQuartiles(vals) {
-    vals = vals.filter(Number.isFinite).sort((a, b) => a - b);
-    if (!vals.length) return { min: 0, q1: 1, q2: 2, q3: 3, max: 4 };
-
-    let min = vals[0], max = vals[vals.length - 1];
-    let q1  = d3.quantileSorted(vals, 0.25);
-    let q2  = d3.quantileSorted(vals, 0.50);
-    let q3  = d3.quantileSorted(vals, 0.75);
-
-    const eps = 1e-6;
-    if (!(q1 > min)) q1 = min + eps;
-    if (!(q2 > q1)) q2 = q1 + eps;
-    if (!(q3 > q2)) q3 = q2 + eps;
-    if (!(max > q3)) max = q3 + eps;
-    return { min, q1, q2, q3, max };
-  }
-
-  function valores(metricKey) {
-    const key = METRICAS[metricKey].tasaKey;
-    return tasas.map(d => +d[key]).filter(Number.isFinite);
-  }
-
-  let colorScale, min, q1, q2, q3, max;
-
+  // Paleta por métrica
   function paletteFor(metricKey) {
     return METRICAS[metricKey].palette === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
-  }
-
-  // Recomputar cuartiles y pintar mapa
-  function recomputeAndPaint() {
-    ({ min, q1, q2, q3, max } = computeQuartiles(valores(currentMetric)));
-    const pal = paletteFor(currentMetric);
-    const esPob = currentMetric === "poblacion";
-
-    colorScale = d3.scaleLinear()
-      .domain([min, q1, q2, q3, max])
-      .range(pal)
-      .interpolate(d3.interpolateRgb);
-
-    g.selectAll("path.municipio")
-      .transition().duration(350)
-      .attr("fill", f => {
-        const nombre = (f.properties?.NOMGEO || f.properties?.NOMBRE || "").trim();
-        const row = byMun[nombre];
-        if (!row) return COLOR_SIN;
-        const v = +row[METRICAS[currentMetric].tasaKey];
-        if (!Number.isFinite(v)) return COLOR_SIN;
-        if (!esPob && v <= 0) return COLOR_CERO;
-        return colorScale(v);
-      });
-
-    // Leyenda dinámica
-    legendHost.selectAll("*").remove();
-    const pasosCrudos = [min, q1, q2, q3, max];
-    const pasos = [];
-    const seen = new Set();
-    pasosCrudos.forEach(v => {
-      const k = esPob ? Math.round(v) : +(+v).toFixed(2);
-      if (!seen.has(k)) { seen.add(k); pasos.push(k); }
-    });
-
-    crearLeyenda(legendHost, {
-      dominio: [min, max],
-      pasos,
-      colores: pal,
-      titulo: METRICAS[currentMetric].label,
-      chips: esPob ? null : [
-        { color: COLOR_CERO, texto: "0.00" },
-        { color: COLOR_SIN,  texto: "s/d"  }
-      ]
-    });
   }
 
   // ==============================
@@ -218,6 +149,68 @@ Promise.all([
       ocultarTooltip(tooltip);
       d3.select(this).attr("stroke-width", 0.5);
     });
+
+  // ==============================
+// REPINTADO (usa helpers globales)
+// ==============================
+function recomputeAndPaint() {
+  const pal = paletteFor(currentMetric);
+  const esPob = (currentMetric === "poblacion");
+
+  // 👉 elige UNA de estas dos estrategias para población:
+
+  // A) Mitigar outliers (recomendado): capea el máximo al percentil 95
+  const extraPob = { capAtPercentile: 0.95 };
+
+  // B) Congelar posiciones de la barra: usa un dominio fijo (pon tus propios cortes)
+  // const extraPob = { fixedDomain: [6000, 15000, 30000, 60000, 120000] };
+
+  const { scale, legendCfg } = prepararEscalaYLeyenda(
+    tasas,
+    METRICAS,
+    currentMetric,
+    {
+      palette: pal,
+      titulo: METRICAS[currentMetric].label,
+      excludeIds: ["8888", "9999"], // ignora s/d y total
+      idKey: "id",
+      clamp: true,
+      ...(esPob ? extraPob : {})   // solo aplica a población
+    }
+  );
+
+  // Colorear municipios
+  g.selectAll("path.municipio")
+    .transition().duration(350)
+    .attr("fill", f => {
+      const nombre = (f.properties?.NOMGEO || f.properties?.NOMBRE || "").trim();
+      const row = byMun[nombre];
+      if (!row) return COLOR_SIN;
+      const v = +row[METRICAS[currentMetric].tasaKey];
+      if (!Number.isFinite(v)) return COLOR_SIN;
+      if (!esPob && v <= 0)     return COLOR_CERO;  // 0.00 en gris
+      return scale(v);
+    });
+
+  // Leyenda
+  legendHost.selectAll("*").remove();
+  crearLeyenda(legendHost, legendCfg);
+}
+
+  // ==============================
+  // ZOOM Y CONTROLES
+  // ==============================
+  const zoom = d3.zoom()
+    .scaleExtent([1, 20])
+    .on("zoom", (event) => {
+      g.attr("transform", event.transform);
+      for (const ctl of ctlPorTipo.values()) ctl.updateZoom(event.transform.k);
+    });
+  svg.call(zoom);
+
+  renderZoomControles("#mapa-entidad", {
+    svg, g, zoom, showHome: true, idsPrefix: "tam", escalaMin: 1, escalaMax: 20, paso: 0.5
+  });
 
   // ==============================
   // CAPA DE MARCADORES (opcional)
@@ -261,21 +254,6 @@ Promise.all([
       });
     }
   }
-
-  // ==============================
-  // ZOOM Y CONTROLES
-  // ==============================
-  const zoom = d3.zoom()
-    .scaleExtent([1, 20])
-    .on("zoom", (event) => {
-      g.attr("transform", event.transform);
-      for (const ctl of ctlPorTipo.values()) ctl.updateZoom(event.transform.k);
-    });
-  svg.call(zoom);
-
-  renderZoomControles("#mapa-entidad", {
-    svg, g, zoom, showHome: true, idsPrefix: "tam", escalaMin: 1, escalaMax: 20, paso: 0.5
-  });
 
   // ==============================
   // ETIQUETAS MUNICIPALES
