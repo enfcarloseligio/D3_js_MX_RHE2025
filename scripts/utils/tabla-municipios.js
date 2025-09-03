@@ -1,4 +1,4 @@
-// tabla-municipios.js
+// scripts/utils/tabla-municipios.js
 // ===============================================
 // TABLA MUNICIPAL DINÁMICA (sincronizada con #sel-metrica)
 // ===============================================
@@ -20,6 +20,34 @@ let _tbody = null;      // referencia al TBODY actual
 let _tabla = null;      // referencia a la tabla (para ordenar/descargar)
 let _currentMetric = "tasa_total"; // inicial por defecto
 
+// ===== Comparadores / parsers reutilizables =====
+const collES = new Intl.Collator('es', { sensitivity: 'base', numeric: true });
+
+function getCellText(td) {
+  return (td?.textContent || "").trim();
+}
+function parseNumFromCell(td) {
+  // permite miles con espacio/coma y decimales con punto
+  const raw = getCellText(td).replace(/[^0-9.\-]/g, "");
+  const num = parseFloat(raw);
+  return Number.isFinite(num) ? num : NaN;
+}
+
+// Detecta si la métrica seleccionada es "Población" (flexible con nombres comunes)
+function esMetricaPoblacion(metricKey) {
+  if (!metricKey) return false;
+  const mk = String(metricKey).toLowerCase();
+  return (
+    mk === "poblacion" ||
+    mk === "población" ||
+    mk === "pob_total" ||
+    mk === "pob" ||
+    mk === "pobl" ||
+    /^pob/.test(mk) ||    // ej. 'POB_TOTAL'
+    /poblaci[oó]n/.test(mk)
+  );
+}
+
 // ===============================================
 // FUNCIÓN PRINCIPAL PARA GENERAR LA TABLA
 // ===============================================
@@ -28,12 +56,18 @@ export function generarTablaMunicipios(rutaCSV) {
     // 1) Normaliza columnas al esquema ancho
     const data = raw.map(d => {
       const out = { ...d };
+
+      // ID y municipio (mantén lo existente)
+      out.id = d.id ?? d.ID ?? d.Id ?? "";
+      out.municipio = d.municipio ?? d.MUNICIPIO ?? d.Municipio ?? "";
+
       // población (acepta "población" o "poblacion")
-      out.población = +((("población" in d) && d["población"] !== "") ? d["población"] : (d.poblacion || 0));
+      const pob = (("población" in d) && d["población"] !== "") ? d["población"] : (d.poblacion ?? d.POB_TOTAL ?? d.pob_total ?? "");
+      out.población = +(`${pob}`.replace(/[^0-9.\-]/g, "")) || 0;
 
       // totales (compat con legado enfermeras/tasa)
-      out.enfermeras_total = +((d.enfermeras_total ?? d.enfermeras) || 0);
-      out.tasa_total       = +((d.tasa_total       ?? d.tasa)       || 0);
+      out.enfermeras_total = +((d.enfermeras_total ?? d.enfermeras ?? 0));
+      out.tasa_total       = +((d.tasa_total       ?? d.tasa       ?? 0));
 
       // niveles / ámbitos (si no existen, 0)
       out.enfermeras_primer      = +(d.enfermeras_primer      || 0);
@@ -68,10 +102,10 @@ export function generarTablaMunicipios(rutaCSV) {
     const thead = document.createElement("thead");
     thead.innerHTML = `
       <tr>
-        <th><span class="flecha-orden"></span>Municipio</th>
-        <th><span class="flecha-orden"></span>Población</th>
-        <th><span class="flecha-orden"></span>Enfermeras</th>
-        <th><span class="flecha-orden"></span>Tasa por cada mil habitantes</th>
+        <th data-type="text"><span class="flecha-orden"></span>Municipio</th>
+        <th data-type="num"><span class="flecha-orden"></span>Población</th>
+        <th data-type="num"><span class="flecha-orden"></span>Enfermeras</th>
+        <th data-type="num"><span class="flecha-orden"></span>Tasa por cada mil habitantes</th>
       </tr>
     `;
 
@@ -112,8 +146,9 @@ export function generarTablaMunicipios(rutaCSV) {
 function renderTabla(metricKey = "tasa_total") {
   if (!_cache || !_tbody) return;
 
+  const esPoblacion = esMetricaPoblacion(metricKey);
   const def = METRICAS[metricKey] || METRICAS["tasa_total"];
-  const { tasaKey, countKey } = def;
+  const { tasaKey, countKey } = def || {};
 
   // Copia para ordenar sin mutar cache
   const data = _cache.slice();
@@ -124,7 +159,7 @@ function renderTabla(metricKey = "tasa_total") {
     if (b.id === "9999") return -1;
     if (a.id === "8888") return 1;
     if (b.id === "8888") return -1;
-    return a.municipio.localeCompare(b.municipio, "es", { sensitivity: "base" });
+    return collES.compare(a.municipio, b.municipio);
   });
 
   _tbody.innerHTML = "";
@@ -133,14 +168,26 @@ function renderTabla(metricKey = "tasa_total") {
     fila.dataset.id = d.id;
     if (d.id === "9999") fila.classList.add("fila-total"); // estilo de total
 
-    const enfermeras = +(d[countKey] || 0);
-    const tasa       = +(d[tasaKey]  || 0);
+    // Cuando el indicador es Población, forzamos "-" en enfermeras y tasa
+    let enfermerasDisplay, tasaDisplay;
+
+    if (esPoblacion) {
+      enfermerasDisplay = "-";
+      tasaDisplay = "-";
+    } else {
+      const enfermerasNum = +(d[countKey] || 0);
+      const tasaNum       = +(d[tasaKey]  || 0);
+      enfermerasDisplay   = Number(enfermerasNum).toLocaleString("es-MX");
+      tasaDisplay         = Number.isFinite(tasaNum) ? tasaNum.toFixed(2) : "—";
+    }
+
+    const poblacionDisplay = Number(d.población).toLocaleString("es-MX");
 
     fila.innerHTML = `
       <td class="municipio">${d.municipio}</td>
-      <td class="numero">${Number(d.población).toLocaleString("es-MX")}</td>
-      <td class="numero">${Number(enfermeras).toLocaleString("es-MX")}</td>
-      <td class="numero">${Number.isFinite(tasa) ? tasa.toFixed(2) : "—"}</td>
+      <td class="numero">${poblacionDisplay}</td>
+      <td class="numero">${enfermerasDisplay}</td>
+      <td class="numero">${tasaDisplay}</td>
     `;
 
     _tbody.appendChild(fila);
@@ -151,20 +198,23 @@ function renderTabla(metricKey = "tasa_total") {
 // FUNCIÓN PARA ORDENAR LAS COLUMNAS DE LA TABLA
 // ===============================================
 function activarOrdenamientoTabla(tabla) {
-  const ths = tabla.querySelectorAll("thead th");
+  const thead = tabla.querySelector('thead');
+  const ths = thead.querySelectorAll("th");
 
   ths.forEach((th, index) => {
     th.style.cursor = "pointer";
     th.setAttribute("data-orden", "asc");
 
     th.addEventListener("click", () => {
+      const tipo = th.dataset.type || "num"; // 'text' | 'num'
       const ordenActual = th.getAttribute("data-orden");
-      const nuevoOrden = ordenActual === "asc" ? "desc" : "asc";
+      const nuevoOrden  = ordenActual === "asc" ? "desc" : "asc";
 
-      // Limpiar flechas
+      // Limpiar flechas y marcar la activa
       tabla.querySelectorAll(".flecha-orden").forEach(span => span.textContent = "");
       const flecha = th.querySelector(".flecha-orden");
       if (flecha) flecha.textContent = nuevoOrden === "asc" ? "▲" : "▼";
+      th.setAttribute("data-orden", nuevoOrden);
 
       const filas = Array.from(tabla.querySelectorAll("tbody tr"));
 
@@ -172,25 +222,29 @@ function activarOrdenamientoTabla(tabla) {
       const especiales = filas.filter(f => ["8888", "9999"].includes(f.dataset.id));
       const normales   = filas.filter(f => !["8888", "9999"].includes(f.dataset.id));
 
-      // Ordena comparando texto o número
-      normales.sort((a, b) => {
-        const rawA = a.children[index].textContent.trim().replace(/[^\d.-]/g, "");
-        const rawB = b.children[index].textContent.trim().replace(/[^\d.-]/g, "");
-        const isNum = v => /^-?\d+(\.\d+)?$/.test(v);
-
-        const valA = isNum(rawA) ? parseFloat(rawA) : rawA.toLowerCase();
-        const valB = isNum(rawB) ? parseFloat(rawB) : rawB.toLowerCase();
-
-        if (typeof valA === "number" && typeof valB === "number") {
-          return nuevoOrden === "asc" ? valA - valB : valB - valA;
+      // Comparador según tipo
+      const cmp = (a, b) => {
+        if (tipo === "text") {
+          const A = getCellText(a.children[index]);
+          const B = getCellText(b.children[index]);
+          const res = collES.compare(A, B);
+          return nuevoOrden === "asc" ? res : -res;
+        } else {
+          const A = parseNumFromCell(a.children[index]);
+          const B = parseNumFromCell(b.children[index]);
+          let res;
+          if (Number.isNaN(A) && Number.isNaN(B)) res = 0;
+          else if (Number.isNaN(A)) res = 1;
+          else if (Number.isNaN(B)) res = -1;
+          else res = A - B;
+          return nuevoOrden === "asc" ? res : -res;
         }
-        return rawA.localeCompare(rawB, "es", { sensitivity: "base" }) * (nuevoOrden === "asc" ? 1 : -1);
-      });
+      };
+
+      normales.sort(cmp);
 
       const tbody = tabla.querySelector("tbody");
       [...normales, ...especiales].forEach(f => tbody.appendChild(f));
-
-      th.setAttribute("data-orden", nuevoOrden);
     });
   });
 }
@@ -208,7 +262,7 @@ export function habilitarDescargaExcel(nombreArchivo = "tasas-enfermeras-municip
 
     const sel = document.getElementById("sel-metrica");
     const mk  = sel?.value || _currentMetric || "tasa_total";
-    const nombreBonito = (METRICAS[mk]?.label || "Total").replace(/\s+/g, " ");
+    const nombreBonito = (METRICAS[mk]?.label || (esMetricaPoblacion(mk) ? "Población" : "Total")).replace(/\s+/g, " ");
 
     const wb = XLSX.utils.table_to_book(tabla, { sheet: `Municipal - ${nombreBonito}` });
     const nombre = nombreArchivo.replace(".xlsx", ` - ${nombreBonito}.xlsx`);

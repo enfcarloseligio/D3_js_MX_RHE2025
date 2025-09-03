@@ -1,5 +1,7 @@
 // scripts/maps/tamaulipas.js
-
+// ==============================
+// IMPORTACIONES
+// ==============================
 import {
   crearTooltip, mostrarTooltip, ocultarTooltip, mostrarTooltipClinica
 } from '../utils/tooltip.js';
@@ -11,25 +13,32 @@ import {
 } from '../utils/config-mapa.js';
 
 import { renderZoomControles } from '../componentes/zoom-controles.js';
-import { renderTablaNacional as renderTabla, attachExcelButton } from '../utils/tablas.js';
-import { normalizarDataset } from '../utils/normalizacion.js';
 
+// Builder de tabla municipal + exportación Excel
+import { generarTablaMunicipios, habilitarDescargaExcel } from '../utils/tabla-municipios.js';
+
+// Marcadores: control, rutas y estilos
 import { renderMarcadoresControl } from '../componentes/marcadores-control.js';
 import { RUTAS_MARCADORES, normalizarClinicaRow } from '../utils/marcadores.config.js';
 import { MARCADORES_TIPOS, pintarMarcadores, crearLeyendaMarcadores } from '../utils/marcadores.js';
 
-// ====== SVG y tooltip ======
+// ==============================
+// CREACIÓN DEL MAPA
+// ==============================
 const { svg, g } = crearSVGBase("#mapa-entidad", "Mapa de enfermeras – Tamaulipas");
 const tooltip = crearTooltip();
 const legendHost = svg.append("g").attr("id", "legend-host");
 
-// ====== Paletas ======
-const COLOR_CERO = '#bfbfbf';
-const COLOR_SIN  = '#d9d9d9';
+// ==============================
+// CONSTANTES / CONFIG
+// ==============================
+const COLOR_CERO = '#bfbfbf';   // valor 0.00 (solo tasas)
+const COLOR_SIN  = '#d9d9d9';   // sin dato
+
 const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen'];
 const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'];
 
-// ====== Métricas (mismo set que nacional) ======
+// Definición de métricas disponibles
 const METRICAS = {
   tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",       countKey: "enfermeras_total",     palette: "tasas" },
   tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",      countKey: "enfermeras_primer",    palette: "tasas" },
@@ -43,27 +52,54 @@ const METRICAS = {
 };
 let currentMetric = "tasa_total";
 
-// ====== Carga de datos ======
+// ==============================
+// CARGA DE DATOS
+// ==============================
 Promise.all([
   d3.json("../data/maps/tamaulipas.geojson"),
   d3.csv("../data/rate/tamaulipas.csv")
 ]).then(([geoData, tasasRaw]) => {
 
-  // Año y título dinámico
+  // Año dinámico en título y etiquetas
   const year = new Date().getFullYear();
   document.title = `SIARHE | Enfermería en Tamaulipas ${year}`;
   document.querySelectorAll(".year").forEach(el => el.textContent = year);
 
-  // Normalizar dataset al “scope” entidad
-  const tasas = normalizarDataset(tasasRaw, { scope: "entidad", extras: [] });
+  // --- Usamos el CSV tal cual y forzamos números (sin normalizar por scope) ---
+  function toNumber(v){ const n = +v; return Number.isFinite(n) ? n : NaN; }
 
-  // Total entidad (si tu CSV trae una fila agregada “id=9999” o “municipio=TOTAL”)
+  const tasas = tasasRaw.map(d => ({
+    ...d,
+    // soporta acento en población
+    poblacion: toNumber(d.poblacion ?? d['población']),
+    // totales
+    enfermeras_total: toNumber(d.enfermeras_total),
+    tasa_total:       toNumber(d.tasa_total),
+    // niveles
+    enfermeras_primer:   toNumber(d.enfermeras_primer),
+    tasa_primer:         toNumber(d.tasa_primer),
+    enfermeras_segundo:  toNumber(d.enfermeras_segundo),
+    tasa_segundo:        toNumber(d.tasa_segundo),
+    enfermeras_tercer:   toNumber(d.enfermeras_tercer),
+    tasa_tercer:         toNumber(d.tasa_tercer),
+    enfermeras_apoyo:    toNumber(d.enfermeras_apoyo),
+    tasa_apoyo:          toNumber(d.tasa_apoyo),
+    enfermeras_escuelas: toNumber(d.enfermeras_escuelas),
+    tasa_escuelas:       toNumber(d.tasa_escuelas),
+    enfermeras_no_aplica:   toNumber(d.enfermeras_no_aplica),
+    tasa_no_aplica:         toNumber(d.tasa_no_aplica),
+    enfermeras_no_asignado: toNumber(d.enfermeras_no_asignado),
+    tasa_no_asignado:       toNumber(d.tasa_no_asignado),
+  }));
+
+  // Total de la entidad (fila id=9999 o TOTAL)
   const filaTotal = tasasRaw.find(d => String(d.id) === "9999" || (d.municipio || "").toUpperCase() === "TOTAL");
-  const totalEnt = filaTotal ? (Number(filaTotal.enfermeras_total ?? filaTotal.enfermeras) || 0) : d3.sum(tasas, d => +d.enfermeras_total || 0);
+  const totalEnt = filaTotal ? (Number(filaTotal.enfermeras_total ?? filaTotal.enfermeras) || 0)
+                             : d3.sum(tasas, d => +d.enfermeras_total || 0);
   const spanTotal = document.getElementById("total-enfermeras-ent");
   if (spanTotal) spanTotal.textContent = (totalEnt || 0).toLocaleString("es-MX");
 
-  // Diccionario por municipio (clave: nombre o id normalizado)
+  // Diccionario por municipio (clave: nombre normalizado)
   const byMun = {};
   tasas.forEach(d => {
     const mun = (d.municipio || d.municipio_nombre || "").trim();
@@ -71,14 +107,18 @@ Promise.all([
     byMun[mun] = d;
   });
 
-  // ====== Cuartiles y escala de color ======
+  // ==============================
+  // UTILIDADES DE CUARTILES
+  // ==============================
   function computeQuartiles(vals) {
     vals = vals.filter(Number.isFinite).sort((a, b) => a - b);
     if (!vals.length) return { min: 0, q1: 1, q2: 2, q3: 3, max: 4 };
+
     let min = vals[0], max = vals[vals.length - 1];
     let q1  = d3.quantileSorted(vals, 0.25);
     let q2  = d3.quantileSorted(vals, 0.50);
     let q3  = d3.quantileSorted(vals, 0.75);
+
     const eps = 1e-6;
     if (!(q1 > min)) q1 = min + eps;
     if (!(q2 > q1)) q2 = q1 + eps;
@@ -98,6 +138,7 @@ Promise.all([
     return METRICAS[metricKey].palette === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
   }
 
+  // Recomputar cuartiles y pintar mapa
   function recomputeAndPaint() {
     ({ min, q1, q2, q3, max } = computeQuartiles(valores(currentMetric)));
     const pal = paletteFor(currentMetric);
@@ -120,7 +161,7 @@ Promise.all([
         return colorScale(v);
       });
 
-    // Leyenda
+    // Leyenda dinámica
     legendHost.selectAll("*").remove();
     const pasosCrudos = [min, q1, q2, q3, max];
     const pasos = [];
@@ -142,13 +183,14 @@ Promise.all([
     });
   }
 
-  // ====== Proyección ======
+  // ==============================
+  // PROYECCIÓN Y PATHS MUNICIPALES
+  // ==============================
   const projection = d3.geoMercator()
     .fitExtent([[20, 20],[MAP_WIDTH - 20, MAP_HEIGHT - 20]], { type: "FeatureCollection", features: geoData.features });
 
   const path = d3.geoPath().projection(projection);
 
-  // ====== Paths municipales ======
   g.selectAll("path.municipio")
     .data(geoData.features)
     .join("path")
@@ -177,7 +219,9 @@ Promise.all([
       d3.select(this).attr("stroke-width", 0.5);
     });
 
-  // ====== Marcadores (opcional) ======
+  // ==============================
+  // CAPA DE MARCADORES (opcional)
+  // ==============================
   const gMarcadores = g.append("g").attr("class", "capa-marcadores");
   const ctlPorTipo = new Map();
 
@@ -208,7 +252,7 @@ Promise.all([
         if (ctl) ctlPorTipo.set(t, ctl);
       }
     }
-    // leyenda
+    // leyenda de marcadores
     const tipos = Array.from(ctlPorTipo.keys());
     svg.selectAll(".leyenda-marcadores").remove();
     if (tipos.length) {
@@ -218,6 +262,9 @@ Promise.all([
     }
   }
 
+  // ==============================
+  // ZOOM Y CONTROLES
+  // ==============================
   const zoom = d3.zoom()
     .scaleExtent([1, 20])
     .on("zoom", (event) => {
@@ -230,7 +277,9 @@ Promise.all([
     svg, g, zoom, showHome: true, idsPrefix: "tam", escalaMin: 1, escalaMax: 20, paso: 0.5
   });
 
-  // ====== Etiquetas municipales (apagadas por defecto) ======
+  // ==============================
+  // ETIQUETAS MUNICIPALES
+  // ==============================
   const labelsGroup = g.append("g").attr("id", "etiquetas-municipios").style("display", "none");
   geoData.features.forEach(f => {
     const nombre = (f.properties?.NOMGEO || f.properties?.NOMBRE || "").trim();
@@ -239,54 +288,34 @@ Promise.all([
     crearEtiquetaMunicipio(labelsGroup, nombre, x, y, { fontSize: "6px" });
   });
 
-  // ====== Pintado inicial ======
+  // ==============================
+  // PINTADO INICIAL
+  // ==============================
   const sel = document.getElementById("sel-metrica");
   if (sel) currentMetric = sel.value || currentMetric;
   recomputeAndPaint();
 
-  // ====== Tabla municipal (reutilizando utilidad de tabla) ======
-  const tabla = renderTabla({
-    data: tasas,            // tu normalización ya expone columnas consistentes
-    METRICAS,
-    metricKey: currentMetric,
-    hostSelector: "#tabla-contenido"
-  });
+  // Tabla municipal vinculada al selector
+  generarTablaMunicipios("../data/rate/tamaulipas.csv");
+  habilitarDescargaExcel("tamaulipas.xlsx");
 
-  // ====== Botón Excel sincronizado con la métrica ======
-  function resetExcelButtonListener() {
-    const btn = document.querySelector("#descargar-excel");
-    if (!btn) return;
-    const clone = btn.cloneNode(true);
-    btn.parentNode.replaceChild(clone, btn);
-  }
-  function actualizarDescargaExcel() {
-    const metric = METRICAS[currentMetric] || { label: currentMetric };
-    const filename = `tamaulipas-${currentMetric}.xlsx`;
-    resetExcelButtonListener();
-    attachExcelButton({
-      buttonSelector: "#descargar-excel",
-      filenameBase: filename,
-      sheetName: metric.label
-    });
-  }
-  actualizarDescargaExcel();
-
+  // Cambio de métrica -> repinta mapa
   if (sel) {
     sel.addEventListener("change", () => {
       currentMetric = sel.value;
       recomputeAndPaint();
-      tabla.update(currentMetric);
-      actualizarDescargaExcel();
     });
   }
 
-  // ====== Selector de marcadores ======
+  // Selector de marcadores
   const items = Object.values(MARCADORES_TIPOS).map(t => ({ value: t, label: t }));
   const marcCtl = renderMarcadoresControl("#control-marcadores", { items, label: "Marcadores", size: 4 });
   marcCtl.setSelected([]); // por defecto, sin marcadores
   marcCtl.onChange(async () => { await updateMarcadores(marcCtl.getSelected()); });
 
-  // ====== Descargas PNG ======
+  // ==============================
+  // DESCARGAS PNG
+  // ==============================
   document.getElementById("descargar-sin-etiquetas")?.addEventListener("click", () => {
     const titulo = construirTitulo(currentMetric, { entidad: "Tamaulipas", year });
     const etiquetas = document.getElementById("etiquetas-municipios");
