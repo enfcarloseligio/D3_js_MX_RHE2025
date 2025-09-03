@@ -39,8 +39,8 @@ export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribu
  * pasos: array con cortes (min, q1, q2, q3, max)
  * colores: array de colores (mismo largo que pasos)
  * titulo: texto. Si contiene “población”, se muestra 1 línea "Población".
- * chips: [{color, texto}] (opcional). Para población normalmente null.
- * equalSpacing: si true, coloca los ticks equiespaciados (útil para población).
+ * chips: [{color, texto}] (opcional).
+ * equalSpacing: si true, coloca los ticks equiespaciados (independiente del dominio).
  */
 let __legendCounter = 0;
 export function crearLeyenda(host, {
@@ -90,10 +90,7 @@ export function crearLeyenda(host, {
   const esPoblacionPorTitulo = titulo && /poblaci/i.test(String(titulo));
   const fmtTick = esPoblacionPorTitulo ? d3.format(",.0f") : d3.format(".2f");
 
-  // Si equalSpacing=false -> ticks según valor numérico (proporcional)
-  // Si equalSpacing=true  -> ticks en posiciones equiespaciadas (índice)
   let eje;
-
   if (!equalSpacing) {
     const escala = d3.scaleLinear()
       .domain([dominio[0], dominio[1]])
@@ -107,13 +104,11 @@ export function crearLeyenda(host, {
       .attr("transform", `translate(${x + ancho}, 0)`)
       .call(eje);
   } else {
-    // Escala visual 0..N-1 -> equiespaciado
     const n = pasos.length;
     const escalaIdx = d3.scaleLinear()
       .domain([0, n - 1])
       .range([y + alto, y]);
 
-    // Ticks en índices 0..n-1, con formato usando los valores reales en "pasos"
     eje = d3.axisRight(escalaIdx)
       .tickValues(d3.range(n))
       .tickFormat(i => fmtTick(pasos[i]));
@@ -126,7 +121,6 @@ export function crearLeyenda(host, {
   // Título
   if (titulo) {
     if (esPoblacionPorTitulo) {
-      // Una sola línea: "Población"
       root.append("text")
         .attr("x", x + ancho / 2)
         .attr("y", y - 10)
@@ -135,7 +129,6 @@ export function crearLeyenda(host, {
         .attr("font-family", "'Noto Sans', sans-serif")
         .text("Población");
     } else {
-      // Dos líneas: "Tasa" + categoría
       const cat = String(titulo).replace(/^\s*tasa\s*/i, "").trim() || "total";
       const t = root.append("text")
         .attr("x", x + ancho / 2)
@@ -277,13 +270,11 @@ export function activarZoomConBotones(svg, g, {
 // ==============================
 // DESCARGAR SVG COMO PNG
 // ==============================
-// ============ NUEVO helper: título según métrica ============
 export function construirTitulo(metricKey, { entidad = null, year = 2025 } = {}) {
   const lugar = entidad ? `en ${entidad}` : "en México";
   const sufijo = `(${year})`;
 
   const map = {
-    // Tasas
     "tasa_total":       `Tasa de enfermeras por cada mil habitantes ${lugar} ${sufijo}`,
     "tasa_primer":      `Tasa de enfermeras por cada mil habitantes en 1er nivel de atención ${lugar} ${sufijo}`,
     "tasa_segundo":     `Tasa de enfermeras por cada mil habitantes en 2º nivel de atención ${lugar} ${sufijo}`,
@@ -292,8 +283,6 @@ export function construirTitulo(metricKey, { entidad = null, year = 2025 } = {})
     "tasa_escuelas":    `Tasa de enfermeras por cada mil habitantes en escuelas ${lugar} ${sufijo}`,
     "tasa_no_aplica":   `Registros “No aplica” de enfermería ${lugar} ${sufijo}`,
     "tasa_no_asignado": `Registros “No asignado” de enfermería ${lugar} ${sufijo}`,
-
-    // Población (no dice “tasa”)
     "poblacion":        `Población ${lugar} ${sufijo}`,
   };
 
@@ -313,12 +302,10 @@ export function descargarComoPNG(
   const svgElement = document.querySelector(svgSelector);
   if (!svgElement) return;
 
-  // --- Parámetros visuales ---
   const extraTop = 50;
   const citaFontSize = 13;
   const citaLineHeight = 18;
 
-  // Helper: wrap en máximo 2 líneas
   function wrapDosLineas(str, maxChars = 130) {
     const words = String(str).split(/\s+/);
     const lines = [];
@@ -334,7 +321,6 @@ export function descargarComoPNG(
       }
     }
     if (line) lines.push(line);
-
     if (lines.length > 2) {
       lines[1] = lines.slice(1).join(" ");
       return lines.slice(0, 2);
@@ -342,7 +328,6 @@ export function descargarComoPNG(
     return lines;
   }
 
-  // ---------- TÍTULO ----------
   svgElement.setAttribute("viewBox", `0 ${-extraTop} ${width} ${height + extraTop + 80}`);
 
   const fondoTitulo = document.createElementNS("http://www.w3.org/2000/svg", "rect");
@@ -364,11 +349,9 @@ export function descargarComoPNG(
   tituloNode.setAttribute("font-weight", "bold");
   tituloNode.setAttribute("fill", "#111");
   tituloNode.setAttribute("id", "titulo-descarga");
-  tituloNode.textContent =
-    titulo || `Tasa de enfermeras por cada mil habitantes (2025)`;
+  tituloNode.textContent = titulo || `Tasa de enfermeras por cada mil habitantes (2025)`;
   svgElement.appendChild(tituloNode);
 
-  // ---------- CITA ----------
   const fecha = new Date().toISOString().split("T")[0];
   const citaTexto =
     cita ||
@@ -408,7 +391,6 @@ export function descargarComoPNG(
     citaNode.appendChild(tspan);
   });
 
-  // ---------- Serializar y descargar ----------
   const serializer = new XMLSerializer();
   const svgString = serializer.serializeToString(svgElement);
 
@@ -435,7 +417,6 @@ export function descargarComoPNG(
   };
   image.src = url;
 
-  // Limpieza
   setTimeout(() => {
     svgElement.querySelector("#titulo-descarga")?.remove();
     svgElement.querySelector("#fondo-titulo")?.remove();
@@ -448,9 +429,9 @@ export function descargarComoPNG(
 export function construirTituloClinicas(
   metricKey,
   {
-    nombreTipo = "clínicas",             // p. ej. "clínicas de catéter"
-    entidad = null,                      // p. ej. "Tamaulipas"
-    year = new Date().getFullYear(),     // 2025 por defecto actual
+    nombreTipo = "clínicas",
+    entidad = null,
+    year = new Date().getFullYear(),
   } = {}
 ) {
   const lugar = entidad ? `en ${entidad}` : "en México";
@@ -458,7 +439,6 @@ export function construirTituloClinicas(
 
   const baseTasa = `Distribución de ${nombreTipo} y tasa de enfermeras por cada mil habitantes`;
   const map = {
-    // Tasas
     "tasa_total":       `${baseTasa} ${lugar} ${sufijo}`,
     "tasa_primer":      `${baseTasa} en 1er nivel de atención ${lugar} ${sufijo}`,
     "tasa_segundo":     `${baseTasa} en 2º nivel de atención ${lugar} ${sufijo}`,
@@ -467,8 +447,6 @@ export function construirTituloClinicas(
     "tasa_escuelas":    `${baseTasa} en escuelas ${lugar} ${sufijo}`,
     "tasa_no_aplica":   `Distribución de ${nombreTipo} y registros “No aplica” de enfermería ${lugar} ${sufijo}`,
     "tasa_no_asignado": `Distribución de ${nombreTipo} y registros “No asignado” de enfermería ${lugar} ${sufijo}`,
-
-    // Población
     "poblacion":        `Distribución de ${nombreTipo} y población ${lugar} ${sufijo}`,
   };
 
@@ -478,12 +456,6 @@ export function construirTituloClinicas(
 // ===============================================
 // UTILIDADES GLOBALES PARA ESCALAS Y LEYENDAS
 // ===============================================
-
-/**
- * Devuelve sólo los valores válidos para una métrica.
- * - Para población: mantiene 0s, pero excluye filas especiales (8888, 9999).
- * - Para tasas: excluye <= 0 (esos van al chip "0.00").
- */
 export function valuesForMetric(
   rows,
   METRICAS,
@@ -501,13 +473,9 @@ export function valuesForMetric(
     .map(r => +r[key])
     .filter(Number.isFinite);
 
-  // En tasas removemos 0 y negativos (se pintan como chip 0.00)
   return esPoblacion ? arr : arr.filter(v => v > 0);
 }
 
-/**
- * Cuartiles robustos con pequeños epsilons para evitar dominios iguales.
- */
 export function computeQuartiles(vals) {
   const v = vals.slice().filter(Number.isFinite).sort((a, b) => a - b);
   if (!v.length) return { min: 0, q1: 1, q2: 2, q3: 3, max: 4 };
@@ -526,9 +494,6 @@ export function computeQuartiles(vals) {
   return { min, q1, q2, q3, max };
 }
 
-/**
- * Construye escala lineal de 5 nodos (min, q1, q2, q3, max).
- */
 export function buildColorScale(stats, palette) {
   const { min, q1, q2, q3, max } = stats;
   return d3.scaleLinear()
@@ -537,11 +502,6 @@ export function buildColorScale(stats, palette) {
     .interpolate(d3.interpolateRgb);
 }
 
-/**
- * Pasos “bonitos” para la leyenda (evita repetidos y redondea).
- * - Para población redondea enteros.
- * - Para tasas mantiene dos decimales.
- */
 export function legendSteps(stats, { isPopulation = false } = {}) {
   const { min, q1, q2, q3, max } = stats;
   const raw = [min, q1, q2, q3, max];
@@ -556,8 +516,8 @@ export function legendSteps(stats, { isPopulation = false } = {}) {
 
 /**
  * Helper completo: valores -> dominio (fijo o dinámico) -> escala y leyenda.
- * - fixedDomain (opcional): usa un dominio fijo [min, q1, q2, q3, max] (ideal para población).
- * - capAtPercentile (opcional): recorta el max a un percentil (ej. 0.95) para mitigar outliers.
+ * - fixedDomain (opcional): usa un dominio fijo [min, q1, q2, q3, max].
+ * - capAtPercentile (opcional): recorta el max a un percentil (ej. 0.95).
  * Devuelve { stats, scale, legendCfg } listos para usar.
  */
 export function prepararEscalaYLeyenda(
@@ -571,8 +531,8 @@ export function prepararEscalaYLeyenda(
     idKey = "id",
     extraFilter = null,
     fixedDomain = null,     // [min, q1, q2, q3, max]
-    clamp = true,           // saturar fuera de rango
-    capAtPercentile = null  // ej. 0.95 (solo útil si no hay fixedDomain)
+    clamp = true,
+    capAtPercentile = null
   } = {}
 ) {
   const esPoblacion = (metricKey === "poblacion");
@@ -582,13 +542,13 @@ export function prepararEscalaYLeyenda(
 
   // 2) Dominio para la escala (fijo o dinámico)
   let domainValues;
-  if (esPoblacion && Array.isArray(fixedDomain) && fixedDomain.length === 5) {
+  if (Array.isArray(fixedDomain) && fixedDomain.length === 5) {
     domainValues = fixedDomain.slice().sort((a, b) => a - b);
   } else {
     const stats = computeQuartiles(vals);
     let { min, q1, q2, q3, max } = stats;
 
-    if (esPoblacion && typeof capAtPercentile === "number" && capAtPercentile > 0 && capAtPercentile < 1) {
+    if (typeof capAtPercentile === "number" && capAtPercentile > 0 && capAtPercentile < 1) {
       const sorted = vals.slice().sort((a, b) => a - b);
       const pMax = d3.quantileSorted(sorted, capAtPercentile);
       if (Number.isFinite(pMax) && pMax < max) max = pMax;
@@ -614,7 +574,7 @@ export function prepararEscalaYLeyenda(
     pasos,
     colores: palette,
     titulo,
-    equalSpacing: esPoblacion,   // <- ticks equiespaciados en población
+    equalSpacing: true,   // <<< SIEMPRE equiespaciado en la leyenda
     chips: esPoblacion ? null : [
       { color: COLOR_CERO, texto: '0.00' },
       { color: COLOR_SIN,  texto: 's/d'  }
