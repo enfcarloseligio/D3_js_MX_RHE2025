@@ -37,6 +37,13 @@ const legendHost = svg.append("g").attr("id", "legend-host");
 const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen'];
 const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'];
 
+// ✅ Filtro de entidad para marcadores (Tamaulipas)
+const ES_CVE_TAM = "28";
+const esDeTamaulipasRaw = (d) =>
+  String(d.Clave_Entidad || d.cve_ent || d.CVE_ENT || d.entidad_id)
+    .padStart(2, "0") === ES_CVE_TAM
+  || /tamaulipas/i.test(String(d.Entidad || d.estado || d.entidad || ""));
+
 // Definición de métricas disponibles
 const METRICAS = {
   tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",       countKey: "enfermeras_total",     palette: "tasas" },
@@ -151,51 +158,47 @@ Promise.all([
     });
 
   // ==============================
-// REPINTADO (usa helpers globales)
-// ==============================
-function recomputeAndPaint() {
-  const pal = paletteFor(currentMetric);
-  const esPob = (currentMetric === "poblacion");
+  // REPINTADO (usa helpers globales)
+  // ==============================
+  function recomputeAndPaint() {
+    const pal = paletteFor(currentMetric);
+    const esPob = (currentMetric === "poblacion");
 
-  // 👉 elige UNA de estas dos estrategias para población:
+    // (Conserva tu estrategia actual)
+    const extraPob = { capAtPercentile: 0.95 };
+    // const extraPob = { fixedDomain: [6000, 15000, 30000, 60000, 120000] };
 
-  // A) Mitigar outliers (recomendado): capea el máximo al percentil 95
-  const extraPob = { capAtPercentile: 0.95 };
+    const { scale, legendCfg } = prepararEscalaYLeyenda(
+      tasas,
+      METRICAS,
+      currentMetric,
+      {
+        palette: pal,
+        titulo: METRICAS[currentMetric].label,
+        excludeIds: ["8888", "9999"], // ignora s/d y total
+        idKey: "id",
+        clamp: true,
+        ...(esPob ? extraPob : {})   // solo aplica a población
+      }
+    );
 
-  // B) Congelar posiciones de la barra: usa un dominio fijo (pon tus propios cortes)
-  // const extraPob = { fixedDomain: [6000, 15000, 30000, 60000, 120000] };
+    // Colorear municipios
+    g.selectAll("path.municipio")
+      .transition().duration(350)
+      .attr("fill", f => {
+        const nombre = (f.properties?.NOMGEO || f.properties?.NOMBRE || "").trim();
+        const row = byMun[nombre];
+        if (!row) return COLOR_SIN;
+        const v = +row[METRICAS[currentMetric].tasaKey];
+        if (!Number.isFinite(v)) return COLOR_SIN;
+        if (!esPob && v <= 0)     return COLOR_CERO;  // 0.00 en gris
+        return scale(v);
+      });
 
-  const { scale, legendCfg } = prepararEscalaYLeyenda(
-    tasas,
-    METRICAS,
-    currentMetric,
-    {
-      palette: pal,
-      titulo: METRICAS[currentMetric].label,
-      excludeIds: ["8888", "9999"], // ignora s/d y total
-      idKey: "id",
-      clamp: true,
-      ...(esPob ? extraPob : {})   // solo aplica a población
-    }
-  );
-
-  // Colorear municipios
-  g.selectAll("path.municipio")
-    .transition().duration(350)
-    .attr("fill", f => {
-      const nombre = (f.properties?.NOMGEO || f.properties?.NOMBRE || "").trim();
-      const row = byMun[nombre];
-      if (!row) return COLOR_SIN;
-      const v = +row[METRICAS[currentMetric].tasaKey];
-      if (!Number.isFinite(v)) return COLOR_SIN;
-      if (!esPob && v <= 0)     return COLOR_CERO;  // 0.00 en gris
-      return scale(v);
-    });
-
-  // Leyenda
-  legendHost.selectAll("*").remove();
-  crearLeyenda(legendHost, legendCfg);
-}
+    // Leyenda
+    legendHost.selectAll("*").remove();
+    crearLeyenda(legendHost, legendCfg);
+  }
 
   // ==============================
   // ZOOM Y CONTROLES
@@ -221,13 +224,22 @@ function recomputeAndPaint() {
   async function cargarYPintar(tipo) {
     const ruta = RUTAS_MARCADORES[tipo];
     if (!ruta) return null;
+
     const raw = await d3.csv(ruta);
-    const pts = raw.map(d => normalizarClinicaRow(d, tipo))
-                   .filter(d => Number.isFinite(d.lat) && Number.isFinite(d.lon));
+
+    // ✅ Solo marcadores de Tamaulipas (Clave_Entidad=28 o Entidad='Tamaulipas')
+    const rawTam = raw.filter(esDeTamaulipasRaw);
+
+    const pts = rawTam
+      .map(d => normalizarClinicaRow(d, tipo))
+      .filter(d => Number.isFinite(d.lat) && Number.isFinite(d.lon));
+
     const ctl = pintarMarcadores(gMarcadores, pts, projection, { tipo });
     ctl.selection
       .on("mouseover", (event, d) => { event.stopPropagation(); mostrarTooltipClinica(tooltip, event, d); })
-      .on("mousemove", (event) => { event.stopPropagation(); tooltip.style("left", (event.pageX + 10) + "px").style("top",  (event.pageY - 28) + "px"); })
+      .on("mousemove", (event) => { event.stopPropagation(); tooltip
+        .style("left", (event.pageX + 10) + "px")
+        .style("top",  (event.pageY - 28) + "px"); })
       .on("mouseout",  (event) => { event.stopPropagation(); ocultarTooltip(tooltip); });
     return ctl;
   }
