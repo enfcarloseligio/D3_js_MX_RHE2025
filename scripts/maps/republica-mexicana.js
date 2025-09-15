@@ -13,7 +13,8 @@ import {
 import {
   crearSVGBase, MAP_WIDTH, MAP_HEIGHT,
   crearLeyenda, descargarComoPNG, crearEtiquetaMunicipio,
-  construirTitulo
+  construirTitulo,
+  prepararEscalaYLeyenda // ← añadido: helper para cortes equidistantes
 } from '../utils/config-mapa.js';
 
 import { renderZoomControles } from '../componentes/zoom-controles.js';
@@ -106,6 +107,7 @@ Promise.all([
 
   // (Opcional) Título SEO dinámico con año
   document.title = `SIARHE | Distribución de Profesionales de Enfermería en México ${year}`;
+
   // ==============================
   // Normalización (GLOBAL)
   // ==============================
@@ -135,53 +137,38 @@ Promise.all([
   });
 
   // ==============================
-  // Utilidades de cuartiles
-  // ==============================
-  function computeQuartiles(vals) {
-    vals = vals.filter(Number.isFinite).sort((a, b) => a - b);
-    if (!vals.length) return { min: 0, q1: 1, q2: 2, q3: 3, max: 4 };
-
-    let min = vals[0], max = vals[vals.length - 1];
-    let q1  = d3.quantileSorted(vals, 0.25);
-    let q2  = d3.quantileSorted(vals, 0.50);
-    let q3  = d3.quantileSorted(vals, 0.75);
-
-    const eps = 1e-6;
-    if (!(q1 > min)) q1 = min + eps;
-    if (!(q2 > q1)) q2 = q1 + eps;
-    if (!(q3 > q2)) q3 = q2 + eps;
-    if (!(max > q3)) max = q3 + eps;
-
-    return { min, q1, q2, q3, max };
-  }
-
-  function valoresDeMetrica(metricKey) {
-    const key = METRICAS[metricKey].tasaKey;
-    return tasas
-      .filter(d => idsEntidades.has(String(d.id)))
-      .map(d => +d[key])
-      .filter(Number.isFinite);
-  }
-
-  let min, q1, q2, q3, max;
-  let colorScale;
-
+  // Utilidad: paleta por métrica (se mantiene)
+// ==============================
   function paletteFor(metricKey) {
     const pal = METRICAS[metricKey].palette;
     return pal === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
   }
 
+  // ==============================
+  // Pintado + leyenda (EQUI-DISTANTE con helper)
+// ==============================
   function recomputeAndPaint() {
-    ({ min, q1, q2, q3, max } = computeQuartiles(valoresDeMetrica(currentMetric)));
-
     const PALETTE = paletteFor(currentMetric);
     const esPoblacion = currentMetric === "poblacion";
 
-    colorScale = d3.scaleLinear()
-      .domain([min, q1, q2, q3, max])
-      .range(PALETTE)
-      .interpolate(d3.interpolateRgb);
+    // Cortes equidistantes min–s1–s2–s3–max y escala alineada con la leyenda
+    const { scale, legendCfg } = prepararEscalaYLeyenda(
+      // datos base:
+      tasas.filter(d => idsEntidades.has(String(d.id))), // solo 1..32 para calcular rango
+      METRICAS,
+      currentMetric,
+      // opciones:
+      {
+        palette: PALETTE,                     // ← mantiene tus colores
+        titulo: METRICAS[currentMetric].label,
+        idKey: "id",
+        excludeIds: ["8888", "9999"],         // por si vienen en el CSV
+        clamp: true                           // fuera de rango → extremo
+        // sin P95: usa min/max reales; el helper hace tramos equidistantes
+      }
+    );
 
+    // Pintado del mapa usando EXACTAMENTE la misma escala que la leyenda
     g.selectAll("path.estado")
       .transition().duration(350)
       .attr("fill", d => {
@@ -190,30 +177,13 @@ Promise.all([
         if (!item) return COLOR_SIN;
         const v = +item[METRICAS[currentMetric].tasaKey];
         if (!Number.isFinite(v)) return COLOR_SIN;
-        if (!esPoblacion && v <= 0) return COLOR_CERO;
-        return colorScale(v);
+        if (!esPoblacion && v <= 0) return COLOR_CERO; // 0.00 en gris
+        return scale(v);
       });
 
+    // Leyenda
     legendHost.selectAll("*").remove();
-
-    const pasosCrudos = [min, q1, q2, q3, max];
-    const pasos = [];
-    const seen = new Set();
-    pasosCrudos.forEach(v => {
-      const k = esPoblacion ? Math.round(v) : +(+v).toFixed(2);
-      if (!seen.has(k)) { seen.add(k); pasos.push(k); }
-    });
-
-    crearLeyenda(legendHost, {
-      dominio: [min, max],
-      pasos,
-      colores: PALETTE,
-      titulo: METRICAS[currentMetric].label,
-      chips: esPoblacion ? null : [
-        { color: COLOR_CERO, texto: "0.00" },
-        { color: COLOR_SIN,  texto: "s/d"  }
-      ]
-    });
+    crearLeyenda(legendHost, legendCfg);
   }
 
   // ==============================
@@ -382,7 +352,7 @@ Promise.all([
   });
 
   // ==============================
-  // --- SELECTOR + TABLA SINCRONIZADOS ---
+// --- SELECTOR + TABLA SINCRONIZADOS ---
   // ==============================
   const selMetrica = document.getElementById("sel-metrica");
   if (selMetrica) currentMetric = selMetrica.value || currentMetric;
