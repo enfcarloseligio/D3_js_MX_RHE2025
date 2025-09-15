@@ -13,7 +13,8 @@ import {
 import {
   crearSVGBase, MAP_WIDTH, MAP_HEIGHT,
   crearLeyenda, descargarComoPNG, crearEtiquetaMunicipio,
-  construirTituloClinicas
+  construirTituloClinicas,
+  prepararEscalaYLeyenda // ← helper para escala + leyenda equidistante
 } from '../utils/config-mapa.js';
 
 import { renderZoomControles } from '../componentes/zoom-controles.js';
@@ -46,6 +47,7 @@ const legendHost = svg.append("g").attr("id", "legend-host");
 const COLOR_CERO = '#bfbfbf';   // 0.00 para tasas
 const COLOR_SIN  = '#d9d9d9';   // s/d
 
+// ← Tus paletas se mantienen idénticas
 const COLORES_TASAS     = ['#9b2247', 'orange', '#e6d194', 'green', 'darkgreen'];
 const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'];
 
@@ -101,7 +103,9 @@ Promise.all([
   // ==============================
   // Normalización global del CSV de tasas
   // ==============================
-  const tasas = normalizarDataset(tasasRaw, { scope: "nacional", extras: [] });
+  const tasas = normalizarDataset(tasasRaw, { scope: "nacional", extras: [] })
+    // Solo estados 1..32 (evita filas TOTAL/otros ids)
+    .filter(d => idsEntidades.has(String(d.id)));
 
   // ==============================
   // Diccionario por estado (para polígonos/tooltip)
@@ -127,32 +131,6 @@ Promise.all([
   });
 
   // ==============================
-  // Utilidades de cuartiles
-  // ==============================
-  function computeQuartiles(vals) {
-    vals = vals.filter(Number.isFinite).sort((a, b) => a - b);
-    if (!vals.length) return { min: 0, q1: 1, q2: 2, q3: 3, max: 4 };
-    let min = vals[0], max = vals[vals.length - 1];
-    let q1  = d3.quantileSorted(vals, 0.25);
-    let q2  = d3.quantileSorted(vals, 0.50);
-    let q3  = d3.quantileSorted(vals, 0.75);
-    const eps = 1e-6;
-    if (!(q1 > min)) q1 = min + eps;
-    if (!(q2 > q1)) q2 = q1 + eps;
-    if (!(q3 > q2)) q3 = q2 + eps;
-    if (!(max > q3)) max = q3 + eps;
-    return { min, q1, q2, q3, max };
-  }
-
-  function valoresDeMetrica(metricKey) {
-    const key = METRICAS[metricKey].tasaKey; // 'tasa_*' o 'poblacion'
-    return tasas
-      .filter(d => idsEntidades.has(String(d.id)))
-      .map(d => +d[key])
-      .filter(Number.isFinite);
-  }
-
-  // ==============================
   // Proyección y paths de estados
   // ==============================
   const projection = d3.geoMercator()
@@ -172,27 +150,36 @@ Promise.all([
     .attr("fill", COLOR_SIN);
 
   // ==============================
-  // Pintado + leyenda
-  // ==============================
-  let min, q1, q2, q3, max;
-  let colorScale;
-
+  // Pintado + leyenda (con helpers)
+// ==============================
   function paletteFor(metricKey) {
-    const pal = METRICAS[metricKey].palette;
-    return pal === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
+    return METRICAS[metricKey].palette === "poblacion"
+      ? COLORES_POBLACION
+      : COLORES_TASAS;
   }
 
   function recomputeAndPaint() {
-    ({ min, q1, q2, q3, max } = computeQuartiles(valoresDeMetrica(currentMetric)));
-
     const PALETTE = paletteFor(currentMetric);
     const esPoblacion = currentMetric === "poblacion";
 
-    colorScale = d3.scaleLinear()
-      .domain([min, q1, q2, q3, max])
-      .range(PALETTE)
-      .interpolate(d3.interpolateRgb);
+    // Helper centralizado: calcula escala y config de leyenda con
+    // cortes E Q U I D I S T A N T E S min–s1–s2–s3–max a partir de los datos
+    const { scale, legendCfg } = prepararEscalaYLeyenda(
+      tasas,
+      METRICAS,
+      currentMetric,
+      {
+        palette: PALETTE,          // ← tus colores
+        titulo: METRICAS[currentMetric].label,
+        idKey: "id",
+        excludeIds: ["8888","9999"], // ignora TOTAL u otros
+        clamp: true,                 // valores fuera de rango se capean al extremo
+        // sin P95: se usa min y max reales del conjunto 1..32
+        // y con cortes equidistantes generados por el helper
+      }
+    );
 
+    // Pintado consistente con la leyenda
     estados.transition().duration(350)
       .attr("fill", d => {
         const nombre = (d.properties.NOMBRE || "").trim();
@@ -200,31 +187,13 @@ Promise.all([
         if (!item) return COLOR_SIN;
         const v = +item[METRICAS[currentMetric].tasaKey];
         if (!Number.isFinite(v)) return COLOR_SIN;
-        if (!esPoblacion && v <= 0) return COLOR_CERO; // '0.00' solo aplica a tasas
-        return colorScale(v);
+        if (!esPoblacion && v <= 0) return COLOR_CERO; // 0.00 en gris
+        return scale(v);
       });
 
+    // Leyenda: el helper ya trae los mismos cortes usados por la escala
     legendHost.selectAll("*").remove();
-
-    // Pasos únicos (redondeo distinto para población vs. tasas)
-    const pasosCrudos = [min, q1, q2, q3, max];
-    const pasos = [];
-    const seen = new Set();
-    pasosCrudos.forEach(v => {
-      const k = esPoblacion ? Math.round(v) : +(+v).toFixed(2);
-      if (!seen.has(k)) { seen.add(k); pasos.push(k); }
-    });
-
-    crearLeyenda(legendHost, {
-      dominio: [min, max],
-      pasos,
-      colores: PALETTE,
-      titulo: METRICAS[currentMetric].label,
-      chips: esPoblacion ? null : [
-        { color: COLOR_CERO, texto: "0.00" },
-        { color: COLOR_SIN,  texto: "s/d"  }
-      ]
-    });
+    crearLeyenda(legendHost, legendCfg);
   }
 
   // ==============================
