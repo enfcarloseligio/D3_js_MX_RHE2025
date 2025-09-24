@@ -1,5 +1,4 @@
-id,CVE_ENT,CVE_MUN,municipio,población,enfermeras,tasa
-1,27,001,Balancán,58524,151,2.580138063
+id,CVE_ENT,CVE_MUN,municipio,población,enfermeras,tasaid,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado1,27,001,Balancán,58524,151,2.580138063
 2,27,002,Cárdenas,243229,577,2.37225002
 3,27,003,Centla,107731,185,1.717240163
 4,27,004,Centro,683607,4368,6.389636151

@@ -1,4 +1,4 @@
-id,CVE_ENT,CVE_MUN,municipio,población,enfermeras,tasa
+id,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
 1,22,001,Amealco de Bonfil,66841,64,0.957496148
 2,22,002,Pinal de Amoles,27365,27,0.986661794
 3,22,003,Arroyo Seco,13142,18,1.369654543

@@ -1,4 +1,4 @@
-id,CVE_ENT,CVE_MUN,municipio,población,enfermeras,tasa
+id,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
 1,25,001,Ahome,459310,1407,3.063290588
 2,25,002,Angostura,44093,82,1.859705622
 3,25,003,Badiraguato,26542,71,2.675005651

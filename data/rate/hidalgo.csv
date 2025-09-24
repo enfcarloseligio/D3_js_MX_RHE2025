@@ -1,4 +1,4 @@
-id,CVE_ENT,CVE_MUN,municipio,poblaci�n,enfermeras,tasa
+id,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
 1,13,001,Acatlán,22268,20,0.898149811
 2,13,002,Acaxochitlán,46065,34,0.738087485
 3,13,003,Actopan,61002,179,2.934330022

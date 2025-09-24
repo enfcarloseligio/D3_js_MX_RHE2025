@@ -1,4 +1,4 @@
-id,CVE_ENT,CVE_MUN,alcaldías,población,enfermeras,tasa
+id,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
 1,09,002,Álvaro Obregón,759137,3830,5.045202645
 2,09,003,Azcapotzalco,432205,6551,15.15715922
 3,09,004,Benito Juárez,434153,4303,9.911252485
