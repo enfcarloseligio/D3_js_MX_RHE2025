@@ -1,4 +1,4 @@
-id,CVE_ENT,CVE_MUN,municipio,población,enfermeras,tasa
+id,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
 1,01,001,Aguascalientes,948990,3595,3.788238021
 2,01,002,Asientos,46492,39,0.838853996
 3,01,003,Calvillo,58250,209,3.587982833

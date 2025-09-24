@@ -1,4 +1,4 @@
-id,CVE_ENT,CVE_MUN,municipio,población,enfermeras,tasa
+id,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
 1,03,001,Comondú,73021,269,3.683871763
 2,03,002,Mulegé,64022,262,4.092343257
 3,03,003,La Paz,292241,1380,4.722130023

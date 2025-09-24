@@ -1,4 +1,4 @@
-id,CVE_ENT,CVE_MUN,municipio,población,enfermeras,tasa
+id,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
 1,02,001,Ensenada,443807,1410,3.177056694
 2,02,002,Mexicali,1049792,3164,3.013930379
 3,02,003,Tecate,108440,449,4.140538547
