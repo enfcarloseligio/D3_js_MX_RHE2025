@@ -23,13 +23,13 @@ export function nombreTipoMarcador(tipo) {
 // Paletas por tipo de marcador
 export const MARCADOR_ESTILOS = {
   [MARCADORES_TIPOS.CATETER]: {
-    fill: "#1e5b4f",
-    hover: "#004d40",
+    fill: "#1E5B4F",
+    hover: "#002F2A",
     stroke: "#ffffff",
   },
   [MARCADORES_TIPOS.HERIDAS]: {
-    fill: "#3b82f6",
-    hover: "#1e40af",
+    fill: "#9B2247",
+    hover: "#611232",
     stroke: "#ffffff",
   },
 };
