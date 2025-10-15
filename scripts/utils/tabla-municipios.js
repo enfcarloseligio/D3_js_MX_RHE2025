@@ -5,14 +5,15 @@
 
 // Mapeo de métricas disponibles
 const METRICAS = {
-  tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",       countKey: "enfermeras_total" },
-  tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",      countKey: "enfermeras_primer" },
-  tasa_segundo:     { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",     countKey: "enfermeras_segundo" },
-  tasa_tercer:      { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",      countKey: "enfermeras_tercer" },
-  tasa_apoyo:       { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",       countKey: "enfermeras_apoyo" },
-  tasa_escuelas:    { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas",    countKey: "enfermeras_escuelas" },
-  tasa_no_aplica:   { label: "Tasa no aplica",       tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica" },
-  tasa_no_asignado: { label: "Tasa no asignado",     tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado" }
+  tasa_total:       { label: "Tasa total",                    tasaKey: "tasa_total",            countKey: "enfermeras_total" },
+  tasa_primer:      { label: "Tasa 1er nivel",                tasaKey: "tasa_primer",           countKey: "enfermeras_primer" },
+  tasa_segundo:     { label: "Tasa 2º nivel",                 tasaKey: "tasa_segundo",          countKey: "enfermeras_segundo" },
+  tasa_tercer:      { label: "Tasa 3er nivel",                tasaKey: "tasa_tercer",           countKey: "enfermeras_tercer" },
+  tasa_apoyo:       { label: "Tasa en establecimientos de apoyo", tasaKey: "tasa_apoyo",        countKey: "enfermeras_apoyo" },
+  tasa_escuelas:    { label: "Tasa en escuelas",              tasaKey: "tasa_escuelas",         countKey: "enfermeras_escuelas" },
+  tasa_administrativas: { label: "Tasa en áreas administrativas", tasaKey: "tasa_administrativas", countKey: "enfermeras_administrativas" },
+  tasa_no_aplica:   { label: "Tasa no aplica",                tasaKey: "tasa_no_aplica",        countKey: "enfermeras_no_aplica" },
+  tasa_no_asignado: { label: "Tasa no asignado",              tasaKey: "tasa_no_asignado",      countKey: "enfermeras_no_asignado" }
 };
 
 let _cache = null;      // datos normalizados del CSV
@@ -80,6 +81,8 @@ export function generarTablaMunicipios(rutaCSV) {
       out.tasa_apoyo             = +(d.tasa_apoyo             || 0);
       out.enfermeras_escuelas    = +(d.enfermeras_escuelas    || 0);
       out.tasa_escuelas          = +(d.tasa_escuelas          || 0);
+      out.enfermeras_administrativas = +(d.enfermeras_administrativas || 0);
+      out.tasa_administrativas       = +(d.tasa_administrativas       || 0);
       out.enfermeras_no_aplica   = +(d.enfermeras_no_aplica   || 0);
       out.tasa_no_aplica         = +(d.tasa_no_aplica         || 0);
       out.enfermeras_no_asignado = +(d.enfermeras_no_asignado || 0);

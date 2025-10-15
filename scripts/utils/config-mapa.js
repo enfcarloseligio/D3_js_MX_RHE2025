@@ -32,16 +32,6 @@ export function crearSVGBase(selector, ariaLabel = "Mapa interactivo de distribu
 // ==============================
 // LEYENDA GRADIENTE
 // ==============================
-/**
- * Dibuja una leyenda vertical con gradiente + eje + título y chips opcionales.
- * host: svg o <g> (o selector)
- * dominio: [min, max] numérico global de la escala
- * pasos: array con cortes (min, q1, q2, q3, max)
- * colores: array de colores (mismo largo que pasos)
- * titulo: texto. Si contiene “población”, se muestra 1 línea "Población".
- * chips: [{color, texto}] (opcional).
- * equalSpacing: si true, coloca los ticks equiespaciados (independiente del dominio).
- */
 let __legendCounter = 0;
 export function crearLeyenda(host, {
   dominio,
@@ -275,15 +265,16 @@ export function construirTitulo(metricKey, { entidad = null, year = 2025 } = {})
   const sufijo = `(${year})`;
 
   const map = {
-    "tasa_total":       `Tasa de enfermeras por cada mil habitantes ${lugar} ${sufijo}`,
-    "tasa_primer":      `Tasa de enfermeras por cada mil habitantes en 1er nivel de atención ${lugar} ${sufijo}`,
-    "tasa_segundo":     `Tasa de enfermeras por cada mil habitantes en 2º nivel de atención ${lugar} ${sufijo}`,
-    "tasa_tercer":      `Tasa de enfermeras por cada mil habitantes en 3er nivel de atención ${lugar} ${sufijo}`,
-    "tasa_apoyo":       `Tasa de enfermeras por cada mil habitantes en establecimientos de apoyo ${lugar} ${sufijo}`,
-    "tasa_escuelas":    `Tasa de enfermeras por cada mil habitantes en escuelas ${lugar} ${sufijo}`,
-    "tasa_no_aplica":   `Registros “No aplica” de enfermería ${lugar} ${sufijo}`,
-    "tasa_no_asignado": `Registros “No asignado” de enfermería ${lugar} ${sufijo}`,
-    "poblacion":        `Población ${lugar} ${sufijo}`,
+    "tasa_total":          `Tasa de enfermeras por cada mil habitantes ${lugar} ${sufijo}`,
+    "tasa_primer":         `Tasa de enfermeras por cada mil habitantes en 1er nivel de atención ${lugar} ${sufijo}`,
+    "tasa_segundo":        `Tasa de enfermeras por cada mil habitantes en 2º nivel de atención ${lugar} ${sufijo}`,
+    "tasa_tercer":         `Tasa de enfermeras por cada mil habitantes en 3er nivel de atención ${lugar} ${sufijo}`,
+    "tasa_apoyo":          `Tasa de enfermeras por cada mil habitantes en establecimientos de apoyo ${lugar} ${sufijo}`,
+    "tasa_escuelas":       `Tasa de enfermeras por cada mil habitantes en escuelas ${lugar} ${sufijo}`,
+    "tasa_administrativas": `Tasa de enfermeras por cada mil habitantes en áreas administrativas ${lugar} ${sufijo}`,
+    "tasa_no_aplica":      `Registros “No aplica” de enfermería ${lugar} ${sufijo}`,
+    "tasa_no_asignado":    `Registros “No asignado” de enfermería ${lugar} ${sufijo}`,
+    "poblacion":           `Población ${lugar} ${sufijo}`,
   };
 
   return map[metricKey] || `Distribución de enfermería ${lugar} ${sufijo}`;
@@ -439,15 +430,16 @@ export function construirTituloClinicas(
 
   const baseTasa = `Distribución de ${nombreTipo} y tasa de enfermeras por cada mil habitantes`;
   const map = {
-    "tasa_total":       `${baseTasa} ${lugar} ${sufijo}`,
-    "tasa_primer":      `${baseTasa} en 1er nivel de atención ${lugar} ${sufijo}`,
-    "tasa_segundo":     `${baseTasa} en 2º nivel de atención ${lugar} ${sufijo}`,
-    "tasa_tercer":      `${baseTasa} en 3er nivel de atención ${lugar} ${sufijo}`,
-    "tasa_apoyo":       `${baseTasa} en establecimientos de apoyo ${lugar} ${sufijo}`,
-    "tasa_escuelas":    `${baseTasa} en escuelas ${lugar} ${sufijo}`,
-    "tasa_no_aplica":   `Distribución de ${nombreTipo} y registros “No aplica” de enfermería ${lugar} ${sufijo}`,
-    "tasa_no_asignado": `Distribución de ${nombreTipo} y registros “No asignado” de enfermería ${lugar} ${sufijo}`,
-    "poblacion":        `Distribución de ${nombreTipo} y población ${lugar} ${sufijo}`,
+    "tasa_total":          `${baseTasa} ${lugar} ${sufijo}`,
+    "tasa_primer":         `${baseTasa} en 1er nivel de atención ${lugar} ${sufijo}`,
+    "tasa_segundo":        `${baseTasa} en 2º nivel de atención ${lugar} ${sufijo}`,
+    "tasa_tercer":         `${baseTasa} en 3er nivel de atención ${lugar} ${sufijo}`,
+    "tasa_apoyo":          `${baseTasa} en establecimientos de apoyo ${lugar} ${sufijo}`,
+    "tasa_escuelas":       `${baseTasa} en escuelas ${lugar} ${sufijo}`,
+    "tasa_administrativas": `${baseTasa} en áreas administrativas ${lugar} ${sufijo}`,
+    "tasa_no_aplica":      `Distribución de ${nombreTipo} y registros “No aplica” de enfermería ${lugar} ${sufijo}`,
+    "tasa_no_asignado":    `Distribución de ${nombreTipo} y registros “No asignado” de enfermería ${lugar} ${sufijo}`,
+    "poblacion":           `Distribución de ${nombreTipo} y población ${lugar} ${sufijo}`,
   };
 
   return map[metricKey] || `Distribución de ${nombreTipo} y enfermería ${lugar} ${sufijo}`;
@@ -516,9 +508,6 @@ export function legendSteps(stats, { isPopulation = false } = {}) {
 
 /**
  * Helper completo: valores -> dominio (fijo o dinámico) -> escala y leyenda.
- * - fixedDomain (opcional): usa un dominio fijo [min, q1, q2, q3, max].
- * - capAtPercentile (opcional): recorta el max a un percentil (ej. 0.95).
- * Devuelve { stats, scale, legendCfg } listos para usar.
  */
 export function prepararEscalaYLeyenda(
   rows,
@@ -574,7 +563,7 @@ export function prepararEscalaYLeyenda(
     pasos,
     colores: palette,
     titulo,
-    equalSpacing: true,   // <<< SIEMPRE equiespaciado en la leyenda
+    equalSpacing: true,   // leyenda equiespaciada
     chips: esPoblacion ? null : [
       { color: COLOR_CERO, texto: '0.00' },
       { color: COLOR_SIN,  texto: 's/d'  }

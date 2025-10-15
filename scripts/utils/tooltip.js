@@ -21,15 +21,16 @@ export function crearTooltip() {
 // Helpers internos
 // ==============================
 const LABELS = {
-  "tasa_total":       "Tasa total",
-  "tasa_primer":      "Tasa 1er nivel",
-  "tasa_segundo":     "Tasa 2º nivel",
-  "tasa_tercer":      "Tasa 3er nivel",
-  "tasa_apoyo":       "Tasa en apoyo",
-  "tasa_escuelas":    "Tasa en escuelas",
-  "tasa_no_aplica":   "Tasa no aplica",
-  "tasa_no_asignado": "Tasa no asignado",
-  "poblacion":        "Población"
+  "tasa_total":            "Tasa total",
+  "tasa_primer":           "Tasa 1er nivel",
+  "tasa_segundo":          "Tasa 2º nivel",
+  "tasa_tercer":           "Tasa 3er nivel",
+  "tasa_apoyo":            "Tasa en apoyo",
+  "tasa_escuelas":         "Tasa en escuelas",
+  "tasa_administrativas":  "Tasa en áreas administrativas",
+  "tasa_no_aplica":        "Tasa no aplica",
+  "tasa_no_asignado":      "Tasa no asignado",
+  "poblacion":             "Población"
 };
 const labelPorMetrica = key => LABELS[key] || "Tasa";
 
