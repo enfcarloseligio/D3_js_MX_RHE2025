@@ -59,10 +59,11 @@ const METRICAS = {
   tasa_tercer:      { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",      countKey: "enfermeras_tercer",    palette: "tasas" },
   tasa_apoyo:       { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",       countKey: "enfermeras_apoyo",     palette: "tasas" },
   tasa_escuelas:    { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas",    countKey: "enfermeras_escuelas",  palette: "tasas" },
+  tasa_administrativas:{ label: "Tasa en áreas administrativas", tasaKey: "tasa_administrativas", countKey: "enfermeras_administrativas", palette: "tasas" },
   tasa_no_aplica:   { label: "Tasa no aplica",       tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica", palette: "tasas" },
   tasa_no_asignado: { label: "Tasa no asignado",     tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado", palette: "tasas" },
   poblacion:        { label: "Población",            tasaKey: "poblacion",        countKey: "poblacion",            palette: "poblacion" }
-};
+  };
 let currentMetric = "tasa_total";
 
 // ==============================
@@ -127,10 +128,10 @@ Promise.all([
       enfermeras_primer:  d.enfermeras_primer,  tasa_primer:  d.tasa_primer,
       enfermeras_segundo: d.enfermeras_segundo, tasa_segundo: d.tasa_segundo,
       enfermeras_tercer:  d.enfermeras_tercer,  tasa_tercer:  d.tasa_tercer,
-
       enfermeras_apoyo:   d.enfermeras_apoyo,   tasa_apoyo:   d.tasa_apoyo,
       enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas,
-
+      enfermeras_administrativas: d.enfermeras_administrativas,
+      tasa_administrativas:       d.tasa_administrativas,
       enfermeras_no_aplica:   d.enfermeras_no_aplica,   tasa_no_aplica:   d.tasa_no_aplica,
       enfermeras_no_asignado: d.enfermeras_no_asignado, tasa_no_asignado: d.tasa_no_asignado
     };
