@@ -3,18 +3,7 @@
 // TABLA MUNICIPAL DINÁMICA (sincronizada con #sel-metrica)
 // ===============================================
 
-// Mapeo de métricas disponibles
-const METRICAS = {
-  tasa_total:       { label: "Tasa total",                    tasaKey: "tasa_total",            countKey: "enfermeras_total" },
-  tasa_primer:      { label: "Tasa 1er nivel",                tasaKey: "tasa_primer",           countKey: "enfermeras_primer" },
-  tasa_segundo:     { label: "Tasa 2º nivel",                 tasaKey: "tasa_segundo",          countKey: "enfermeras_segundo" },
-  tasa_tercer:      { label: "Tasa 3er nivel",                tasaKey: "tasa_tercer",           countKey: "enfermeras_tercer" },
-  tasa_apoyo:       { label: "Tasa en establecimientos de apoyo", tasaKey: "tasa_apoyo",        countKey: "enfermeras_apoyo" },
-  tasa_escuelas:    { label: "Tasa en escuelas",              tasaKey: "tasa_escuelas",         countKey: "enfermeras_escuelas" },
-  tasa_administrativas: { label: "Tasa en áreas administrativas", tasaKey: "tasa_administrativas", countKey: "enfermeras_administrativas" },
-  tasa_no_aplica:   { label: "Tasa no aplica",                tasaKey: "tasa_no_aplica",        countKey: "enfermeras_no_aplica" },
-  tasa_no_asignado: { label: "Tasa no asignado",              tasaKey: "tasa_no_asignado",      countKey: "enfermeras_no_asignado" }
-};
+import { METRICAS } from "./metricas.js"; // ← usa el diccionario global
 
 let _cache = null;      // datos normalizados del CSV
 let _tbody = null;      // referencia al TBODY actual
@@ -44,7 +33,7 @@ function esMetricaPoblacion(metricKey) {
     mk === "pob_total" ||
     mk === "pob" ||
     mk === "pobl" ||
-    /^pob/.test(mk) ||    // ej. 'POB_TOTAL'
+    /^pob/.test(mk) ||
     /poblaci[oó]n/.test(mk)
   );
 }
@@ -71,22 +60,22 @@ export function generarTablaMunicipios(rutaCSV) {
       out.tasa_total       = +((d.tasa_total       ?? d.tasa       ?? 0));
 
       // niveles / ámbitos (si no existen, 0)
-      out.enfermeras_primer      = +(d.enfermeras_primer      || 0);
-      out.tasa_primer            = +(d.tasa_primer            || 0);
-      out.enfermeras_segundo     = +(d.enfermeras_segundo     || 0);
-      out.tasa_segundo           = +(d.tasa_segundo           || 0);
-      out.enfermeras_tercer      = +(d.enfermeras_tercer      || 0);
-      out.tasa_tercer            = +(d.tasa_tercer            || 0);
-      out.enfermeras_apoyo       = +(d.enfermeras_apoyo       || 0);
-      out.tasa_apoyo             = +(d.tasa_apoyo             || 0);
-      out.enfermeras_escuelas    = +(d.enfermeras_escuelas    || 0);
-      out.tasa_escuelas          = +(d.tasa_escuelas          || 0);
+      out.enfermeras_primer          = +(d.enfermeras_primer          || 0);
+      out.tasa_primer                = +(d.tasa_primer                || 0);
+      out.enfermeras_segundo         = +(d.enfermeras_segundo         || 0);
+      out.tasa_segundo               = +(d.tasa_segundo               || 0);
+      out.enfermeras_tercer          = +(d.enfermeras_tercer          || 0);
+      out.tasa_tercer                = +(d.tasa_tercer                || 0);
+      out.enfermeras_apoyo           = +(d.enfermeras_apoyo           || 0);
+      out.tasa_apoyo                 = +(d.tasa_apoyo                 || 0);
+      out.enfermeras_escuelas        = +(d.enfermeras_escuelas        || 0);
+      out.tasa_escuelas              = +(d.tasa_escuelas              || 0);
       out.enfermeras_administrativas = +(d.enfermeras_administrativas || 0);
       out.tasa_administrativas       = +(d.tasa_administrativas       || 0);
-      out.enfermeras_no_aplica   = +(d.enfermeras_no_aplica   || 0);
-      out.tasa_no_aplica         = +(d.tasa_no_aplica         || 0);
-      out.enfermeras_no_asignado = +(d.enfermeras_no_asignado || 0);
-      out.tasa_no_asignado       = +(d.tasa_no_asignado       || 0);
+      out.enfermeras_no_aplica       = +(d.enfermeras_no_aplica       || 0);
+      out.tasa_no_aplica             = +(d.tasa_no_aplica             || 0);
+      out.enfermeras_no_asignado     = +(d.enfermeras_no_asignado     || 0);
+      out.tasa_no_asignado           = +(d.tasa_no_asignado           || 0);
 
       return out;
     });
@@ -259,6 +248,15 @@ export function habilitarDescargaExcel(nombreArchivo = "tasas-enfermeras-municip
   const boton = document.getElementById("descargar-excel");
   if (!boton) return;
 
+  // Excel: nombres de hoja <= 31 chars, sin : \ / ? * [ ]
+  const sanitizeSheetName = (str) => {
+    const cleaned = String(str).replace(/[:\\\/\?\*\[\]]/g, "").trim();
+    return cleaned.length > 31 ? cleaned.slice(0, 31) : cleaned || "Municipal";
+  };
+
+  // (Opcional) también sanear/recortar el nombre de archivo visible
+  const sanitizeFileName = (str) => String(str).replace(/[\\\/:\*\?"<>\|]/g, "").trim();
+
   boton.addEventListener("click", () => {
     const tabla = _tabla || document.querySelector("#tabla-contenido table");
     if (!tabla) return;
@@ -267,8 +265,12 @@ export function habilitarDescargaExcel(nombreArchivo = "tasas-enfermeras-municip
     const mk  = sel?.value || _currentMetric || "tasa_total";
     const nombreBonito = (METRICAS[mk]?.label || (esMetricaPoblacion(mk) ? "Población" : "Total")).replace(/\s+/g, " ");
 
-    const wb = XLSX.utils.table_to_book(tabla, { sheet: `Municipal - ${nombreBonito}` });
-    const nombre = nombreArchivo.replace(".xlsx", ` - ${nombreBonito}.xlsx`);
+    const hoja = sanitizeSheetName(`Municipal - ${nombreBonito}`);
+    const wb = XLSX.utils.table_to_book(tabla, { sheet: hoja });
+
+    const base = nombreArchivo.replace(/\.xlsx$/i, "");
+    const nombre = sanitizeFileName(`${base} - ${nombreBonito}.xlsx`);
+
     XLSX.writeFile(wb, nombre);
   });
 }

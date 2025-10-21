@@ -20,6 +20,9 @@ export function renderMarcadoresControl(
     typeof host === "string" ? document.querySelector(host) : host;
   if (!container) throw new Error("Host no encontrado para marcadores-control");
 
+  // Mapa value -> label (para mostrar nombres bonitos en el trigger)
+  const labelByValue = new Map(items.map(it => [String(it.value), String(it.label)]));
+
   // Limpia contenedor
   container.innerHTML = "";
 
@@ -71,15 +74,13 @@ export function renderMarcadoresControl(
 
   // Estado
   function getSelected() {
-    return Array.from(menu.querySelectorAll("input:checked")).map(
-      (c) => c.value
-    );
+    return Array.from(menu.querySelectorAll("input:checked")).map(c => c.value);
   }
 
   function setSelected(values = []) {
-    const set = new Set(values);
-    menu.querySelectorAll("input").forEach((c) => {
-      c.checked = set.has(c.value);
+    const set = new Set(values.map(v => String(v)));
+    menu.querySelectorAll("input").forEach(c => {
+      c.checked = set.has(String(c.value));
     });
     updateTrigger();
   }
@@ -90,9 +91,8 @@ export function renderMarcadoresControl(
       trigger.textContent = placeholder;
       trigger.classList.add("is-placeholder");
     } else {
-      const labels = Array.from(menu.querySelectorAll("input:checked")).map(
-        (c) => c.nextSibling.textContent
-      );
+      // 🔧 Ahora usamos el mapa value->label (no nextSibling)
+      const labels = selected.map(v => labelByValue.get(String(v)) || String(v));
       trigger.textContent = labels.join(", ");
       trigger.classList.remove("is-placeholder");
     }

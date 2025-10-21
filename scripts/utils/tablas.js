@@ -3,38 +3,59 @@
 // Tablas unificadas (nacional y municipales)
 // - Orden estable con "especiales" fijos al final
 // - Estilos por fila (ej. total república)
-// - Exportación a Excel
+// - Exportación a Excel con label dinámico
 // =======================================================
 
-/**
- * Devuelve prioridad de orden:
- *   0 = normal (se ordena)
- *   1 = 34  (Laborando en el extranjero)
- *   2 = 8888 (No Disponible)
- *   3 = 9999 (Total República Mexicana)
- *   4 = otros (si llegaran)
- */
+import { METRICAS } from "./metricas.js";
+
+// -------------------------------
+// Utilidades comunes
+// -------------------------------
 function prioridadId(id) {
   const s = String(id);
-  if (s === "34")   return 1;
-  if (s === "8888") return 2;
-  if (s === "9999") return 3;
-  return 0;
+  if (s === "34")   return 1; // Laborando en el extranjero
+  if (s === "8888") return 2; // No disponible
+  if (s === "9999") return 3; // Total República Mexicana
+  return 0;                    // Normal
 }
 
+function esMetricaPoblacion(metricKey) {
+  if (!metricKey) return false;
+  const mk = String(metricKey).toLowerCase();
+  return (
+    mk === "poblacion" ||
+    mk === "población" ||
+    mk === "pob_total" ||
+    mk === "pob" ||
+    mk === "pobl" ||
+    /^pob/.test(mk) ||
+    /poblaci[oó]n/.test(mk)
+  );
+}
+
+// Excel: nombres de hoja <= 31 chars, sin : \ / ? * [ ]
+const sanitizeSheetName = (str) => {
+  const cleaned = String(str).replace(/[:\\\/\?\*\[\]]/g, "").trim();
+  return cleaned.length > 31 ? cleaned.slice(0, 31) : (cleaned || "Resumen");
+};
+
+// También sanea nombre de archivo visible (evita caracteres ilegales)
+const sanitizeFileName = (str) => String(str).replace(/[\\\/:\*\?"<>\|]/g, "").trim();
+
+// -------------------------------
+// Tabla Nacional
+// -------------------------------
 /**
  * Renderiza la tabla nacional con datos ya normalizados.
- * 
+ *
  * @param {Object} opts
  *  - data: array CSV normalizado (incluye 1..32 + 34 + 8888 + 9999)
- *  - METRICAS: objeto de métricas (con tasaKey y countKey)
  *  - metricKey: métrica inicial ("tasa_total", "poblacion", ...)
  *  - hostSelector: contenedor donde insertar la tabla (#tabla-contenido)
  *  - rowClasses: (opcional) mapa { id: "clase-css" } para decorar filas
  */
 export function renderTablaNacional({
   data = [],
-  METRICAS,
   metricKey = "tasa_total",
   hostSelector = "#tabla-contenido",
   rowClasses = { "9999": "fila-total" } // por defecto, Total con clase especial
@@ -73,21 +94,24 @@ export function renderTablaNacional({
   function buildRowsFor(metricKey) {
     const def = METRICAS[metricKey] || METRICAS["tasa_total"];
     const { tasaKey, countKey } = def;
-    const esPob = metricKey === "poblacion";
+    const esPob = esMetricaPoblacion(metricKey);
 
     // Mapeo universal (incluye 34, 8888, 9999)
     const filas = data.map(d => {
       const id     = String(d.id || d.ID || "").trim();
       const estado = (d.estado || d.Estado || "").trim();
-      const pobl   = +d.poblacion || 0;
-      const enf    = esPob ? null : (+d[countKey] || 0);
-      const tasa   = esPob ? null : (+d[tasaKey]  || 0);
+      const pobl   = Number.isFinite(+d.poblacion) ? +d.poblacion
+                     : (Number.isFinite(+d["población"]) ? +d["población"] : 0);
+      const enf    = esPob ? null : (Number.isFinite(+d[countKey]) ? +d[countKey] : NaN);
+      const tasa   = esPob ? null : (Number.isFinite(+d[tasaKey])  ? +d[tasaKey]  : NaN);
       return { id, estado, pobl, enf, tasa, esPob };
     });
 
     // Orden estable: primero normales por nombre; luego especiales (34, 8888, 9999) en ese orden
-    const normales   = filas.filter(f => prioridadId(f.id) === 0)
-                            .sort((a,b) => a.estado.localeCompare(b.estado, 'es', {sensitivity:'base'}));
+    const normales   = filas
+      .filter(f => prioridadId(f.id) === 0)
+      .sort((a,b) => a.estado.localeCompare(b.estado, 'es', { sensitivity: 'base' }));
+
     const especiales = [
       ...filas.filter(f => f.id === "34"),
       ...filas.filter(f => f.id === "8888"),
@@ -175,10 +199,13 @@ export function renderTablaNacional({
   return { update };
 }
 
+// -------------------------------
+// Exportación a Excel (tabla visible)
+// -------------------------------
 /**
  * Vincula el botón para exportar la tabla visible a Excel.
- * - filenameBase: nombre base del archivo .xlsx
- * - sheetName: nombre de la hoja (opcional; si quieres, puedes dinamizarlo leyendo el label)
+ * - filenameBase: nombre base del archivo .xlsx (sin sufijo dinámico)
+ * - sheetName: nombre de la hoja por defecto (si no hay selector o label)
  */
 export function attachExcelButton({
   buttonSelector = "#descargar-excel",
@@ -192,11 +219,17 @@ export function attachExcelButton({
     const tabla = document.querySelector("#tabla-contenido table");
     if (!tabla) return;
 
-    // Si quieres que el nombre de la hoja sea el label actual del selector:
-    // const key = document.getElementById("sel-metrica")?.value || "";
-    // const hoja = (window.METRICAS?.[key]?.label || sheetName).replace(/\s+/g, " ");
+    // Lee la métrica actual del selector, si existe
+    const key = document.getElementById("sel-metrica")?.value || "";
+    const labelFromMetric = METRICAS[key]?.label;
+    const label = (labelFromMetric || (esMetricaPoblacion(key) ? "Población" : null) || sheetName).replace(/\s+/g, " ");
 
-    const wb = XLSX.utils.table_to_book(tabla, { sheet: sheetName });
-    XLSX.writeFile(wb, filenameBase);
+    const hoja = sanitizeSheetName(label);
+    const wb = XLSX.utils.table_to_book(tabla, { sheet: hoja });
+
+    const base = filenameBase.replace(/\.xlsx$/i, "");
+    const nombre = sanitizeFileName(`${base} - ${label}.xlsx`);
+
+    XLSX.writeFile(wb, nombre);
   });
 }

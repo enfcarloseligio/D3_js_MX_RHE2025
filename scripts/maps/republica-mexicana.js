@@ -7,14 +7,14 @@ import {
   crearTooltip,
   mostrarTooltip,
   ocultarTooltip,
-  mostrarTooltipClinica, // tooltip estándar para clínicas (como en catéteres)
+  mostrarTooltipClinica,
 } from '../utils/tooltip.js';
 
 import {
   crearSVGBase, MAP_WIDTH, MAP_HEIGHT,
   crearLeyenda, descargarComoPNG, crearEtiquetaMunicipio,
   construirTitulo,
-  prepararEscalaYLeyenda // ← añadido: helper para cortes equidistantes
+  prepararEscalaYLeyenda
 } from '../utils/config-mapa.js';
 
 import { renderZoomControles } from '../componentes/zoom-controles.js';
@@ -31,6 +31,15 @@ import {
   crearLeyendaMarcadores,
   nombreTipoMarcador
 } from '../utils/marcadores.js';
+
+// 🔴 NUEVO: catálogo central de métricas
+import {
+  METRICAS,          // objeto plano, por si lo requieren otras utilidades
+  metricLabel,
+  metricPalette,
+  tasaKey,
+  isPopulation
+} from '../utils/metricas.js';
 
 // ==============================
 // CREACIÓN DEL MAPA
@@ -51,19 +60,6 @@ const COLORES_POBLACION = ['#e5f5e0', '#a1d99b', '#74c476', '#31a354', '#006d2c'
 // ids válidos de entidad para el cálculo de cuartiles (1..32)
 const idsEntidades = new Set(Array.from({ length: 32 }, (_, i) => String(i + 1)));
 
-// Definición de métricas
-const METRICAS = {
-  tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",       countKey: "enfermeras_total",     palette: "tasas" },
-  tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",      countKey: "enfermeras_primer",    palette: "tasas" },
-  tasa_segundo:     { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",     countKey: "enfermeras_segundo",   palette: "tasas" },
-  tasa_tercer:      { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",      countKey: "enfermeras_tercer",    palette: "tasas" },
-  tasa_apoyo:       { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",       countKey: "enfermeras_apoyo",     palette: "tasas" },
-  tasa_escuelas:    { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas",    countKey: "enfermeras_escuelas",  palette: "tasas" },
-  tasa_administrativas:{ label: "Tasa en áreas administrativas", tasaKey: "tasa_administrativas", countKey: "enfermeras_administrativas", palette: "tasas" },
-  tasa_no_aplica:   { label: "Tasa no aplica",       tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica", palette: "tasas" },
-  tasa_no_asignado: { label: "Tasa no asignado",     tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado", palette: "tasas" },
-  poblacion:        { label: "Población",            tasaKey: "poblacion",        countKey: "poblacion",            palette: "poblacion" }
-  };
 let currentMetric = "tasa_total";
 
 // ==============================
@@ -96,7 +92,6 @@ Promise.all([
           .filter(Boolean)
       );
       const n = nombresUnicos.size;
-      // si luce razonable (20–40), usa ese valor; si no, fija 32
       return n >= 20 && n <= 40 ? n : NUM_ENTIDADES_FED;
     } catch {
       return NUM_ENTIDADES_FED;
@@ -128,44 +123,43 @@ Promise.all([
       enfermeras_primer:  d.enfermeras_primer,  tasa_primer:  d.tasa_primer,
       enfermeras_segundo: d.enfermeras_segundo, tasa_segundo: d.tasa_segundo,
       enfermeras_tercer:  d.enfermeras_tercer,  tasa_tercer:  d.tasa_tercer,
+
       enfermeras_apoyo:   d.enfermeras_apoyo,   tasa_apoyo:   d.tasa_apoyo,
       enfermeras_escuelas:d.enfermeras_escuelas,tasa_escuelas:d.tasa_escuelas,
+
       enfermeras_administrativas: d.enfermeras_administrativas,
       tasa_administrativas:       d.tasa_administrativas,
+
       enfermeras_no_aplica:   d.enfermeras_no_aplica,   tasa_no_aplica:   d.tasa_no_aplica,
       enfermeras_no_asignado: d.enfermeras_no_asignado, tasa_no_asignado: d.tasa_no_asignado
     };
   });
 
   // ==============================
-  // Utilidad: paleta por métrica (se mantiene)
-// ==============================
+  // Utilidad: paleta por métrica
+  // ==============================
   function paletteFor(metricKey) {
-    const pal = METRICAS[metricKey].palette;
+    const pal = metricPalette(metricKey);
     return pal === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
   }
 
   // ==============================
-  // Pintado + leyenda (EQUI-DISTANTE con helper)
-// ==============================
+  // Pintado + leyenda
+  // ==============================
   function recomputeAndPaint() {
     const PALETTE = paletteFor(currentMetric);
-    const esPoblacion = currentMetric === "poblacion";
+    const esPoblacion = isPopulation(currentMetric);
 
-    // Cortes equidistantes min–s1–s2–s3–max y escala alineada con la leyenda
     const { scale, legendCfg } = prepararEscalaYLeyenda(
-      // datos base:
-      tasas.filter(d => idsEntidades.has(String(d.id))), // solo 1..32 para calcular rango
-      METRICAS,
+      tasas.filter(d => idsEntidades.has(String(d.id))), // 1..32
+      METRICAS,              // catálogo central (para keys)
       currentMetric,
-      // opciones:
       {
-        palette: PALETTE,                     // ← mantiene tus colores
-        titulo: METRICAS[currentMetric].label,
+        palette: PALETTE,
+        titulo: metricLabel(currentMetric),
         idKey: "id",
-        excludeIds: ["8888", "9999"],         // por si vienen en el CSV
-        clamp: true                           // fuera de rango → extremo
-        // sin P95: usa min/max reales; el helper hace tramos equidistantes
+        excludeIds: ["8888", "9999"],
+        clamp: true
       }
     );
 
@@ -176,7 +170,7 @@ Promise.all([
         const nombre = (d.properties.NOMBRE || "").trim();
         const item = dataByEstado[nombre];
         if (!item) return COLOR_SIN;
-        const v = +item[METRICAS[currentMetric].tasaKey];
+        const v = +item[tasaKey(currentMetric)];
         if (!Number.isFinite(v)) return COLOR_SIN;
         if (!esPoblacion && v <= 0) return COLOR_CERO; // 0.00 en gris
         return scale(v);
@@ -207,7 +201,7 @@ Promise.all([
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.5)
     .attr("vector-effect", "non-scaling-stroke")
-    .attr("fill", COLOR_SIN) // por si la primera pintura tarda
+    .attr("fill", COLOR_SIN)
     .on("mouseover", function (event, d) {
       const nombre = (d.properties.NOMBRE || "").trim();
       const item = dataByEstado[nombre];
@@ -215,9 +209,9 @@ Promise.all([
       d3.select(this).attr("stroke-width", 1.5);
 
       mostrarTooltip(tooltip, event, nombre, item, {
-        metricKey: METRICAS[currentMetric].tasaKey,
-        label: METRICAS[currentMetric].label,
-        onlyPopulation: currentMetric === "poblacion"
+        metricKey: tasaKey(currentMetric),
+        label: metricLabel(currentMetric),
+        onlyPopulation: isPopulation(currentMetric)
       });
     })
     .on("mousemove", event => {
@@ -242,9 +236,8 @@ Promise.all([
   // CAPA DE MARCADORES (multi-tipo)
   // ==============================
   const gMarcadores = g.append("g").attr("class", "capa-marcadores");
-  let marcadoresCtlPorTipo = new Map(); // tipo -> controlador pintarMarcadores
+  let marcadoresCtlPorTipo = new Map();
 
-  // Carga un CSV por tipo, normaliza y pinta; devuelve controlador
   async function cargarYPintarTipo(tipo) {
     const ruta = RUTAS_MARCADORES[tipo];
     if (!ruta) return null;
@@ -256,7 +249,6 @@ Promise.all([
 
     const ctl = pintarMarcadores(gMarcadores, puntos, projection, { tipo });
 
-    // Tooltips de clínica: MISMA VISTA que “Clínicas de catéteres”
     ctl.selection
       .on("mouseover", function (event, d) {
         event.stopPropagation();
@@ -275,11 +267,9 @@ Promise.all([
     return ctl;
   }
 
-  // Actualiza marcadores según selección (añade/quita y actualiza leyenda)
   async function updateMarcadores(tiposSeleccionados = []) {
     const setSel = new Set(tiposSeleccionados);
 
-    // Remover tipos que ya no están seleccionados
     for (const [tipo, ctl] of marcadoresCtlPorTipo.entries()) {
       if (!setSel.has(tipo)) {
         ctl.selection.remove();
@@ -287,7 +277,6 @@ Promise.all([
       }
     }
 
-    // Cargar/pintar los nuevos tipos seleccionados
     for (const tipo of setSel) {
       if (!marcadoresCtlPorTipo.has(tipo)) {
         const ctl = await cargarYPintarTipo(tipo);
@@ -295,7 +284,6 @@ Promise.all([
       }
     }
 
-    // Leyenda de marcadores (posición abajo-izquierda)
     const tiposPresentes = Array.from(marcadoresCtlPorTipo.keys());
     svg.selectAll(".leyenda-marcadores").remove();
     if (tiposPresentes.length) {
@@ -316,7 +304,6 @@ Promise.all([
     .scaleExtent([1, 20])
     .on("zoom", (event) => {
       g.attr("transform", event.transform);
-      // reescala cada capa de marcadores activa
       for (const ctl of marcadoresCtlPorTipo.values()) {
         ctl.updateZoom(event.transform.k);
       }
@@ -324,12 +311,11 @@ Promise.all([
 
   svg.call(zoom);
 
-  // Controles de zoom (sin “home”, esta vista es el home)
   renderZoomControles("#mapa-nacional", {
     svg,
     g,
-    zoom,            // conecta botones al mismo zoom
-    showHome: false, // sin botón home
+    zoom,
+    showHome: false,
     idsPrefix: "rep",
     escalaMin: 1,
     escalaMax: 20,
@@ -353,7 +339,7 @@ Promise.all([
   });
 
   // ==============================
-// --- SELECTOR + TABLA SINCRONIZADOS ---
+  // --- SELECTOR + TABLA SINCRONIZADOS ---
   // ==============================
   const selMetrica = document.getElementById("sel-metrica");
   if (selMetrica) currentMetric = selMetrica.value || currentMetric;
@@ -364,25 +350,24 @@ Promise.all([
   // TABLA NACIONAL (creación)
   const tablaNac = renderTablaNacional({
     data: tasas,
-    METRICAS,
+    METRICAS,             // catálogo central
     metricKey: currentMetric,
     hostSelector: "#tabla-contenido"
   });
 
-  // === DESCARGA DE EXCEL DINÁMICA (según indicador actual, sin listeners duplicados) ===
+  // === DESCARGA DE EXCEL DINÁMICA ===
   function resetExcelButtonListener() {
     const btn = document.querySelector("#descargar-excel");
     if (!btn) return;
-    const clone = btn.cloneNode(true);          // sin listeners
-    btn.parentNode.replaceChild(clone, btn);    // reemplaza
+    const clone = btn.cloneNode(true);
+    btn.parentNode.replaceChild(clone, btn);
   }
 
   function actualizarDescargaExcel() {
-    const metric = METRICAS[currentMetric] || { label: currentMetric };
     const nombreArchivo = `enfermeras-${currentMetric}.xlsx`;
-    const nombreHoja = metric.label;
+    const nombreHoja = metricLabel(currentMetric);
 
-    resetExcelButtonListener(); // limpia listeners previos
+    resetExcelButtonListener();
     attachExcelButton({
       buttonSelector: "#descargar-excel",
       filenameBase: nombreArchivo,
@@ -390,10 +375,8 @@ Promise.all([
     });
   }
 
-  // Inicializa con la métrica vigente
   actualizarDescargaExcel();
 
-  // Cuando cambias el indicador: repinta, actualiza tabla y reconfigura Excel
   if (selMetrica) {
     selMetrica.addEventListener("change", () => {
       currentMetric = selMetrica.value;
@@ -417,9 +400,7 @@ Promise.all([
     size: 4
   });
 
-  // Por defecto, sin marcadores seleccionados
   marcCtl.setSelected([]);
-
   marcCtl.onChange(async () => {
     const seleccion = marcCtl.getSelected();
     await updateMarcadores(seleccion);
