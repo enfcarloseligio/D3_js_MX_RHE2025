@@ -1,3 +1,4 @@
+// scripts/componentes/indicador-control.js
 // ==============================
 // Componente: Control de Métrica
 // (mismo layout que Marcadores)

@@ -1,10 +1,10 @@
-id,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
-1,02,001,Ensenada,443807,1410,3.177056694
-2,02,002,Mexicali,1049792,3164,3.013930379
-3,02,003,Tecate,108440,449,4.140538547
-4,02,004,Tijuana,1922523,3344,1.739381011
-5,02,005,Playas de Rosarito,126890,222,1.749546852
-6,02,006,San Quintín,117568,261,2.219991835
-7,02,007,San Felipe,19204,41,2.134971881
-8888,8888,8888,No Disponible,0,533,0
-9999,9999,9999,Total Baja California,3788224,9424,2.48770928
+id,CVE_ENT,CVE_MUN,MAPA,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_administrativas,tasa_administrativas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
+1,02,001,02001,Ensenada,441746,1410,3.191879496,205,0.464067586,1168,2.64405337,0,0,2,0.004527489,0,0,35,0.079231051,0,0,0,0
+2,02,002,02002,Mexicali,1032649,3164,3.063964619,558,0.540357856,2398,2.322183046,0,0,1,0.000968383,133,0.128794973,74,0.071660361,0,0,0,0
+3,02,003,02003,Tecate,108440,449,4.140538547,146,1.346366654,303,2.794171892,0,0,0,0,0,0,0,0,0,0,0,0
+4,02,004,02004,Tijuana,1922523,3344,1.739381011,530,0.275679407,2732,1.421049319,0,0,9,0.004681348,0,0,73,0.037970937,0,0,0,0
+5,02,005,02005,Playas de Rosarito,126890,222,1.749546852,72,0.567420601,150,1.182126251,0,0,0,0,0,0,0,0,0,0,0,0
+6,02,006,02006,San Quintín,117568,261,2.219991835,116,0.986663038,122,1.037697333,0,0,0,0,0,0,23,0.195631464,0,0,0,0
+7,02,007,02007,San Felipe,19204,41,2.134971881,41,2.134971881,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+8888,8888,8888,8888,0,0,533,0,10,0,409,0,27,0,0,0,86,0,0,0,0,0,1,0
+9999,9999,9999,9999,Total Baja California,3769020,9424,2.500384715,1678,0.445208569,7282,1.932067222,27,0.007163666,12,0.003183852,219,0.05810529,205,0.054390797,0,0,1,0.000265321

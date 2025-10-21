@@ -1,3 +1,4 @@
+// scripts/inyectar-layout.js
 // ========================================
 // Inyectar Layout Global (Header, Banner, Footer)
 // ========================================

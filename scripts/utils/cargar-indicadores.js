@@ -1,3 +1,4 @@
+// scripts/utils/cargar-indicadores.js
 document.addEventListener("DOMContentLoaded", () => {
   const contenedor = document.getElementById("contenedor-indicadores");
 

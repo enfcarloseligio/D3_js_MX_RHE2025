@@ -1,3 +1,4 @@
+// scripts/utils/window.indicadoresSIARHE.js
 document.addEventListener("DOMContentLoaded", () => {
   d3.csv("data/indicators/indicadores-clave.csv").then(data => {
     const row = data[0];
