@@ -3,103 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de Aguascalientes por municipios." />
-  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería" />
-  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025" />
-  <title>SIARHE | Distribución de Profesionales de Enfermería en el Estado de Aguascalientes</title>
+
+  <!-- SEO -->
+  <title>SIARHE | Distribución de Profesionales de Enfermería en Aguascalientes</title>
+  <meta name="description" content="Mapa y tabla interactiva de la distribución de profesionales de enfermería en Aguascalientes por municipio e indicador seleccionado." />
 
   <!-- Estilos -->
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../styles/mapas.css" />
 
-  <!-- Librerías externas -->
+  <!-- Libs -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  <!-- Scripts internos -->
+  <!-- Layout general -->
   <script src="../scripts/inyectar-layout.js"></script>
+  <!-- Script del mapa de Aguascalientes -->
   <script type="module" src="../scripts/maps/aguascalientes.js"></script>
-  </head>
+</head>
 
 <body>
   <main>
-    <!-- Migas de pan -->
     <nav aria-label="breadcrumb" class="migas">
       <a href="../index.html">Inicio</a> &gt;
-      <a href="../entidades/republica-mexicana.html">República</a> &gt;
+      <a href="./republica-mexicana.html">República Mexicana</a> &gt;
       <span>Aguascalientes</span>
     </nav>
-    <!-- SECCIÓN PRINCIPAL DEL MAPA -->
+
     <section class="mapa-entidad">
       <h1>¿Cuántas enfermeras hay en Aguascalientes en <span class="year"></span>?</h1>
       <p class="bienvenida">
-        En el año <span class="year"></span>, el estado de Aguascalientes cuenta con un total de <strong>[TOTAL ENFERMERAS]</strong> distribuidas en sus municipios, de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE). Esta cifra refleja los esfuerzos del sistema de salud por garantizar el acceso equitativo a los servicios de enfermería en toda la entidad.
+        En el año <span class="year"></span>, Aguascalientes cuenta con
+        <strong><span id="total-enfermeras-ent">—</span> enfermeras</strong>
+        distribuidas en sus municipios, según el SIARHE.
       </p>
 
-      <h2>Distribución de enfermeras por cada mil habitantes en los municipios de Aguascalientes</h2>
+      <h2>Distribución por municipio en <span class="year"></span></h2>
       <p>
-        A continuación se muestra un mapa interactivo que representa la tasa de enfermeras por cada mil habitantes en los municipios de Aguascalientes. Esta tasa permite identificar las regiones con mayor o menor cobertura de personal de enfermería, lo que es clave para la planificación en salud.
+        Selecciona el indicador en el control inferior. Usa (+/–) para zoom. Al pasar el cursor sobre un municipio verás el valor del indicador.
+        Puedes activar <em>marcadores</em> (clínicas, etc.) si están disponibles.
       </p>
 
-      <div id="mapa-aguascalientes" class="mapa-wrapper">
-        <!-- Aquí se inyecta el mapa SVG dinámicamente -->
+      <div id="barra-controles" class="controles-grid">
+        <div id="indicador-control"></div>
+        <div id="control-marcadores"></div>
+      </div>
+
+      <div id="mapa-entidad" class="mapa-wrapper">
         <div class="zoom-controles"></div>
       </div>
-      <!-- NOTA Y FUENTE -->
-      <p id="nota">
-          <strong>Nota:</strong>
-          La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI)
-          y en los registros del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE),
-          con corte estadístico al 28 de enero de 2025.
-          Los intervalos de color en el mapa se establecieron con base en el valor mínimo, los cuartiles (Q1, Q2 o mediana, y Q3), y el valor máximo de la distribución.
-        <br />
-        <strong>Fuente:</strong>
-          Secretaría de Salud. (enero, 2025).
-          Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE) [Sistema Informático].
-      </p>>
 
-      <!-- Botones para descarga del mapa -->
+      <p id="nota">
+        <strong>Nota:</strong> Tasas calculadas con población INEGI 2020 y SIARHE (corte vigente).
+        Los intervalos de color usan min, cuartiles (Q1, mediana, Q3) y máximo de la distribución municipal.
+        <br/><strong>Fuente:</strong> Dirección de Enfermería – DGCES. SIARHE.
+      </p>
+
       <div class="descarga-container">
         <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
         <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
       </div>
     </section>
 
-    <!-- SECCIÓN DE TABLA DINÁMICA -->
-    <section class="tabla-nayarit">
-      <h2>Tasa de enfermeras por municipio en Aguascalientes<span class="year"></span></h2>
-      <p>
-        Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras, su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones en salud pública, distribución de recursos y evaluación de cobertura.
-      </p>
-
-      <div class="tabla-scroll">
-        <div id="tabla-contenido">
-          <!-- Tabla cargada dinámicamente con JS -->
-        </div>
-      </div>
-
-      <div class="descarga-container">
-        <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
-      </div>
+    <section class="tabla-nacional">
+      <h2>Tabla municipal (<span class="year"></span>)</h2>
+      <p>Se actualiza según el indicador seleccionado.</p>
+      <div class="tabla-scroll"><div id="tabla-contenido"></div></div>
+      <div class="descarga-container"><button id="descargar-excel" class="boton">📥 Descargar Excel</button></div>
     </section>
-
   </main>
 
-<!-- Cargar tabla y activar descarga -->
-<script type="module">
-  import { generarTablaMunicipios, habilitarDescargaExcel } from '../scripts/utils/tabla-municipios.js';
-
-  generarTablaMunicipios('../data/rate/aguascalientes.csv');
-
-  const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
-  habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
-</script>
-  <!-- Script final para insertar año -->
-  <script type="module">
-    import { insertarAñoDinamico } from "../code.js";
-    insertarAñoDinamico();
+  <script>
+    (function () {
+      var y = new Date().getFullYear();
+      document.querySelectorAll('.year').forEach(el => el.textContent = y);
+    })();
   </script>
 
+  <!-- Control de indicador -->
+  <script type="module">
+    import { renderIndicadorControl } from "../scripts/componentes/indicador-control.js";
+    renderIndicadorControl("#indicador-control"); // crea <select id="sel-metrica">
+  </script>
 </body>
 </html>

@@ -1,99 +1,261 @@
-styles.css
-index.html
-LICENSE
+.gdignore
 .gitignore
-README.md
 code.js
 estructura.bat
-README_COLABORADORES.md
-.gdignore
 estructura.txt
-desktop.ini
+index.html
+LICENSE
+README.md
+README_COLABORADORES.md
+styles.css
 
 ================================
- pages
+ .git.backup
 ================================
-Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
-El número de serie del volumen es 1983-1116
-G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\PAGES
-¦   contactanos.html
-¦   publicaciones.html
-¦   acerca-de.html
-¦   normas.html
-¦   acceso.html
-¦   ayuda.html
-¦   clinicas-cateteres.html
+Listado de rutas de carpetas
+El número de serie del volumen es 6076-4BBE
+D:\USERS\JUAN.DELACRUZ\DOCUMENTS\PROYECTOS\D3_JS_MX_RHE2025\.GIT.BACKUP
+¦   COMMIT_EDITMSG
+¦   config
+¦   description
+¦   FETCH_HEAD
+¦   HEAD
+¦   index
+¦   ORIG_HEAD
+¦   packed-refs
 ¦   
-+---publicaciones
-¦       datos-abiertos.html
-¦       libros.html
-¦       documentos.html
++---hooks
+¦       applypatch-msg.sample
+¦       commit-msg.sample
+¦       fsmonitor-watchman.sample
+¦       post-update.sample
+¦       pre-applypatch.sample
+¦       pre-commit.sample
+¦       pre-merge-commit.sample
+¦       pre-push.sample
+¦       pre-rebase.sample
+¦       pre-receive.sample
+¦       prepare-commit-msg.sample
+¦       push-to-checkout.sample
+¦       sendemail-validate.sample
+¦       update.sample
 ¦       
-+---acerca-de
-¦       siarhe.html
-¦       antecedentes.html
-¦       atribuciones.html
-¦       mision.html
-¦       vision.html
-¦       directorio.html
++---info
+¦       exclude
+¦       refs
 ¦       
-+---normas
-        normatividad.html
-        operacion.html
-        
++---logs
+¦   ¦   HEAD
+¦   ¦   
+¦   +---refs
+¦       +---heads
+¦       ¦       main
+¦       ¦       
+¦       +---remotes
+¦           +---origin
+¦                   HEAD
+¦                   main
+¦                   SQuetzalliAC
+¦                   
++---objects
+¦   +---11
+¦   ¦       d461a33b28d10a9f87fb7101683ed07ecb7097
+¦   ¦       
+¦   +---5f
+¦   ¦       4dd62d5a1eb6baf19a191c132163160cab6019
+¦   ¦       
+¦   +---6c
+¦   ¦       39c4fb7a0c2e22a82896cbefa9d24319148ef1
+¦   ¦       
+¦   +---7e
+¦   ¦       66c17cb9f49bd5f7fbcb65326f251ca04ecb4a
+¦   ¦       
+¦   +---83
+¦   ¦       08599d1880a8befeba0a7836a0f14aac7644a2
+¦   ¦       
+¦   +---96
+¦   ¦       b46ddcc1165a69cb26fbed750d3fdcf0c23021
+¦   ¦       
+¦   +---b6
+¦   ¦       d35cbdcf2ffee0ba7d86edfadbfd4b9d981409
+¦   ¦       
+¦   +---bd
+¦   ¦       2f7ec44c9ea3b79afc6afae81ad9f57ffdda27
+¦   ¦       
+¦   +---ce
+¦   ¦       e7cf55292ba8d94ad5a758c00bee57b0c8bcdc
+¦   ¦       
+¦   +---d5
+¦   ¦       3d2cb6f3d2e9a42e3871fea3167b95b9808822
+¦   ¦       
+¦   +---ec
+¦   ¦       073d2b1a9e27dda931129beb75a77ac50b2e41
+¦   ¦       
+¦   +---info
+¦   ¦       commit-graph
+¦   ¦       packs
+¦   ¦       
+¦   +---pack
+¦           pack-06e68121b643201e7cc0b82bb6945d085eb9efc2.idx
+¦           pack-06e68121b643201e7cc0b82bb6945d085eb9efc2.pack
+¦           pack-06e68121b643201e7cc0b82bb6945d085eb9efc2.rev
+¦           pack-42180fbb9f52469a71a840ec7f8f5ba6d3ec167d.idx
+¦           pack-42180fbb9f52469a71a840ec7f8f5ba6d3ec167d.pack
+¦           pack-42180fbb9f52469a71a840ec7f8f5ba6d3ec167d.rev
+¦           pack-95dd102e2e700ca648038ccbf984047b444bd1da.idx
+¦           pack-95dd102e2e700ca648038ccbf984047b444bd1da.pack
+¦           pack-95dd102e2e700ca648038ccbf984047b444bd1da.rev
+¦           pack-da00a493658a60735d343fee0082379b8bbb2bf3.idx
+¦           pack-da00a493658a60735d343fee0082379b8bbb2bf3.pack
+¦           pack-da00a493658a60735d343fee0082379b8bbb2bf3.rev
+¦           
++---refs
+    +---heads
+    ¦       main
+    ¦       
+    +---remotes
+        +---origin
+                HEAD
+                
 
 ================================
- styles
+ componentes
 ================================
-Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
-El número de serie del volumen es 1983-1116
-G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\STYLES
-    mapas.css
-    index.css
-    contactanos.css
+Listado de rutas de carpetas
+El número de serie del volumen es 6076-4BBE
+D:\USERS\JUAN.DELACRUZ\DOCUMENTS\PROYECTOS\D3_JS_MX_RHE2025\COMPONENTES
+    banner.html
+    footer.html
+    header.html
+    layout-entidades.html
+    layout-simple.html
     
 No existe ninguna subcarpeta 
 
 
 ================================
+ data
+================================
+Listado de rutas de carpetas
+El número de serie del volumen es 6076-4BBE
+D:\USERS\JUAN.DELACRUZ\DOCUMENTS\PROYECTOS\D3_JS_MX_RHE2025\DATA
++---clinicas
+¦       clinicas-cateteres.csv
+¦       clinicas-heridas.csv
+¦       
++---indicators
+¦       indicadores-clave.csv
+¦       
++---maps
+¦       aguascalientes.geojson
+¦       baja-california-sur.geojson
+¦       baja-california.geojson
+¦       campeche.geojson
+¦       chiapas.geojson
+¦       chihuahua.geojson
+¦       ciudad-de-mexico.geojson
+¦       coahuila.geojson
+¦       colima.geojson
+¦       durango.geojson
+¦       estado-de-mexico.geojson
+¦       guanajuato.geojson
+¦       guerrero.geojson
+¦       hidalgo.geojson
+¦       jalisco.geojson
+¦       michoacan.geojson
+¦       morelos.geojson
+¦       nayarit.geojson
+¦       nuevo-leon.geojson
+¦       oaxaca.geojson
+¦       puebla.geojson
+¦       queretaro.geojson
+¦       quintana-roo.geojson
+¦       republica-mexicana.geojson
+¦       san-luis-potosi.geojson
+¦       sinaloa.geojson
+¦       sonora.geojson
+¦       tabasco.geojson
+¦       tamaulipas.geojson
+¦       tlaxcala.geojson
+¦       veracruz.geojson
+¦       yucatan.geojson
+¦       zacatecas.geojson
+¦       
++---rate
+        aguascalientes.csv
+        baja-california-sur.csv
+        baja-california.csv
+        campeche.csv
+        chiapas.csv
+        chihuahua.csv
+        ciudad-de-mexico.csv
+        coahuila.csv
+        colima.csv
+        durango.csv
+        estado-de-mexico.csv
+        guanajuato.csv
+        guerrero.csv
+        hidalgo.csv
+        jalisco.csv
+        michoacan.csv
+        morelos.csv
+        nayarit.csv
+        nuevo-leon.csv
+        oaxaca.csv
+        puebla.csv
+        queretaro.csv
+        quintana-roo.csv
+        republica-mexicana.csv
+        san-luis-potosi.csv
+        sinaloa.csv
+        sonora.csv
+        tabasco.csv
+        tamaulipas.csv
+        tlaxcala.csv
+        veracruz.csv
+        yucatan.csv
+        zacatecas.csv
+        
+
+================================
  entidades
 ================================
-Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
-El número de serie del volumen es 1983-1116
-G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\ENTIDADES
-    nayarit.html
-    republica-mexicana.html
+Listado de rutas de carpetas
+El número de serie del volumen es 6076-4BBE
+D:\USERS\JUAN.DELACRUZ\DOCUMENTS\PROYECTOS\D3_JS_MX_RHE2025\ENTIDADES
     aguascalientes.html
-    tamaulipas.html
-    zacatecas.html
-    yucatan.html
-    veracruz.html
-    tlaxcala.html
-    tabasco.html
-    sonora.html
-    sinaloa.html
-    san-luis-potosi.html
-    campeche.html
-    baja-california.html
-    chiapas.html
     baja-california-sur.html
-    ciudad-de-mexico.html
+    baja-california.html
+    campeche.html
+    chiapas.html
     chihuahua.html
-    quintana-roo.html
-    queretaro.html
-    puebla.html
-    oaxaca.html
-    nuevo-leon.html
-    morelos.html
-    michoacan.html
-    jalisco.html
-    hidalgo.html
-    guerrero.html
-    guanajuato.html
-    estado-de-mexico.html
-    durango.html
-    colima.html
+    ciudad-de-mexico.html
     coahuila.html
+    Colima.html
+    durango.html
+    estado-de-mexico.html
+    guanajuato.html
+    guerrero.html
+    hidalgo.html
+    jalisco.html
+    michoacan.html
+    morelos.html
+    nayarit.html
+    nuevo-leon.html
+    oaxaca.html
+    puebla.html
+    queretaro.html
+    quintana-roo.html
+    republica-mexicana.html
+    san-luis-potosi.html
+    sinaloa.html
+    sonora.html
+    tabasco.html
+    tamaulipas.html
+    tlaxcala.html
+    veracruz.html
+    yucatan.html
+    zacatecas.html
     
 No existe ninguna subcarpeta 
 
@@ -101,9 +263,9 @@ No existe ninguna subcarpeta
 ================================
  img
 ================================
-Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
-El número de serie del volumen es 1983-1116
-G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\IMG
+Listado de rutas de carpetas
+El número de serie del volumen es 6076-4BBE
+D:\USERS\JUAN.DELACRUZ\DOCUMENTS\PROYECTOS\D3_JS_MX_RHE2025\IMG
     texture-r-2.png
     texture-r-2.svg
     
@@ -111,161 +273,109 @@ No existe ninguna subcarpeta
 
 
 ================================
- componentes
+ pages
 ================================
-Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
-El número de serie del volumen es 1983-1116
-G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\COMPONENTES
-    header.html
-    banner.html
-    footer.html
-    layout-simple.html
-    layout-entidades.html
-    
-No existe ninguna subcarpeta 
-
+Listado de rutas de carpetas
+El número de serie del volumen es 6076-4BBE
+D:\USERS\JUAN.DELACRUZ\DOCUMENTS\PROYECTOS\D3_JS_MX_RHE2025\PAGES
+¦   acceso.html
+¦   acerca-de.html
+¦   ayuda.html
+¦   clinicas-cateteres.html
+¦   contactanos.html
+¦   normas.html
+¦   publicaciones.html
+¦   
++---acerca-de
+¦       antecedentes.html
+¦       atribuciones.html
+¦       directorio.html
+¦       mision.html
+¦       siarhe.html
+¦       vision.html
+¦       
++---normas
+¦       normatividad.html
+¦       operacion.html
+¦       
++---publicaciones
+        datos-abiertos.html
+        documentos.html
+        libros.html
+        
 
 ================================
  scripts
 ================================
-Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
-El número de serie del volumen es 1983-1116
-G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\SCRIPTS
+Listado de rutas de carpetas
+El número de serie del volumen es 6076-4BBE
+D:\USERS\JUAN.DELACRUZ\DOCUMENTS\PROYECTOS\D3_JS_MX_RHE2025\SCRIPTS
 ¦   inyectar-layout.js
 ¦   
++---componentes
+¦       indicador-control.js
+¦       marcadores-control.js
+¦       zoom-controles.js
+¦       
 +---maps
-¦       republica-mexicana.js
-¦       nayarit.js
 ¦       aguascalientes.js
-¦       chihuahua.js
-¦       nuevo-leon.js
-¦       queretaro.js
-¦       campeche.js
+¦       baja-california-sur.js
 ¦       baja-california.js
+¦       campeche.js
+¦       chiapas.js
+¦       chihuahua.js
 ¦       ciudad-de-mexico.js
-¦       estado-de-mexico.js
+¦       clinicas-cateteres.js
+¦       coahuila.js
 ¦       colima.js
 ¦       durango.js
-¦       tlaxcala.js
-¦       coahuila.js
+¦       estado-de-mexico.js
+¦       guanajuato.js
+¦       guerrero.js
+¦       hidalgo.js
+¦       jalisco.js
+¦       michoacan.js
 ¦       morelos.js
+¦       nayarit.js
+¦       nuevo-leon.js
 ¦       oaxaca.js
 ¦       puebla.js
-¦       zacatecas.js
-¦       hidalgo.js
-¦       guerrero.js
-¦       sonora.js
-¦       tamaulipas.js
-¦       guanajuato.js
-¦       veracruz.js
-¦       baja-california-sur.js
-¦       sinaloa.js
-¦       michoacan.js
-¦       tabasco.js
-¦       san-luis-potosi.js
-¦       chiapas.js
-¦       jalisco.js
+¦       queretaro.js
 ¦       quintana-roo.js
+¦       republica-mexicana.js
+¦       san-luis-potosi.js
+¦       sinaloa.js
+¦       sonora.js
+¦       tabasco.js
+¦       tamaulipas.js
+¦       tlaxcala.js
+¦       veracruz.js
 ¦       yucatan.js
-¦       clinicas-cateteres.js
+¦       zacatecas.js
 ¦       
 +---utils
-¦       tabla-municipios.js
-¦       config-mapa.js
-¦       tooltip.js
-¦       cargar-indicadores.js
-¦       window.indicadoresSIARHE.js
-¦       marcadores.js
-¦       tablas.js
-¦       normalizacion.js
-¦       enlaces.js
-¦       marcadores.config.js
-¦       
-+---componentes
-        indicador-control.js
-        zoom-controles.js
-        marcadores-control.js
+        cargar-indicadores.js
+        config-mapa.js
+        enlaces.js
+        marcadores.config.js
+        marcadores.js
+        metricas.js
+        normalizacion.js
+        tabla-municipios.js
+        tablas.js
+        tooltip.js
+        window.indicadoresSIARHE.js
         
 
 ================================
- data
+ styles
 ================================
-Listado de rutas de carpetas para el volumen enfcarloseligio@gmail.com - G...
-El número de serie del volumen es 1983-1116
-G:\MI UNIDAD\TRABAJO\PROYECTOS\GEOESPACIAL\D3_JS_MX_RHE2025\DATA
-+---rate
-¦       nayarit.csv
-¦       aguascalientes.csv
-¦       republica-mexicana.csv
-¦       coahuila.csv
-¦       baja-california-sur.csv
-¦       jalisco.csv
-¦       yucatan.csv
-¦       oaxaca.csv
-¦       queretaro.csv
-¦       campeche.csv
-¦       baja-california.csv
-¦       sinaloa.csv
-¦       quintana-roo.csv
-¦       chihuahua.csv
-¦       hidalgo.csv
-¦       colima.csv
-¦       tabasco.csv
-¦       veracruz.csv
-¦       zacatecas.csv
-¦       estado-de-mexico.csv
-¦       tlaxcala.csv
-¦       san-luis-potosi.csv
-¦       guanajuato.csv
-¦       nuevo-leon.csv
-¦       tamaulipas.csv
-¦       ciudad-de-mexico.csv
-¦       puebla.csv
-¦       morelos.csv
-¦       chiapas.csv
-¦       guerrero.csv
-¦       michoacan.csv
-¦       sonora.csv
-¦       durango.csv
-¦       
-+---maps
-¦       nayarit.geojson
-¦       tabasco.geojson
-¦       baja-california-sur.geojson
-¦       tlaxcala.geojson
-¦       colima.geojson
-¦       sonora.geojson
-¦       san-luis-potosi.geojson
-¦       puebla.geojson
-¦       guanajuato.geojson
-¦       jalisco.geojson
-¦       sinaloa.geojson
-¦       zacatecas.geojson
-¦       chiapas.geojson
-¦       guerrero.geojson
-¦       estado-de-mexico.geojson
-¦       quintana-roo.geojson
-¦       tamaulipas.geojson
-¦       michoacan.geojson
-¦       oaxaca.geojson
-¦       baja-california.geojson
-¦       yucatan.geojson
-¦       coahuila.geojson
-¦       queretaro.geojson
-¦       nuevo-leon.geojson
-¦       durango.geojson
-¦       ciudad-de-mexico.geojson
-¦       campeche.geojson
-¦       morelos.geojson
-¦       veracruz.geojson
-¦       chihuahua.geojson
-¦       hidalgo.geojson
-¦       republica-mexicana.geojson
-¦       aguascalientes.geojson
-¦       
-+---indicators
-¦       indicadores-clave.csv
-¦       
-+---clinicas
-        clinicas-cateteres.csv
-        
+Listado de rutas de carpetas
+El número de serie del volumen es 6076-4BBE
+D:\USERS\JUAN.DELACRUZ\DOCUMENTS\PROYECTOS\D3_JS_MX_RHE2025\STYLES
+    contactanos.css
+    index.css
+    mapas.css
+    
+No existe ninguna subcarpeta 
+

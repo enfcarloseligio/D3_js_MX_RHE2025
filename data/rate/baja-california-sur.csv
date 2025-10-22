@@ -1,8 +1,8 @@
-id,CVE_ENT,CVE_MUN,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
-1,03,001,Comondú,73021,269,3.683871763
-2,03,002,Mulegé,64022,262,4.092343257
-3,03,003,La Paz,292241,1380,4.722130023
-4,03,004,Los Cabos,351111,826,2.35253239
-5,03,005,Loreto,18052,39,2.160425438
-8888,8888,8888,No Disponible,0,7,0
-9999,9999,9999,Total Baja California Sur,798447,2783,3.485516258
+id,CVE_ENT,CVE_MUN,MAPA,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_administrativas,tasa_administrativas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
+1,03,001,03001,Comondú,73021,269,3.683871763,39,0.534092932,226,3.095000068,0,0,0,0,0,0,4,0.054778762,0,0,0,0
+2,03,002,03002,Mulegé,64022,262,4.092343257,136,2.124269782,111,1.733779013,0,0,0,0,0,0,15,0.234294461,0,0,0,0
+3,03,003,03003,La Paz,292241,1380,4.722130023,186,0.636461003,1121,3.835875185,0,0,3,0.0102655,17,0.058171167,53,0.181357168,0,0,0,0
+4,03,008,03008,Los Cabos,351111,825,2.349684288,158,0.450000142,660,1.87974743,0,0,0,0,0,0,7,0.019936715,0,0,0,0
+5,03,009,03009,Loreto,18052,39,2.160425438,17,0.941723909,22,1.218701529,0,0,0,0,0,0,0,0,0,0,0,0
+8888,8888,8888,8888,No Disponible,0,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7,0
+9999,9999,9999,9999,Total Baja California Sur,798447,2782,3.484263827,536,0.671303167,2140,2.680202944,0,0,3,0.003757294,17,0.021291332,79,0.098942071,0,0,7,0.008767019
