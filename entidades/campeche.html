@@ -19,7 +19,7 @@
 
   <!-- Layout general -->
   <script src="../scripts/inyectar-layout.js"></script>
-  <!-- ⚠️ Script del mapa de Campeche -->
+  <!-- Script del mapa de Campeche -->
   <script type="module" src="../scripts/maps/campeche.js"></script>
 </head>
 
@@ -81,10 +81,10 @@
     })();
   </script>
 
-  <!-- Control de indicador -->
+  <!-- Control de indicador: crea <select id="sel-metrica"> -->
   <script type="module">
-    import { renderIndicadorControl } from "../scripts/componentes/indicador-control.js";
-    renderIndicadorControl("#indicador-control"); // crea <select id="sel-metrica">
+    import { renderIndicadorControl } from "../scripts/componentes/indicador-control.js"; /* :contentReference[oaicite:11]{index=11} */
+    renderIndicadorControl("#indicador-control");
   </script>
 </body>
 </html>

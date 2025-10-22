@@ -10,19 +10,33 @@ import {
   crearSVGBase, MAP_WIDTH, MAP_HEIGHT,
   crearLeyenda, descargarComoPNG, crearEtiquetaMunicipio,
   construirTitulo,
-  prepararEscalaYLeyenda,   // helper global (cuartiles, dominios, etc.)
-  COLOR_CERO, COLOR_SIN     // colores globales (0 y s/d)
+  prepararEscalaYLeyenda,   // helper global
+  COLOR_CERO, COLOR_SIN     // colores globales (exportados en config-mapa)
 } from '../utils/config-mapa.js';
 
-import { renderZoomControles } from '../componentes/zoom-controles.js';
+import { renderZoomControles } from '../componentes/zoom-controles.js'; // :contentReference[oaicite:6]{index=6}
 
 // Builder de tabla municipal + exportación Excel
-import { generarTablaMunicipios, habilitarDescargaExcel } from '../utils/tabla-municipios.js';
+import { generarTablaMunicipios, habilitarDescargaExcel } from '../utils/tabla-municipios.js'; // :contentReference[oaicite:7]{index=7}
 
 // Marcadores: control, rutas y estilos
-import { renderMarcadoresControl } from '../componentes/marcadores-control.js';
+import { renderMarcadoresControl } from '../componentes/marcadores-control.js'; // :contentReference[oaicite:8]{index=8}
 import { RUTAS_MARCADORES, normalizarClinicaRow } from '../utils/marcadores.config.js';
-import { MARCADORES_TIPOS, pintarMarcadores, crearLeyendaMarcadores } from '../utils/marcadores.js';
+import {
+  MARCADORES_TIPOS,
+  pintarMarcadores,
+  crearLeyendaMarcadores,
+  nombreTipoMarcador
+} from '../utils/marcadores.js'; // :contentReference[oaicite:9]{index=9}
+
+// Catálogo central de métricas
+import {
+  METRICAS,
+  metricLabel,
+  metricPalette,
+  tasaKey,
+  isPopulation
+} from '../utils/metricas.js';
 
 // ==============================
 // CREACIÓN DEL MAPA
@@ -44,18 +58,6 @@ const esDeCampecheRaw = (d) =>
     .padStart(2, "0") === ES_CVE_CAM
   || /campeche/i.test(String(d.Entidad || d.estado || d.entidad || ""));
 
-// Definición de métricas disponibles (igual que Tamaulipas)
-const METRICAS = {
-  tasa_total:       { label: "Tasa total",           tasaKey: "tasa_total",       countKey: "enfermeras_total",     palette: "tasas" },
-  tasa_primer:      { label: "Tasa 1er nivel",       tasaKey: "tasa_primer",      countKey: "enfermeras_primer",    palette: "tasas" },
-  tasa_segundo:     { label: "Tasa 2º nivel",        tasaKey: "tasa_segundo",     countKey: "enfermeras_segundo",   palette: "tasas" },
-  tasa_tercer:      { label: "Tasa 3er nivel",       tasaKey: "tasa_tercer",      countKey: "enfermeras_tercer",    palette: "tasas" },
-  tasa_apoyo:       { label: "Tasa en apoyo",        tasaKey: "tasa_apoyo",       countKey: "enfermeras_apoyo",     palette: "tasas" },
-  tasa_escuelas:    { label: "Tasa en escuelas",     tasaKey: "tasa_escuelas",    countKey: "enfermeras_escuelas",  palette: "tasas" },
-  tasa_no_aplica:   { label: "Tasa no aplica",       tasaKey: "tasa_no_aplica",   countKey: "enfermeras_no_aplica", palette: "tasas" },
-  tasa_no_asignado: { label: "Tasa no asignado",     tasaKey: "tasa_no_asignado", countKey: "enfermeras_no_asignado", palette: "tasas" },
-  poblacion:        { label: "Población",            tasaKey: "poblacion",        countKey: "poblacion",            palette: "poblacion" }
-};
 let currentMetric = "tasa_total";
 
 // ==============================
@@ -63,7 +65,7 @@ let currentMetric = "tasa_total";
 // ==============================
 Promise.all([
   d3.json("../data/maps/campeche.geojson"),
-  d3.csv("../data/rate/campeche.csv") // agrega ?v=Date.now() si quieres cache-buster
+  d3.csv("../data/rate/campeche.csv")
 ]).then(([geoData, tasasRaw]) => {
 
   // Año dinámico en título y etiquetas
@@ -73,18 +75,18 @@ Promise.all([
 
   // --- Parseo robusto ---
   const toNumber = v => {
-    const n = +v;
+    if (v == null) return NaN;
+    const n = +String(v).trim().replace(/\s+/g, "").replace(",", ".");
     return Number.isFinite(n) ? n : NaN;
   };
 
   const tasas = tasasRaw.map(d => ({
     ...d,
-    // soporta acento en población
+    // población (acepta 'población' o 'poblacion')
     poblacion: toNumber(d.poblacion ?? d['población']),
-    // totales
+    // totales + ámbitos
     enfermeras_total: toNumber(d.enfermeras_total),
     tasa_total:       toNumber(d.tasa_total),
-    // niveles
     enfermeras_primer:   toNumber(d.enfermeras_primer),
     tasa_primer:         toNumber(d.tasa_primer),
     enfermeras_segundo:  toNumber(d.enfermeras_segundo),
@@ -95,6 +97,8 @@ Promise.all([
     tasa_apoyo:          toNumber(d.tasa_apoyo),
     enfermeras_escuelas: toNumber(d.enfermeras_escuelas),
     tasa_escuelas:       toNumber(d.tasa_escuelas),
+    enfermeras_administrativas: toNumber(d.enfermeras_administrativas),
+    tasa_administrativas:       toNumber(d.tasa_administrativas),
     enfermeras_no_aplica:   toNumber(d.enfermeras_no_aplica),
     tasa_no_aplica:         toNumber(d.tasa_no_aplica),
     enfermeras_no_asignado: toNumber(d.enfermeras_no_asignado),
@@ -102,7 +106,7 @@ Promise.all([
   }));
 
   // Total de la entidad (fila id=9999 o TOTAL)
-  const filaTotal = tasasRaw.find(d => String(d.id) === "9999" || (d.municipio || "").toUpperCase() === "TOTAL");
+  const filaTotal = tasasRaw.find(d => String(d.id) === "9999" || (String(d.municipio || "").toUpperCase()) === "TOTAL");
   const totalEnt = filaTotal ? (Number(filaTotal.enfermeras_total ?? filaTotal.enfermeras) || 0)
                              : d3.sum(tasas, d => +d.enfermeras_total || 0);
   const spanTotal = document.getElementById("total-enfermeras-ent");
@@ -116,9 +120,9 @@ Promise.all([
     byMun[mun] = d;
   });
 
-  // Paleta por métrica
-  function paletteFor(metricKey) {
-    return METRICAS[metricKey].palette === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
+  // Paleta por métrica (según metricPalette)
+  function paletteFor(mk) {
+    return metricPalette(mk) === "poblacion" ? COLORES_POBLACION : COLORES_TASAS;
   }
 
   // ==============================
@@ -143,9 +147,9 @@ Promise.all([
       const row = byMun[nombre];
       d3.select(this).attr("stroke-width", 1.5);
       mostrarTooltip(tooltip, event, nombre, row, {
-        metricKey: METRICAS[currentMetric].tasaKey,
-        label: METRICAS[currentMetric].label,
-        onlyPopulation: currentMetric === "poblacion"
+        metricKey: tasaKey(currentMetric),
+        label: metricLabel(currentMetric),
+        onlyPopulation: isPopulation(currentMetric)
       });
     })
     .on("mousemove", event => {
@@ -158,15 +162,13 @@ Promise.all([
     });
 
   // ==============================
-  // REPINTADO (helpers globales)
+  // REPINTADO (usa helpers globales + métricas centralizadas)
   // ==============================
   function recomputeAndPaint() {
     const pal = paletteFor(currentMetric);
-    const esPob = (currentMetric === "poblacion");
+    const esPob = isPopulation(currentMetric);
 
-    // Conserva tu estrategia para población
     const extraPob = { capAtPercentile: 0.95 };
-    // const extraPob = { fixedDomain: [6000, 15000, 30000, 60000, 120000] };
 
     const { scale, legendCfg } = prepararEscalaYLeyenda(
       tasas,
@@ -174,8 +176,8 @@ Promise.all([
       currentMetric,
       {
         palette: pal,
-        titulo: METRICAS[currentMetric].label,
-        excludeIds: ["8888", "9999"], // ignora s/d y total
+        titulo: metricLabel(currentMetric),
+        excludeIds: ["8888", "9999"],
         idKey: "id",
         clamp: true,
         ...(esPob ? extraPob : {})
@@ -189,9 +191,9 @@ Promise.all([
         const nombre = (f.properties?.NOMGEO || f.properties?.NOMBRE || "").trim();
         const row = byMun[nombre];
         if (!row) return COLOR_SIN;
-        const v = +row[METRICAS[currentMetric].tasaKey];
+        const v = +row[tasaKey(currentMetric)];
         if (!Number.isFinite(v)) return COLOR_SIN;
-        if (!esPob && v <= 0)     return COLOR_CERO;  // 0.00 en gris
+        if (!esPob && v <= 0)     return COLOR_CERO;
         return scale(v);
       });
 
@@ -216,7 +218,7 @@ Promise.all([
   });
 
   // ==============================
-  // CAPA DE MARCADORES (opcional)
+  // CAPA DE MARCADORES
   // ==============================
   const gMarcadores = g.append("g").attr("class", "capa-marcadores");
   const ctlPorTipo = new Map();
@@ -281,7 +283,7 @@ Promise.all([
   // ==============================
   // PINTADO INICIAL
   // ==============================
-  const sel = document.getElementById("sel-metrica");
+  const sel = document.getElementById("sel-metrica"); // creado por Indicador Control :contentReference[oaicite:10]{index=10}
   if (sel) currentMetric = sel.value || currentMetric;
   recomputeAndPaint();
 
@@ -297,8 +299,13 @@ Promise.all([
     });
   }
 
-  // Selector de marcadores
-  const items = Object.values(MARCADORES_TIPOS).map(t => ({ value: t, label: t }));
+  // ==============================
+  // SELECTOR DE MARCADORES
+  // ==============================
+  const items = Object.values(MARCADORES_TIPOS).map(t => ({
+    value: t,
+    label: nombreTipoMarcador(t)
+  }));
   const marcCtl = renderMarcadoresControl("#control-marcadores", { items, label: "Marcadores", size: 4 });
   marcCtl.setSelected([]); // por defecto, sin marcadores
   marcCtl.onChange(async () => { await updateMarcadores(marcCtl.getSelected()); });
