@@ -199,7 +199,7 @@ h6 { font-size: 1rem; }
 
 /* Contenedor del menú */
 .menu-principal {
-  background-color: var(--color-Oro-Antiguo);
+  background-color: #3A0B1E;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -237,7 +237,7 @@ h6 { font-size: 1rem; }
   display: flex;
   justify-content: center;
   gap: 5px;
-  background-color: var(--color-Oro-Antiguo);
+  background-color: var(#3A0B1E);
 }
 
 .menu > li {
@@ -327,7 +327,7 @@ h6 { font-size: 1rem; }
     align-items: flex-end;
     min-height: 45px;
     padding: 0 10px;
-    background-color: var(--color-Oro-Antiguo);
+    background-color: #3A0B1E;
     position: relative;
     z-index: 100;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -351,7 +351,7 @@ h6 { font-size: 1rem; }
   .menu {
     display: none;
     flex-direction: column;
-    background-color: var(--color-Oro-Antiguo);
+    background-color: #3A0B1E;
     width: 100%;
     position: absolute;
     top: 100%;
