@@ -1,5 +1,5 @@
 id,CVE_ENT,CVE_MUN,MAPA,municipio,población,enfermeras_total,tasa_total,enfermeras_primer,tasa_primer,enfermeras_segundo,tasa_segundo,enfermeras_tercer,tasa_tercer,enfermeras_apoyo,tasa_apoyo,enfermeras_escuelas,tasa_escuelas,enfermeras_administrativas,tasa_administrativas,enfermeras_no_aplica,tasa_no_aplica,enfermeras_no_asignado,tasa_no_asignado
-1,27,001,27001,Balancán,58524,151,2.580138063,51,0.871437359,89,1.520743627,0,0,0,0,0,0,11,0.187957077,0,0,0,0
+1,27,001,27001,Balanc�n,58524,151,2.580138063,51,0.871437359,89,1.520743627,0,0,0,0,0,0,11,0.187957077,0,0,0,0
 2,27,002,27002,Cárdenas,243229,577,2.37225002,218,0.896274704,347,1.426639093,0,0,0,0,0,0,12,0.049336222,0,0,0,0
 3,27,003,27003,Centla,107731,185,1.717240163,110,1.021061719,71,0.659048927,0,0,0,0,0,0,4,0.037129517,0,0,0,0
 4,27,004,27004,Centro,683607,4368,6.389636151,579,0.846977869,1548,2.264458965,2197,3.21383485,17,0.024868089,0,0,27,0.039496377,0,0,0,0
