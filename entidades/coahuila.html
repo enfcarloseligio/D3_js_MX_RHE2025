@@ -3,103 +3,90 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <!-- REEMPLAZAR: Descripción con el nombre del estado -->
-  <meta name="description" content="Visualización interactiva de la distribución de enfermeras en el Estado de {{ESTADO}} 2025." />
-  
-  <meta name="author" content="Secretaría de Salud - Dirección General de Calidad y Educación en Salud - Dirección de Enfermería" />
-  <meta name="keywords" content="enfermería, salud, SIARHE, enfermeras, México, distribución, mapa, 2025" />
-  
-  <!-- REEMPLAZAR: Título de la pestaña -->
-  <title>Distribución de Enfermeras en el Estado de {{ESTADO}} - Gobierno de México</title>
+
+  <!-- SEO -->
+  <title>SIARHE | Distribución de Profesionales de Enfermería en Coahuila</title>
+  <meta name="description" content="Mapa y tabla interactiva de la distribución de profesionales de enfermería en Coahuila por municipio e indicador seleccionado." />
 
   <!-- Estilos -->
   <link rel="stylesheet" href="../styles.css" />
   <link rel="stylesheet" href="../styles/mapas.css" />
 
-  <!-- Librerías externas -->
+  <!-- Libs -->
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  <!-- REEMPLAZAR: Nombre del archivo JS del mapa -->
-  <script type="module" src="../scripts/maps/{{archivoJS}}.js"></script>
-
-  <!-- Script para inyectar header, banner y footer -->
-  <script src="../scripts/inyectar-layout.js" defer></script>
+  <!-- Layout general -->
+  <script src="../scripts/inyectar-layout.js"></script>
+  <!-- Script del mapa de Coahuila -->
+  <script type="module" src="../scripts/maps/coahuila.js"></script>
 </head>
 
 <body>
-<main>
+  <main>
+    <nav aria-label="breadcrumb" class="migas">
+      <a href="../index.html">Inicio</a> &gt;
+      <a href="../republica-mexicana.html">República Mexicana</a> &gt;
+      <span>Coahuila</span>
+    </nav>
 
-  <!-- SECCIÓN PRINCIPAL DEL MAPA -->
-  <section class="mapa-entidad">
-    <!-- REEMPLAZAR: Título H1 con el nombre del estado -->
-    <h1>¿Cuántas enfermeras hay en {{ESTADO}} en 2025?</h1>
-    
-    <!-- REEMPLAZAR: Total de enfermeras y municipios -->
-    <p class="bienvenida">
-      En el año 2025, el estado de {{ESTADO}} cuenta con un total de <strong>{{TOTAL_ENFERMERAS}}</strong> enfermeras distribuidas en sus {{TOTAL_MUNICIPIOS}} municipios, de acuerdo con datos oficiales del Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE). Esta cifra refleja los esfuerzos del sistema de salud por garantizar el acceso equitativo a los servicios de enfermería en toda la entidad.
-    </p>
+    <section class="mapa-entidad">
+      <h1>¿Cuántas enfermeras hay en Coahuila en <span class="year"></span>?</h1>
+      <p class="bienvenida">
+        En el año <span class="year"></span>, Coahuila cuenta con
+        <strong><span id="total-enfermeras-ent">—</span> enfermeras</strong>
+        distribuidas en sus municipios, según el SIARHE.
+      </p>
 
-    <!-- REEMPLAZAR: Nombre del estado -->
-    <h2>Distribución de enfermeras en los municipios de {{ESTADO}}</h2>
-    <p>
-      A continuación se muestra un mapa interactivo que representa la tasa de enfermeras por cada mil habitantes en los municipios de {{ESTADO}}. 
-      Utiliza los botones de zoom (+/–) para acercar o alejar el mapa, y el botón de reinicio (⟳) para volver a la vista general. Al pasar el cursor sobre cada municipio, podrás ver la tasa específica de enfermeras por cada mil habitantes.
-    </p>
+      <h2>Distribución por municipio en <span class="year"></span></h2>
+      <p>
+        Selecciona el indicador en el control inferior. Usa (+/–) para zoom. Al pasar el cursor sobre un municipio verás el valor del indicador.
+        Puedes activar <em>marcadores</em> (clínicas, etc.) si están disponibles.
+      </p>
 
-    <!-- REEMPLAZAR: ID del contenedor de mapa con el nombre del archivo JS -->
-    <div id="mapa-{{archivoJS}}" class="mapa-wrapper">
-      <!-- Aquí se inyecta el mapa SVG dinámicamente -->
-      <div class="zoom-controles"></div>
-    </div>
-
-    <p id="nota">
-      <em>
-        Nota: La tasa se calcula con base en el Censo de Población y Vivienda 2020 (INEGI) y la Información del SIARHE (28 de enero de 2025).
-        <br>Secretaría de Salud. (enero, 2025). Sistema de Información Administrativa de Recursos Humanos en Enfermería (SIARHE).
-      </em>
-    </p>
-
-    <!-- Botones para descargar el mapa -->
-    <div class="descarga-container">
-      <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
-      <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
-    </div>
-  </section>
-
-  <!-- SECCIÓN DE TABLA -->
-  <!-- REEMPLAZAR: clase con el nombre del archivo JS (opcional) -->
-  <section class="tabla-{{archivoJS}}">
-    <!-- REEMPLAZAR: Nombre del estado -->
-    <h2>Tasa de enfermeras por municipio en {{ESTADO}} (2025)</h2>
-    <p>
-      Esta tabla presenta un resumen detallado de cada municipio del estado, mostrando el número total de enfermeras, su población y la tasa de enfermeras por cada mil habitantes. Esta información es útil para la toma de decisiones en salud pública, distribución de recursos y evaluación de cobertura.
-    </p>
-
-    <div class="tabla-scroll">
-      <div id="tabla-contenido">
-        <!-- La tabla se carga con JS -->
+      <div id="barra-controles" class="controles-grid">
+        <div id="indicador-control"></div>
+        <div id="control-marcadores"></div>
       </div>
-    </div>
 
-    <div class="descarga-container">
-      <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
-    </div>
-  </section>
+      <div id="mapa-entidad" class="mapa-wrapper">
+        <div class="zoom-controles"></div>
+      </div>
 
-</main>
+      <p id="nota">
+        <strong>Nota:</strong> Tasas calculadas con población INEGI 2020 y SIARHE (corte vigente).
+        Los intervalos de color usan min, cuartiles (Q1, mediana, Q3) y máximo de la distribución municipal.
+        <br/><strong>Fuente:</strong> Dirección de Enfermería – DGCES. SIARHE.
+      </p>
 
-<!-- REEMPLAZAR: nombre del archivo CSV con el de la entidad -->
-<script type="module">
-  import { generarTablaMunicipios, habilitarDescargaExcel } from '../scripts/utils/tabla-municipios.js';
+      <div class="descarga-container">
+        <button id="descargar-sin-etiquetas" class="boton">🗺️ Descargar 🗺️</button>
+        <button id="descargar-con-etiquetas" class="boton">📝 Descargar 📝</button>
+      </div>
+    </section>
 
-  generarTablaMunicipios('../data/tasas/tasas-enfermeras-{{archivoJS}}.csv');
+    <section class="tabla-nacional">
+      <h2>Tabla municipal (<span class="year"></span>)</h2>
+      <p>Se actualiza según el indicador seleccionado.</p>
+      <div class="tabla-scroll"><div id="tabla-contenido"></div></div>
+      <div class="descarga-container">
+        <button id="descargar-excel" class="boton">📥 Descargar Excel</button>
+      </div>
+    </section>
+  </main>
 
-  const nombreEntidad = location.pathname.split("/").pop().replace(".html", "");
-  habilitarDescargaExcel(`enfermeras-${nombreEntidad}.xlsx`);
-</script>
+  <script>
+    (function () {
+      const y = new Date().getFullYear();
+      document.querySelectorAll('.year').forEach(el => el.textContent = y);
+    })();
+  </script>
 
+  <!-- Control de indicador -->
+  <script type="module">
+    import { renderIndicadorControl } from "../scripts/componentes/indicador-control.js";
+    renderIndicadorControl("#indicador-control"); // crea <select id="sel-metrica">
+  </script>
 </body>
 </html>
